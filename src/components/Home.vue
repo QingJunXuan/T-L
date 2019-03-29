@@ -13,24 +13,28 @@
         </div>
       </div>
     </div>
-    <el-dialog title="登录" :visible.sync="loginTableVisible" class="login-container">
+    <el-dialog :visible.sync="loginTableVisible" width="500px" :center="true">
       <div style="padding: 10px 70px 10px 70px">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="0px">
+        <h2>LOGIN</h2>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="0px" style="margin-top: 25px">
           <el-form-item prop="account">
             <el-input type="text" v-model="ruleForm.account" auto-complete="off" placeholder="账号"></el-input>
           </el-form-item>
           <el-form-item prop="checkPass">
             <el-input type="password" v-model="ruleForm.password" auto-complete="off" placeholder="密码"></el-input>
           </el-form-item>
-          <el-form-item style="width:100%;">
-            <el-button type="primary" style="width:100%;" @click="handleLogin" :loading="logining">登录</el-button>
-            <el-button type="text" @click="showRegister" >没有账号？点击注册</el-button>
-          </el-form-item>
+          <div style="width:100%;" align="center">
+            <el-button type="primary" class="form-button" @click="handleLogin" :loading="logining">登录</el-button>
+          </div>
+          <div style="width:100%;" align="center">
+            <el-button type="text" class="form-text-button" @click="showRegister">注册账号</el-button>
+          </div>
         </el-form>
       </div>
     </el-dialog>
-    <el-dialog title="注册" :visible.sync="registerTableVisible" class="register-container">
+    <el-dialog :visible.sync="registerTableVisible" width="900px" :center="true">
       <div style="padding: 10px 70px 10px 70px">
+        <h2>REGISTER</h2>
         <el-form :model="ruleForm1" :rules="rules1" status-icon ref="ruleForm1" label-position="left" label-width="80px" style="margin: 50px auto;">
           <el-row :gutter="30">
             <el-col :span="12">
@@ -78,7 +82,9 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-button type="primary" style="width:40%; margin-top: 20px" @click="handleRegister" :loading="registering">注册</el-button>
+          <div align="center">
+            <el-button type="primary" class="form-button" style="width: 40%" @click="handleRegister" :loading="registering">注册</el-button>
+          </div>
         </el-form>
       </div>
     </el-dialog>
@@ -211,8 +217,8 @@
         handleLogin(ev) {
           this.$refs.ruleForm.validate((valid) => {
             let that = this;
-            that.logining = true;
             if (valid) {
+              that.logining = true;
               that.$http.post('/api/auth', {
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
@@ -244,8 +250,8 @@
         handleRegister(ev) {
           this.$refs.ruleForm1.validate((valid) => {
             let that = this;
-            that.registering = true;
             if (valid) {
+              that.registering = true;
               that.$http.post('/api/register', {
                 mail: this.ruleForm1.email,
                 password: this.ruleForm1.password,
@@ -264,7 +270,7 @@
                 this.showLogin();
               }, response => {
                 console.log('注册失败：', response);
-                that.logining = false;
+                that.registering = false;
                 that.$notify.error({
                   title: '注册失败',
                   message: '网络错误',
@@ -281,10 +287,13 @@
         showLogin() {
           this.registerTableVisible = false;
           this.loginTableVisible = true;
+        },
+        getData(val) {
+          this.loginTableVisible = val;
         }
       },
-      mounted () {
-        bus.$on('loginVisible', this.loginTableVisible);
+      created () {
+        bus.$on('loginVisible', (val) => this.getData(val));
       }
     }
 </script>
@@ -341,14 +350,23 @@
     width: 100%;
   }
 
-  .login-container {
-    margin: 0 auto;
-    width: 1000px;
+  .form-button {
+    width:100%;
+    margin-top: 20px;
+    letter-spacing: 15px;
+    text-indent: 15px;
+    background-color: #01edc9;
+    border-color: #01edc9;
+    color: #fff;
+    font-weight: 900;
+    font-family: 黑体;
   }
 
-  .register-container {
-    margin-left: -150px;
-    width: 1800px;
-    height: 700px;
+  .form-text-button {
+    width:100%;
+    margin-top: 10px;
+    color: #8A8A8A;
+    font-weight: 900;
+    font-family: 黑体;
   }
 </style>
