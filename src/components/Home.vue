@@ -156,8 +156,8 @@
           ruleForm1: {
             email: '',
             name: '',
-            gender: '0',
-            auth: '0',
+            gender: '男',
+            auth: '学生',
             number: '',
             password: '',
             repassword: '',
@@ -165,15 +165,15 @@
             imgUrl: '',
           },
           genderOptions:[
-            {value:'0', label:'男'},
-            {value:'1', label:'女'}
+            {value:'男', label:'男'},
+            {value:'女', label:'女'}
           ],
           authOptions:[{
-            value:'0',// Evan: 这里请填入接口中定义的学生和老师对应编号
+            value:'学生',
             label:'学生'
           },{
-            value:'1',
-            label:'教师'
+            value:'老师',
+            label:'老师'
           }],
           rules1: {
             email:[
