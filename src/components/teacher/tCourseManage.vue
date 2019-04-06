@@ -1,10 +1,10 @@
 <template>
   <div style="height:550px">
     <el-col :span="20" :offset="2">
-      <el-row :gutter="40">
-        <el-col :span="3" style="margin-top:10px">
-          <el-button type="primary" size="mini" @click="isPlus=true">添加课程</el-button>
-        </el-col>
+      <el-row>
+          <el-col :span="16" :offset="4">
+              <el-card style="margin-top:10px;height:200px"><p>demo1</p></el-card>
+          </el-col>
       </el-row>
       <el-row :gutter="40">
         <el-col :span="8" v-for="(item,index) in items" :key="index">
@@ -27,31 +27,13 @@
           </el-card>
         </el-col>
       </el-row>
-      <el-dialog :visible.sync="isPlus" title="添加课程" width="30%" center>
-        <el-form>
-          <el-form-item label="邀请码" label-width="70px">
-            <el-input v-model="code" auto-complete="off" placeholder="请输入邀请码"></el-input>
-          </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="isPlus=false" size="mini">取消</el-button>
-          <el-button type="primary" @click="submit" size="mini">确认</el-button>
-        </span>
-      </el-dialog>
-      <el-dialog :visible.sync="isConfirm" title="课程信息确认" width="25%" center>
-        <span>{{courseConfirm.courseInfo.courseName}}{{courseConfirm.courseInfo.teacherName}}</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="isConfirm=false" size="mini">返回</el-button>
-          <el-button type="primary" @click="confirm" size="mini">确认</el-button>
-        </span>
-      </el-dialog>
     </el-col>
   </div>
 </template>
 <script>
 import axios from "axios";
 export default {
-  name: "courseManagement",
+  name: "tCourseManage",
   data() {
     return {
       code: "",
@@ -134,45 +116,9 @@ export default {
       });
   }, */
   methods: {
-    submit: function() {
-     /*  axios
-        .get("/api/getCourseByCode", {
-          params: {
-            courseCode: this.code
-          }
-        })
-        .then(resp => {
-          console.log(resp.data);
-          this.courseConfirm = resp.data;
-          //this.items.push(resp.data);
-        })
-        .catch(err => {
-          console.log(err);
-        }); */
-      this.isConfirm = true;
-    },
-    confirm() {
-      this.isPlus = false;
-      this.isConfirm = false;
-      /* axios
-        .get("/api/getCourseByCode", {
-          params: {
-            studentID: 1,
-            courseClassID: this.courseConfirm.courseClass.id
-          }
-        })
-        .then(resp => {
-          console.log(resp);
-          this.$message(resp.message)
-        })
-        .catch(err => {
-          console.log(err);
-        }); */
-      this.code=""
-    },
     courseDetail: function(courseID) {
       this.$router.push({
-        path: "/courseDetail",
+        path: "/teacher/courseDetail",
         query: {
           courseID: courseID
         }
@@ -180,7 +126,7 @@ export default {
     },
     homework() {
       this.$router.push({
-        path: "/courseDetail/currentHomework",
+        path: "/teacher/currentHomework",
         query: {
           chapterID: chapterID
         }
@@ -217,7 +163,7 @@ export default {
 }
 .top {
   /*   background-color: rgba(54, 88, 241, 0.808);*/
-  background-image: url(../assets/course/img-2.jpg);
+  background-image: url(../../assets/course/img-2.jpg);
   /* background-image: image-set(); */
   height: 100px;
 }

@@ -1,8 +1,9 @@
 <template>
-    <div></div>
+    <div>loading</div>
 </template>
 <script>
 export default {
+    name:'sChapterDetail',
     data(){
 
     }

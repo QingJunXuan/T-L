@@ -9,6 +9,10 @@
       <el-row>
         <div style="line-height:200px">JAVA</div>
       </el-row>
+      <el-row>
+        <el-col :span="1" :offset="21"><el-button type="text" @click="stuDetail">学生</el-button></el-col>
+        <el-col :span="2"><el-button type="text" @click="couAnalysis">课程分析</el-button></el-col>
+      </el-row>
     </el-row>
     <el-row>
       <div class="tabs">
@@ -28,8 +32,8 @@
           </div>
         </el-col>
         <el-col :span="4">
-          <div @click="getAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
-            <el-button type="text" class="tab" :class="{'clickButton':isAnalysis}">学习分析</el-button>
+          <div @click="getGrade" class="tabBack" :class="{'clickDiv':isGrade}">
+            <el-button type="text" class="tab" :class="{'clickButton':isGrade}">评分</el-button>
           </div>
         </el-col>
       </div>
@@ -37,23 +41,29 @@
     <el-row>
       <div style="background-color:rgba(118, 162, 163, 0.26);">
         <div v-show="isNotice" class="noticeBack">
-          <el-col :span="12" :offset="6">
-            <div class="notice">{{notice}}</div>
+          <el-col :span="10" :offset="7">
+            <div class="notice">{{textarea}}</div>
+            <el-input type="textarea" :rows="5" placeholder="请输入课程介绍" v-model="textarea"></el-input>
           </el-col>
         </div>
         <div v-show="isLesson" class="noticeBack">
-          <el-col :span="14" :offset="5" style="margin-top:-50px">
-            <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
-          </el-col>
-        </div>
-        <div v-show="isAnalysis" class="analysisBack">
           <el-row>
-            <el-col :span="12" :offset="6">
-              <p style="text-align:left">学习进度：</p>
-              <el-progress :text-inside="true" :stroke-width="18" :percentage="rate"></el-progress>
+            <el-col :span="1" :offset="17" style="margin-top:-90px">
+              <el-button type="text" @click="editChapter">编辑章节</el-button>
             </el-col>
           </el-row>
-          <el-row></el-row>
+          <el-row>
+            <el-col :span="12" :offset="6" style="margin-top:-40px">
+              <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+            </el-col>
+          </el-row>
+        </div>
+        <div v-show="isGrade" class="gradeBack">
+          <el-col :span="10" :offset="7" v-for="(item,index) in items" :key="index">
+            <el-row style="padding-bottom:20px">
+              <el-card @click="grade(item.id)" shadow="never" class="grade">{{item.content}}</el-card>
+            </el-row>
+          </el-col>
         </div>
       </div>
     </el-row>
@@ -62,54 +72,18 @@
 <script>
 import axios from "axios";
 export default {
+  name: "sCourseDetail",
   data() {
     return {
       courseID: 1,
       isNotice: true,
       isLesson: false,
-      isAnalysis: false,
+      isGrade: false,
       notice: "Java是一门面向对象编程语言.",
+      textarea: "",
       //data: null,
       rate: 20,
       lesson: null,
-      /* data: [
-        {
-          label: "一级 1",
-          children: [
-            {
-              label: "二级 1-1"
-            },
-            {
-              label: "课前"
-            },
-            {
-              label: "课后"
-            }
-          ]
-        },
-        {
-          label: "一级 2",
-          children: [
-            {
-              label: "二级 2-1"
-            },
-            {
-              label: "二级 2-2"
-            }
-          ]
-        },
-        {
-          label: "一级 3",
-          children: [
-            {
-              label: "二级 3-1"
-            },
-            {
-              label: "二级 3-2"
-            }
-          ]
-        }
-      ], */
       data: [
         {
           id: 1,
@@ -150,7 +124,17 @@ export default {
       defaultProps: {
         children: "subCatalog",
         label: "contentName"
-      }
+      },
+      items:[{
+        id:1,
+        content:"点击开始评分-1"
+      },{
+        id:2,
+        content:"开始评分-2"
+      },{
+        id:3,
+        content:"开始评分-3"
+      }]
     };
   },
   created() {
@@ -171,7 +155,7 @@ export default {
       if (this.isNotice == false) {
         this.isNotice = true;
         this.isLesson = false;
-        this.isAnalysis = false;
+        this.isGrade = false;
         /* axios.get("/api/getNoticeByCouID", {
             params: {
               courseID: this.courseID
@@ -187,42 +171,48 @@ export default {
       if (this.isLesson == false) {
         this.isNotice = false;
         this.isLesson = true;
-        this.isAnalysis = false;
+        this.isGrade = false;
 
         axios
-      .get("/api/getCourseCatalog", {
-        params: {
-          courseID: this.courseID
-        }
-      })
-      .then(resp => {
-        console.log(this.data);
-        //this.data = resp.data;
-        console.log(resp.data);
-        console.log(this.courseID);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+          .get("/api/getCourseCatalog", {
+            params: {
+              courseID: this.courseID
+            }
+          })
+          .then(resp => {
+            console.log(this.data);
+            //this.data = resp.data;
+            console.log(resp.data);
+            console.log(this.courseID);
+          })
+          .catch(err => {
+            console.log(err);
+          });
       }
     },
-    getAnalysis() {
-      if (this.isAnalysis == false) {
+    getGrade() {
+      if (this.isGrade == false) {
         this.isNotice = false;
         this.isLesson = false;
-        this.isAnalysis = true;
+        this.isGrade = true;
       }
     },
+    grade() {},
     handleNodeClick(object) {
       this.$router.push({
-        name: "/courseDetail/lesson",
-        params: {
+        path: "/student/courseDetail",
+        query: {
           id: object.id
         }
       });
     },
+    editChapter() {},
     courseBack() {
-      this.$router.back({ path: "/courseManagement" });
+      this.$router.back({ path: "/student/courseManagement" });
+    },
+    stuDetail(){},
+    couAnalysis(){
+
     }
   }
 };
@@ -242,7 +232,7 @@ body {
   font-size: 25px;
   font-weight: 700;
   color: rgb(92, 87, 87);
-  background-image: url("../assets/course/img-8.jpg");
+  background-image: url("../../assets/course/img-8.jpg");
   background-size: cover;
 }
 .tabs {
@@ -274,14 +264,19 @@ body {
   font-family: "Courier New", Courier, monospace;
   /* text-align: justify; */
   white-space: pre-wrap;
-  margin-top: -20px;
+  margin-top: -50px;
+  padding-bottom: 30px;
 }
 .noticeBack {
   padding: 150px 0;
 }
-.analysisBack {
+.gradeBack {
   padding: 20px 0;
   height: 500px;
+  padding-top: 50px;
+}
+.grade {
+  height: 80px;
 }
 .el-tree {
   background-color: rgba(118, 162, 163, 0.26);
