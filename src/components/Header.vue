@@ -6,8 +6,8 @@
 
           <div style="display: inline-block;"><i class="fa fa-leanpub" aria-hidden="true" style="margin-right: 10px;"></i><span style="letter-spacing:3px; font-weight: bold;">教与学</span></div>
           <div style="color: #fff; display: inline-block;">
-            <div class="subhead" style="top: 13px">专业在线教育平台</div>
-            <div class="subhead" style="top: 29px;">TEACH AND LEARN</div>
+            <div class="subhead" style="top: -6px">专业在线教育平台</div>
+            <div class="subhead" style="top: 8px;">TEACH AND LEARN</div>
           </div>
         </div>
       </el-col>
@@ -148,7 +148,8 @@
         cursor: pointer;
       }
       .subhead {
-        font: 12px 黑体;
+        font-size: 12px;
+        font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
         font-weight: bold;
         position: absolute;
         letter-spacing: 3px;
