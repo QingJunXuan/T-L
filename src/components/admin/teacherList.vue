@@ -3,7 +3,33 @@
     <el-row style="padding-top:20px">
       <el-col :span="20" :offset="2">
         <el-row>
-            <el-card></el-card>
+            
+		<!--列表-->
+		<el-table :data="teachers" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;text-align:center">
+			<el-table-column type="selection" width="50">
+			</el-table-column>
+			<el-table-column type="index" label="序号" width="70">
+			</el-table-column>
+			<el-table-column prop="teacherName" label="教师姓名" width="120" sortable>
+			</el-table-column>
+			<el-table-column prop="teacherCode" label="教师编号" width="120"  sortable>
+			</el-table-column>
+      <el-table-column prop="courseNum" label="开课数" width="100"  sortable>
+			</el-table-column>
+			<el-table-column prop="courseName" label="课程名" width="180" sortable>
+			</el-table-column>
+      <el-table-column prop="courseCode" label="课程编号" width="140" sortable>
+			</el-table-column>
+			<el-table-column prop="startTime" label="开课时间" width="150" sortable>
+			</el-table-column>
+			<el-table-column prop="endTime" label="结课时间" width="150" sortable>
+			</el-table-column>
+			<el-table-column label="操作" width="70">
+				<template slot-scope="scope">
+					<el-button type="primary" size="mini" @click="handleView(scope.$index, scope.row)">查看</el-button>
+				</template>
+			</el-table-column>
+		</el-table>
         </el-row>
       </el-col>
     </el-row>
@@ -15,82 +41,65 @@ export default {
     return {
       rate: null,
       textarea: "",
-      items: [
-        {
-          courseInfo: {
-            courseID: 1,
-            teacherID: 433,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            courseYear: 2018,
-            courseSemester: "秋季",
-            currentExerciseChapter: null,
-            startTime: "2018-09-01",
-            endTime: "2019-01-31"
-          },
-          courseClass: {
-            id: 1,
-            courseID: 1,
-            classNum: 1,
-            classCode: "100001"
-          }
-        },
-        {
-          courseInfo: {
-            courseID: 2,
-            teacherID: 433,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            courseYear: 2018,
-            courseSemester: "秋季",
-            currentExerciseChapter: null,
-            startTime: "2018-09-01",
-            endTime: "2019-01-31"
-          },
-          courseClass: {
-            id: 2,
-            courseID: 2,
-            classNum: 1,
-            classCode: "100001"
-          }
-        },
-        {
-          courseInfo: {
-            courseID: 3,
-            teacherID: 433,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            courseYear: 2018,
-            courseSemester: "秋季",
-            currentExerciseChapter: null,
-            startTime: "2018-09-01",
-            endTime: "2019-01-31"
-          },
-          courseClass: {
-            id: 3,
-            courseID: 3,
-            classNum: 1,
-            classCode: "100001"
-          }
-        }
-      ]
+      teachers:[{
+        teacherName:"李老师",
+        teacherCode:'1001',
+        courseNum:2,
+        courseName:'软件项目与过程管理',
+        courseCode:'100001',
+        startTime:'2018-9-1',
+        endTime:'2019-2-1',
+      },{
+        teacherName:"王老师",
+        teacherCode:'1002',
+        courseNum:1,
+        courseName:'JAVA',
+        courseCode:'100002',
+        startTime:'2018-9-1',
+        endTime:'2019-2-1',
+      },{
+        teacherName:"李老师",
+        teacherCode:'1001',
+        courseNum:2,
+        courseName:'web系统与技术',
+        courseCode:'100003',
+        startTime:'2018-9-1',
+        endTime:'2019-2-1',
+      },{
+        teacherName:"张老师",
+        teacherCode:'1004',
+        courseNum:1,
+        courseName:'软件测试',
+        courseCode:'100004',
+        startTime:'2018-9-1',
+        endTime:'2019-2-1',
+      },{
+        teacherName:"赵老师",
+        teacherCode:'1005',
+        courseNum:1,
+        courseName:'安全体系结构与管理',
+        courseCode:'100005',
+        startTime:'2018-9-1',
+        endTime:'2019-2-1',
+      }],
+      sels:[], 
+      listLoading:false,
     };
   },
   methods: {
-    feedbackBack() {
-      this.$router.back({
-        path: "/student/courseDetail"
-      });
-    },
-    submit() {},
     edit() {
       this.$router.push({
-        path: "/admin/edit"
+        path: "/adminManage/edit"
       });
     },
-    chart() {},
-    courseList() {},
-    teacherList(){},
+    selsChange: function (sels) {
+        this.sels = sels;
+      },
+      handleView(){
+        this.$router.push({
+        path: "/adminManage/chart"
+      })
+      }
   }
 };
 </script>
@@ -132,46 +141,6 @@ body {
   line-height: 60px;
   padding-right: 40px;
   font-size: 25px;
-}
-.top {
-  /*   background-color: rgba(54, 88, 241, 0.808);*/
-  background-image: url(../../assets/course/img-5.jpg);
-  /* background-image: image-set(); */
-  height: 110px;
-  background-size: cover;
-}
-#name {
-  position: relative;
-  top: 25%;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: rgba(240, 248, 255, 0.925);
-}
-#name:hover {
-  text-decoration: underline;
-}
-#teacher {
-  font-size: 10px;
-  color: rgb(238, 235, 235);
-}
-#newest {
-  font-size: 11px;
-  color: rgb(36, 89, 187);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-#newest:hover {
-  text-decoration: underline;
-}
-.bottom {
-  height: 100px;
-  /* text-align: left; */
-  font: 12px 黑体;
-  font-weight: bold;
-  padding-top: 15px;
-  color: rgb(102, 161, 163);
 }
 </style>
 
