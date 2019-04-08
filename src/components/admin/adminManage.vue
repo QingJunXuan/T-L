@@ -36,9 +36,15 @@ export default {
     };
   },
   methods: {
-    chart() {},
-    courseList() {},
-    teacherList(){},
+    chart() {
+      this.$router.push('/adminManage/courseGraph')
+    },
+    courseList() {
+      this.$router.push('/adminManage/courseList')
+    },
+    teacherList(){
+      this.$router.push('/adminManage/teacherList')
+    },
   }
 };
 </script>

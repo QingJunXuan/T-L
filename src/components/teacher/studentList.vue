@@ -1,7 +1,8 @@
 <template>
   <el-container>
     <el-main>
-      <div style="padding-top: 10px; margin: 0 auto; width: 900px; min-height: 650px" align="start">
+      <div class="main" align="start">
+        <el-button @click="goBack"><i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回</el-button>
         <h4>学生列表</h4>
         <el-row :gutter="30">
           <el-col :span="8"><el-input placeholder="按学号查找" v-model="searchId" size="small"></el-input></el-col>
@@ -74,11 +75,25 @@
         }
       },
       methods: {
-
+        goBack() {
+          if (window.history.length <= 1) {
+            this.$router.push({path:'/'})
+            return false
+          } else {
+            this.$router.go(-1)
+          }
+        }
       }
     }
 </script>
 
 <style scoped>
+
+  .main {
+    padding-top: 10px;
+    margin: 0 auto;
+    width: 900px;
+    min-height: 650px
+  }
 
 </style>

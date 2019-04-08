@@ -1,9 +1,9 @@
 <template>
   <el-container>
     <el-main>
-      <div style="width: 800px;margin: 0 auto">
+      <div class="main">
         <el-row style="margin-bottom: 20px">
-          <el-col align="left" :span="12"><el-button><i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回</el-button></el-col>
+          <el-col align="left" :span="12"><el-button @click="goBack"><i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回</el-button></el-col>
           <el-col align="right" :span="12">
             <el-select v-model="index" placeholder="跳转学生">
               <el-option
@@ -22,9 +22,9 @@
             <span><el-button circle style="border-color: #fff" @click="index++" :class="index === studentInfo.length - 1? 'buttonHid' : ''"><i class="el-icon-arrow-right"></i></el-button></span>
           </div>
           <div>总成绩：{{totalScore[index]}}</div>
-          <div v-for="i in question.length" :key="i" align="start" style="font-size: 15px; padding: 15px 30px 15px 30px">
+          <div v-for="i in question.length" :key="i" align="start" class="question">
             <div>{{i}}.{{question[i - 1].content}}({{question[i-1].score}}分)</div>
-            <div style="background-color: #fcfcfc; min-height: 80px; padding: 10px 10px 10px 10px; margin-top: 15px;">
+            <div class="answer">
               答案：{{studentInfo[index].answer[i - 1]}}
             </div>
             <div style="margin-top: 15px">
@@ -154,7 +154,14 @@
           }
       },
       methods: {
-
+        goBack() {
+          if (window.history.length <= 1) {
+            this.$router.push({path:'/'})
+            return false
+          } else {
+            this.$router.go(-1)
+          }
+        }
       },
       computed: {
         totalScore() {
@@ -175,6 +182,23 @@
 <style scoped>
   .buttonHid {
     visibility: hidden;
+  }
+
+  .main {
+    width: 800px;
+    margin: 0 auto
+  }
+
+  .question {
+    font-size: 15px;
+    padding: 15px 30px 15px 30px
+  }
+
+  .answer {
+    background-color: #fcfcfc;
+    min-height: 80px;
+    padding: 10px 10px 10px 10px;
+    margin-top: 15px;
   }
 
 </style>

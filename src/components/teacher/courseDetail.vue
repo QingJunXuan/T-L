@@ -61,7 +61,7 @@
         <div v-show="isGrade" class="gradeBack">
           <el-col :span="10" :offset="7" v-for="(item,index) in items" :key="index">
             <el-row style="padding-bottom:20px">
-              <el-card @click="grade(item.id)" shadow="never" class="grade">{{item.content}}</el-card>
+              <el-card shadow="never" class="grade"><el-button type="text" @click="grade(item.id)">{{item.content}}</el-button></el-card>
             </el-row>
           </el-col>
         </div>
@@ -197,7 +197,15 @@ export default {
         this.isGrade = true;
       }
     },
-    grade() {},
+    grade(id) {
+      this.$router.push({
+        path: '/teacher/mark',
+        name: 'exerciseMark',
+        query: {
+          chapter_id: id
+        }
+      })
+    },
     handleNodeClick(object) {
       this.$router.push({
         path: "/student/courseDetail",
@@ -206,13 +214,17 @@ export default {
         }
       });
     },
-    editChapter() {},
+    editChapter() {
+      this.$router.push('/teacher/chapterEdit')
+    },
     courseBack() {
       this.$router.back({ path: "/student/courseManagement" });
     },
-    stuDetail(){},
+    stuDetail(){
+      this.$router.push('/teacher/studentList');
+    },
     couAnalysis(){
-
+      this.$router.push('/teacher/courseAnalysis');
     }
   }
 };
