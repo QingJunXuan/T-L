@@ -6,6 +6,10 @@
           <el-col :span="4" style="margin-top:10px">
             <el-button size="mini" @click="edit">编辑课程</el-button>
           </el-col>
+          <el-col :span="2" style="margin-top:10px">
+            <div v-if="!analysisMode"><el-button size="mini" @click="analysisMode = true">分析课程</el-button></div>
+            <div v-else><el-button size="mini" @click="analysisMode = false">退出分析课程</el-button></div>
+          </el-col>
         </el-row>
         <el-row>
           <el-col :span="7" :offset="1" v-for="(item,index) in items" :key="index">
@@ -13,13 +17,19 @@
               <el-row class="top">
                 <p
                   id="name"
+                  v-if="!analysisMode"
                   @click="courseDetail(item.courseInfo.courseID)"
+                >{{item.courseInfo.courseName}}</p>
+                <p
+                  id="toAnalysis"
+                  v-else
+                  @click="$router.push('/adminManage/courseAnalysis')"
                 >{{item.courseInfo.courseName}}</p>
                 <el-row><el-col :span="5" :offset="18" style="margin-top:10px">
                   <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
                 </el-col></el-row>
                 <el-row><el-col :span="5" :offset="18" >
-                  <span id="teacher">ID：{{item.courseInfo.teacherID}}</span>
+                  <span id="teacherID">ID：{{item.courseInfo.teacherID}}</span>
                 </el-col></el-row>
               </el-row>
               <el-row class="bottom">
@@ -103,7 +113,8 @@ export default {
             classCode: "100001"
           }
         }
-      ]
+      ],
+      analysisMode: false
     };
   },
   methods: {
@@ -172,6 +183,19 @@ body {
 #name:hover {
   text-decoration: underline;
 }
+
+#toAnalysis {
+  position: relative;
+  top: 25%;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(240, 248, 255, 0.925);
+}
+#toAnalysis:hover {
+  text-decoration: underline;
+}
+
 #teacher {
   font-size: 10px;
   color: rgb(238, 235, 235);

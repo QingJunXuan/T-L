@@ -38,20 +38,14 @@ export default {
   },
   methods: {
     chart() {
-      this.$router.push({
-        path: "/adminManage/chart"
-      });
+      this.$router.push('/adminManage/courseGraph')
     },
     courseList() {
-      this.$router.push({
-        path: "/adminManage/courseList"
-      });
+      this.$router.push('/adminManage/courseList')
     },
-    teacherList() {
-      this.$router.push({
-        path: "/adminManage/teacherList"
-      });
-    }
+    teacherList(){
+      this.$router.push('/adminManage/teacherList')
+    },
   }
 };
 </script>

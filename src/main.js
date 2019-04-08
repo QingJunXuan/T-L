@@ -17,19 +17,15 @@ Vue.prototype.$ajax = axios;
 Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false
 
-/*
 router.beforeEach((to, from, next) => {
   //NProgress.start();
-  if (to.path === '/home') {
-    localStorage.removeItem('username');
-  }
   let user = localStorage.getItem('username');
   if (!user && to.path !== '/home') {
     next({path: '/home'})
   } else {
     next()
   }
-});*/
+});
 
 /* eslint-disable no-new */
 new Vue({

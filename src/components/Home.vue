@@ -233,7 +233,8 @@
                   duration: 2000
                 });
                 setTimeout(function () {
-                  that.$router.push('/home');
+                  that.$router.push('/');
+                  //TODO: 根据身份跳转
                 }, 2000)
               }, response => {
                 console.log('登录失败：', response);
