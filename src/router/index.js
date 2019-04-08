@@ -11,6 +11,7 @@ import feedback from '../components/student/feedback.vue'
 import adminManage from '../components/admin/adminManage.vue'
 import courseList from '../components/admin/courseList.vue'
 import teacherList from '../components/admin/teacherList.vue'
+import chart from '../components/admin/chart.vue'
 
 Vue.use(Router)
 
@@ -81,6 +82,10 @@ export default new Router({
         path:'teacherList',
         name:'teacherList',
         component:teacherList,
+      },{
+        path:'chart',
+        name:'chart',
+        component:chart,
       }]
     }],
   mode: 'history',

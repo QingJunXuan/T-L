@@ -107,20 +107,11 @@ export default {
     };
   },
   methods: {
-    feedbackBack() {
-      this.$router.back({
-        path: "/student/courseDetail"
-      });
-    },
-    submit() {},
     edit() {
       this.$router.push({
-        path: "/admin/edit"
+        path: "/adminManage/edit"
       });
     },
-    chart() {},
-    courseList() {},
-    teacherList(){},
   }
 };
 </script>

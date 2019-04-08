@@ -16,7 +16,7 @@
       <!-- 点击跳转到分析页面 -->
       <el-col :span="1" class="icon-right">
         <i class="el-icon-share" @click="chart"></i>
-      </el-col>      
+      </el-col>
       <!-- 老师列表 -->
       <el-col :span="1" class="icon-right">
         <i class="el-icon-service" @click="teacherList"></i>
@@ -26,19 +26,32 @@
         <i class="el-icon-menu" @click="courseList"></i>
       </el-col>
     </el-row>
-    <el-row><router-view></router-view></el-row>
+    <el-row>
+      <router-view></router-view>
+    </el-row>
   </div>
 </template>
 <script>
 export default {
   data() {
-    return {
-    };
+    return {};
   },
   methods: {
-    chart() {},
-    courseList() {},
-    teacherList(){},
+    chart() {
+      this.$router.push({
+        path: "/adminManage/chart"
+      });
+    },
+    courseList() {
+      this.$router.push({
+        path: "/adminManage/courseList"
+      });
+    },
+    teacherList() {
+      this.$router.push({
+        path: "/adminManage/teacherList"
+      });
+    }
   }
 };
 </script>
