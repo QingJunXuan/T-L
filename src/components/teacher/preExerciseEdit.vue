@@ -1,12 +1,14 @@
 <template>
     <el-container>
       <div style="width: 700px; margin: 0 auto;" align="start">
-        <h4>客观题({{totalPreview}}分)</h4>
-        <div v-for="(item1, i) in exercises1" :key="i" align="start" style="font-size: 14px">
+        <h4>客观题({{totalScore}}分)</h4>
+        <div v-for="(item1, i) in exercises" :key="i" align="start" style="font-size: 14px">
+          <!-- 正常显示 -->
           <div v-if="item1.edit === false">
             <div style="margin-top: 8px">
               <span style="margin-left: 5px">{{i+1}}. {{item1.question}}（{{item1.score}}分）</span>
-              <span><el-button size="mini" circle icon="el-icon-edit" style="border-color: #fff" @click="item1.edit = true"></el-button></span>
+              <span><el-button size="mini" circle icon="el-icon-edit" style="border-color: #fff" @click="editMode(i)"></el-button></span>
+              <span><el-button size="mini" circle icon="el-icon-circle-close-outline" style="border-color: #fff" @click="deletePreview(i)"></el-button></span>
             </div>
             <div class="betweenspace" style="margin-top: 10px; padding: 0 10px 0 10px">
               <div v-for="(item2, j) in item1.options" :key="j">
@@ -22,12 +24,13 @@
               {{item1.detail}}
             </div>
           </div>
+          <!-- 编辑模式 -->
           <div v-else style="margin-bottom: 20px">
             <div style="margin-top: 8px">
               <p style="margin-left: 5px">{{i+1}}. </p>
               <p>
                 <el-input
-                  v-model="item1.question"
+                  v-model="exerciseNew.question"
                   type="textarea"
                   :autosize="{ minRows: 8, maxRows: 8}"
                   placeholder="题目内容">
@@ -36,7 +39,7 @@
               <el-row style="margin-top: 20px">
                 <el-col :span="12">
                   <div style="margin-top: 7px">
-                    <el-radio-group v-model="item1.type" >
+                    <el-radio-group v-model="exerciseNew.type" >
                       <el-radio :label="0">单选题</el-radio>
                       <el-radio :label="1">多选题</el-radio>
                     </el-radio-group>
@@ -45,16 +48,16 @@
                 <el-col :span="12">
                   <div align="end">
                     <span>分值</span>
-                    <span style="margin-left: 5px"><el-input size="mini" type="number" v-model="item1.score" style="width: 80px"></el-input></span>
+                    <span style="margin-left: 5px"><el-input size="mini" type="number" v-model="exerciseNew.score" style="width: 80px"></el-input></span>
                   </div>
                 </el-col>
               </el-row>
             </div>
             <div style="margin-top: 15px" class="betweenspace">
-              <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px" >
+              <div v-for="(item2, j) in exerciseNew.options" :key="j" style="margin-top: 10px" >
                 <span>{{String.fromCharCode(j+65)}}.</span>
-                <span><el-input v-model="item1.options[j]" size="mini" style="width: 280px"></el-input></span>
-                <span><el-button type="text" @click="item1.options.splice(j, 1)"><i class="el-icon-circle-close"></i></el-button></span>
+                <span><el-input v-model="exerciseNew.options[j]" size="mini" style="width: 280px"></el-input></span>
+                <span><el-button type="text" @click="exerciseNew.options.splice(j, 1)"><i class="el-icon-circle-close"></i></el-button></span>
               </div>
             </div>
             <div style="margin-top: 15px">
@@ -62,29 +65,29 @@
             </div>
             <div style="margin-top: 15px">
               <p>答案</p>
-              <p style="margin-top: 10px" v-if="item1.type === 0">
-                <el-radio-group v-model="item1.answer[0]">
-                  <el-radio v-for="j in item1.options.length" :key="j" :value="j - 1" :label="j - 1">{{String.fromCharCode(j+64)}}</el-radio>
+              <p style="margin-top: 10px" v-if="exerciseNew.type === 0">
+                <el-radio-group v-model="exerciseNew.answer[0]">
+                  <el-radio v-for="j in exerciseNew.options.length" :key="j" :value="j - 1" :label="j - 1">{{String.fromCharCode(j+64)}}</el-radio>
                 </el-radio-group>
               </p>
               <p style="margin-left: 10px" v-else>
-                <el-checkbox-group v-model="item1.answer">
-                  <el-checkbox v-for="j in item1.options.length" :key="j" :value="j - 1" :label="j - 1">{{String.fromCharCode(j+64)}}</el-checkbox>
+                <el-checkbox-group v-model="exerciseNew.answer">
+                  <el-checkbox v-for="j in exerciseNew.options.length" :key="j" :value="j - 1" :label="j - 1">{{String.fromCharCode(j+64)}}</el-checkbox>
                 </el-checkbox-group>
               </p>
             </div>
             <div style="margin-top: 15px">
               <p>解析</p>
               <el-input
-                v-model="item1.detail"
+                v-model="exerciseNew.detail"
                 type="textarea"
                 :autosize="{ minRows: 8, maxRows: 8}"
                 placeholder="请输入题目解析">
               </el-input>
             </div>
             <div style="margin-top: 20px">
-              <el-button size="mini" @click="item1.edit = false">确认</el-button>
-              <el-button size="mini" style="margin-left: 10px">重置</el-button>
+              <el-button size="mini" @click="saveEdit(i)">确认</el-button>
+              <el-button size="mini" style="margin-left: 10px" @click="cancelEdit(i)">重置</el-button>
             </div>
           </div>
         </div>
@@ -101,12 +104,12 @@
 
 <script>
     export default {
-        name: "preExerciseEdit",
+      name: "preExerciseEdit",
       data() {
           return {
             id: '',
             // 课前习题
-            exercises1 : [
+            exercises : [
               {
                 question: '这里是题目内容',
                 type: 0,
@@ -135,7 +138,8 @@
                 edit: false,
               }
             ],
-            totalPreview: 100,
+            exerciseNew: {},
+            totalScore: 0,
           }
       },
       methods: {
@@ -143,10 +147,10 @@
           this.id = this.$route.query.id;
         },
         addPreOptions(index) {
-          this.exercises1[index].options.push('请填写选项');
+          this.exercises[index].options.push('请填写选项');
         },
         addPreview() {
-          this.exercises1.push({
+          this.exercises.push({
             question: '',
             type: 0,
             options: ['请填写选项', '请填写选项'],
@@ -154,16 +158,65 @@
             answer: [0],
             detail: '',
             edit: true,
-          })
+          });
+          let last = this.exercises.length -1;
+          this.exerciseNew = this.objDeepCopy(this.exercises[last]);
         },
+        deletePreview(index) {
+          this.totalScore -= this.exercises[index].score;
+          this.exercises.splice(index, 1);
+        },
+        editMode(index) {
+          this.exercises[index].edit = true;
+          this.exerciseNew = this.objDeepCopy(this.exercises[index]);
+        },
+        saveEdit(index) {
+          if (this.exerciseNew.question === '' || Number(this.exerciseNew.score) === 0 || this.exerciseNew.detail === '') {
+            this.$message({
+              message: '请将习题内容填写完整！',
+              type: 'warning'
+            });
+          }
+          else {
+            let sum = this.totalScore;
+            sum -= this.exercises[index].score;
+            sum += Number(this.exerciseNew.score);
+            if (sum > 100) {
+              this.$message({
+                message: '总分超出最大值，请调整分数！',
+                type: 'warning'
+              });
+            }
+            else {
+              this.totalScore = sum;
+              this.exerciseNew.edit = false;
+              this.exercises.splice(index, 1, this.exerciseNew);
+            }
+          }
+        },
+        cancelEdit(index) {
+          this.exerciseNew = this.objDeepCopy(this.exercises[index]);
+        },
+        objDeepCopy(source) {
+          let sourceCopy = source instanceof Array ? [] : {};
+          for (let item in source) {
+            if (source.hasOwnProperty(item)) {
+              sourceCopy[item] = typeof source[item] === 'object' ? this.objDeepCopy(source[item]) : source[item];
+            }
+          }
+          return sourceCopy;
+        }
       },
       created() {
         this.getParams();
+        for (let i = 0;i < this.exercises.length;i++) {
+          this.totalScore += this.exercises[i].score;
+        }
       },
       watch: {
         // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
         '$route': 'getParams'
-      }
+      },
     }
 </script>
 

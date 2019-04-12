@@ -20,7 +20,7 @@
               <el-menu-item :index="index1.toString() + '001'">
                 <span><el-button type="text" @click="handleAddPoint(index1)" style="color: #fff">添加知识点</el-button></span>
               </el-menu-item>
-              <div v-for="(item2, index2) in item1.points" :key="index2">
+              <div v-for="(item2, index2) in item1.points" :key="index1*10+index2">
                 <el-row v-if="item2.edit === false" class="vertical-middle">
                   <el-col :span="4"><el-button type="text" size="mini" circle icon="el-icon-circle-close-outline" style="color: #fff;" @click="item1.points.splice(index2, 1)"></el-button></el-col>
                   <el-col :span="16"><router-link :to="{name: 'pointEdit', query:{id: index1.toString() + index2, name: item2.name}}" class="router-link-active"><el-menu-item :index="index1.toString() + index2">{{item2.name}}</el-menu-item></router-link></el-col>
@@ -168,7 +168,7 @@
             this.$router.push({path:'/'})
             return false
           } else {
-            this.$router.go(-1)
+            this.$router.push('/teacher/courseDetail')
           }
         },
         handleAddChapter() {
