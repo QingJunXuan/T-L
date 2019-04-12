@@ -16,10 +16,11 @@ import tStudentAnalysis from '../components/teacher/studentAnalysis.vue'
 import tExerciseMark from '../components/teacher/exerciseMark.vue'
 import tCourseAnalysis from '../components/teacher/courseAnalysis.vue'
 import feedback from '../components/student/feedback.vue'
-import adminManage from '../components/admin/adminManage.vue'
 import courseList from '../components/admin/courseList.vue'
 import teacherList from '../components/admin/teacherList.vue'
-import chart from '../components/admin/chart.vue'
+import aCourseAnalysis from '../components/admin/courseAnalysis.vue'
+import aCourseGraph from '../components/admin/courseGraph.vue'
+import adminManage from '../components/admin/adminManage.vue'
 
 Vue.use(Router)
 
