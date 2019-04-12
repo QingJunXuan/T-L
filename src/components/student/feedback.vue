@@ -30,6 +30,7 @@
 </template>
 <script>
 export default {
+  name:'feedback',
   data() {
     return {
       rate: null,

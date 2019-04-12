@@ -4,12 +4,12 @@
       <el-col :span="10" class="logo logo-width">
         <div>
           <div style="display: inline-block;padding-top:20px">
-            <i class="fa fa-leanpub" aria-hidden="true" style="margin-right: 10px;"></i>
+            <i class="fa fa-leanpub" aria-hidden="true" style="margin-right: 0px;"></i>
             <span style="letter-spacing:3px; font-weight: bold;">教与学</span>
           </div>
           <div style="color: #fff; display: inline-block;">
-            <div class="subhead" style="top: 13px">专业在线教育平台</div>
-            <div class="subhead" style="top: 29px;">TEACH AND LEARN</div>
+            <div class="subhead" style="top: 15px">专业在线教育平台</div>
+            <div class="subhead" style="top: 33px;">TEACH AND LEARN</div>
           </div>
         </div>
       </el-col>
@@ -33,12 +33,13 @@
 </template>
 <script>
 export default {
+  name:'adminManage',
   data() {
     return {};
   },
   methods: {
     chart() {
-      this.$router.push('/adminManage/courseGraph')
+      this.$router.push('/adminManage/courseAnalysis')
     },
     courseList() {
       this.$router.push('/adminManage/courseList')
@@ -87,6 +88,7 @@ body {
   line-height: 60px;
   padding-right: 40px;
   font-size: 25px;
+  cursor: pointer;
 }
 </style>
 

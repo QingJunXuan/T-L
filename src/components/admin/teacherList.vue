@@ -3,7 +3,6 @@
     <el-row style="padding-top:20px">
       <el-col :span="20" :offset="2">
         <el-row>
-            
 		<!--列表-->
 		<el-table :data="teachers" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;text-align:center">
 			<el-table-column type="selection" width="50">
@@ -12,7 +11,7 @@
 			</el-table-column>
 			<el-table-column prop="teacherName" label="教师姓名" width="120" sortable>
 			</el-table-column>
-			<el-table-column prop="teacherCode" label="教师编号" width="120"  sortable>
+			<el-table-column prop="teacherID" label="教师编号" width="120"  sortable>
 			</el-table-column>
       <el-table-column prop="courseNum" label="开课数" width="100"  sortable>
 			</el-table-column>
@@ -37,13 +36,14 @@
 </template>
 <script>
 export default {
+  name:'teacherList',
   data() {
     return {
       rate: null,
       textarea: "",
       teachers:[{
         teacherName:"李老师",
-        teacherCode:'1001',
+        teacherID:'1001',
         courseNum:2,
         courseName:'软件项目与过程管理',
         courseCode:'100001',
@@ -51,7 +51,7 @@ export default {
         endTime:'2019-2-1',
       },{
         teacherName:"王老师",
-        teacherCode:'1002',
+        teacherID:'1002',
         courseNum:1,
         courseName:'JAVA',
         courseCode:'100002',
@@ -59,7 +59,7 @@ export default {
         endTime:'2019-2-1',
       },{
         teacherName:"李老师",
-        teacherCode:'1001',
+        teacherID:'1001',
         courseNum:2,
         courseName:'web系统与技术',
         courseCode:'100003',
@@ -67,7 +67,7 @@ export default {
         endTime:'2019-2-1',
       },{
         teacherName:"张老师",
-        teacherCode:'1004',
+        teacherID:'1004',
         courseNum:1,
         courseName:'软件测试',
         courseCode:'100004',
@@ -75,7 +75,7 @@ export default {
         endTime:'2019-2-1',
       },{
         teacherName:"赵老师",
-        teacherCode:'1005',
+        teacherID:'1005',
         courseNum:1,
         courseName:'安全体系结构与管理',
         courseCode:'100005',

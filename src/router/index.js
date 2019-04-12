@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../components/Home.vue'
+import axios from 'axios'
 import Header from '../components/Header.vue'
 import sCourseManage from '../components/student/courseManage.vue'
 import sCourseDetail from '../components/student/courseDetail.vue'
@@ -19,16 +20,18 @@ import feedback from '../components/student/feedback.vue'
 import adminManage from '../components/admin/adminManage.vue'
 import courseList from '../components/admin/courseList.vue'
 import teacherList from '../components/admin/teacherList.vue'
-import chart from '../components/admin/chart.vue'
+import aCourseAnalysis from '../components/admin/courseAnalysis.vue'
+import aCourseGraph from '../components/admin/courseGraph.vue'
 
 Vue.use(Router)
-
+Vue.prototype.$ajax=axios
 export default new Router({
   routes: [
-    {
+   /*  {
       path: '/',
-      redirect: '/teacher/courseDetail'
-    }, {
+      redirect: '/home'
+    },  */
+    {
       path: '/',
       component: Header,
       name: '教与学',
