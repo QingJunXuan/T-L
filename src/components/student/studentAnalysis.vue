@@ -8,13 +8,7 @@
           </el-button>
         </el-row>
         <el-row>
-          <el-col :span="4">
-            <h4>1612345 学生姓名</h4>
-          </el-col>
-          <el-col :span="4"></el-col>
-          <el-col :span="4">
-            <h4>最近学到章节3</h4>
-          </el-col>
+          <h4>1612345 学生姓名</h4>
         </el-row>
         <el-row>
           <el-col :span="4">
@@ -27,13 +21,18 @@
             <h4>平均总成绩：85</h4>
           </el-col>
           <el-col :span="4">
+            <h4>最近学习到：章节3</h4>
+          </el-col>
+          <el-col :span="4">
             <h4>最近班级排名：10↑</h4>
           </el-col>
         </el-row>
         <el-row>
-          <el-collapse v-model="activeNames" style="margin-top: 20px">
+          <el-collapse v-model="activeNames">
+            
+
             <el-collapse-item title="成绩分析" name="1">
-              <el-row :gutter="10">
+              <el-row :gutter="10" >
                 <el-col :span="6" style="padding-top: 4%">
                   <el-row class="select-title">指标</el-row>
                   <el-row>
@@ -78,13 +77,12 @@
                     class="select-title"
                     v-if="comparison !== 2 && gradeAttribute !== 3"
                   >选择{{cOptions[comparison].label}}</el-row>
-                  <el-row v-if="comparison !== 0">
+                  <el-row v-if="comparison !== 2 && gradeAttribute !== 3">
                     <el-select
                       multiple
-                      size="small"
                       v-model="detail"
-                      :multiple-limit="cOptions[comparison].limit"
-                      :filterable="cOptions[comparison].filterable"
+                      size="small"
+                      :multiple-limit="cOptions[comparison].limit + 4"
                     >
                       <el-option
                         v-for="item in detailOptions"
@@ -94,61 +92,8 @@
                       ></el-option>
                     </el-select>
                   </el-row>
-                  <el-row v-if="comparison === 0 && gradeAttribute === 3">
-                    <el-row>
-                      <el-cascader
-                        :options="studentOptions"
-                        v-model="studentMap[0]"
-                        @change="handleChange(0)"
-                        filterable
-                        clearable
-                      ></el-cascader>
-                    </el-row>
-                  </el-row>
-                  <el-row v-if="comparison === 0 && gradeAttribute !== 3">
-                    <el-row>
-                      <el-cascader
-                        :options="studentOptions"
-                        v-model="studentMap[0]"
-                        @change="handleChange(0)"
-                        filterable
-                        size="small"
-                        clearable
-                      ></el-cascader>
-                    </el-row>
-                    <el-row class="select">
-                      <el-cascader
-                        :options="studentOptions"
-                        v-model="studentMap[1]"
-                        @change="handleChange(1)"
-                        filterable
-                        size="small"
-                        clearable
-                      ></el-cascader>
-                    </el-row>
-                    <el-row class="select">
-                      <el-cascader
-                        :options="studentOptions"
-                        v-model="studentMap[2]"
-                        @change="handleChange(2)"
-                        filterable
-                        size="small"
-                        clearable
-                      ></el-cascader>
-                    </el-row>
-                    <el-row class="select">
-                      <el-cascader
-                        :options="studentOptions"
-                        v-model="studentMap[3]"
-                        @change="handleChange(3)"
-                        filterable
-                        size="small"
-                        clearable
-                      ></el-cascader>
-                    </el-row>
-                  </el-row>
                   <el-row class="select">
-                    <el-button type="primary" @click="getCharts" style="width: 70%" size="small">确定</el-button>
+                    <el-button type="primary" @click="getCharts" style="width: 70%">确定</el-button>
                   </el-row>
                 </el-col>
                 <el-col :span="18">
@@ -163,7 +108,6 @@
                   <el-col :span="6">课前成绩：85</el-col>
                   <el-col :span="6">课后成绩：85</el-col>
                   <el-col :span="6">总成绩：85</el-col>
-                  <el-col :span="6">排名：15</el-col>
                 </el-row>
                 <el-row>评分：4.2</el-row>
                 <el-row>
@@ -176,7 +120,6 @@
                   <el-col :span="6">课前成绩：85</el-col>
                   <el-col :span="6">课后成绩：85</el-col>
                   <el-col :span="6">总成绩：85</el-col>
-                  <el-col :span="6">排名：10</el-col>
                 </el-row>
                 <el-row>评分：4.2</el-row>
                 <el-row>
@@ -196,7 +139,7 @@ export default {
   name: "studentAnalysis",
   data() {
     return {
-      activeNames: ["1"],
+      activeNames: ['1'],
       xyOptions: [
         {
           value: 0,
@@ -272,7 +215,6 @@ export default {
       studentOptions: [],
       students: [],
       chapterList: [],
-      studentMap: [],
       // 成绩 只能数字
       gradeList: [[88, 93, 90], [76, 82, 85]],
       // 课前成绩 只能数字
@@ -298,11 +240,11 @@ export default {
       }
     },
     // 获取列表
-    getStudentOptions(index) {
+    getStudentOptions() {
       this.$http
         .get(
-          "http://localhost:8080/getStudentsByClassID?courseClassID=" +
-            this.studentOptions[index].value,
+          // 获取学生所在班级号
+          "http://localhost:8080/getStudentsByClassID?courseClassID=1",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -316,44 +258,12 @@ export default {
               if (studentList.state === 1) {
                 let i = 0;
                 while (i < studentList.data.length) {
-                  this.studentOptions[index].children.push({
+                  this.studentOptions.push({
                     value: i,
-                    label: studentList.data[i].name,
-                    disabled: false
+                    label: studentList.data[i].name
                   });
                   i++;
                 }
-              }
-            } else {
-              this.$message({ type: "error", message: "加载失败!" });
-            }
-          },
-          response => {
-            this.$message({ type: "error", message: "加载失败!" });
-          }
-        );
-    },
-    getClassOptions() {
-      this.studentOptions = [];
-      // 登录时存teacherID
-      // 根据课程号和老师id
-      this.$http
-        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
-        .then(
-          response => {
-            if (response.status === 200) {
-              let classList = JSON.parse(response.bodyText);
-              let i = 0;
-              while (i < classList.data.length) {
-                this.studentOptions.push({
-                  value: classList.data[i].courseClass.id,
-                  label: classList.data[i].courseClass.classNum + "班",
-                  children: []
-                });
-                this.getStudentOptions(i);
-                i++;
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -432,25 +342,7 @@ export default {
           break;
       }
     },
-    handleChange(index) {
-      let val = this.studentMap[index];
-      if (Object.keys(val).length === 0) {
-        this.detail[index] = undefined;
-      } else {
-        if (this.detail[index] !== undefined) {
-          let lOld = this.detail[index][0];
-          let rOld = this.detail[index][1];
-          this.studentOptions[lOld - 1].children[rOld].disabled = false;
-        }
-        let lNew = val[0];
-        let rNew = val[1];
-        this.studentOptions[lNew - 1].children[rNew].disabled = true;
-        this.detail[index] = this.objDeepCopy(
-          this.studentOptions[lNew - 1].children[rNew]
-        );
-      }
-    },
-    handleGrade() {},
+    handleGrade() { },
     handleDetail() {
       this.detail = [];
     },
@@ -536,7 +428,7 @@ export default {
   },
   created() {
     this.getChapterOptions();
-    this.getClassOptions();
+    this.getStudentOptions();
     this.xData = this.chapterList;
     this.yData = this.gradeList;
     this.detail = new Array(4);

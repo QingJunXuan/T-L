@@ -5,6 +5,7 @@ import Header from '../components/Header.vue'
 import sCourseManage from '../components/student/courseManage.vue'
 import sCourseDetail from '../components/student/courseDetail.vue'
 import sChapterDetail from '../components/student/chapterDetail.vue'
+import sStudentAnalysis from '../components/student/studentAnalysis.vue'
 import tCourseManage from '../components/teacher/courseManage.vue'
 import tCourseDetail from '../components/teacher/courseDetail.vue'
 import tChapterCatalog from '../components/teacher/chapterCatalog.vue'
@@ -52,6 +53,10 @@ export default new Router({
       path: '/student/courseDetail',
       name: 'sCourseDetail',
       component: sCourseDetail,
+    },{
+      path: '/student/studentAnalysis',
+      name: 'sStudentAnalysis',
+      component: sStudentAnalysis,
     }, {
       path: '/student/chapterDetail',
       name: 'sChapterDetail',

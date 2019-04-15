@@ -219,7 +219,7 @@
             let that = this;
             if (valid) {
               that.logining = true;
-              that.$http.post('/api/auth', {
+              that.$http.post('http://localhost:8080/auth', {
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }).then(response => {
@@ -257,7 +257,7 @@
                 mail: this.ruleForm1.email,
                 password: this.ruleForm1.password,
                 name: this.ruleForm1.name,
-                workID: this.ruleForm1.number,
+                work_id: this.ruleForm1.number,
                 role: this.ruleForm1.auth,
                 gender: this.ruleForm1.gender
               }).then(response => {
