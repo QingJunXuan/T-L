@@ -18,11 +18,18 @@
                 <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
               </el-col>
             </el-row>
-            <el-row class="bottom">
-              <el-col :span="16" :offset="4">
+            <el-row style="height:90px">
+              <el-row>
+              <el-col :span="16" :offset="1" style="text-align:left">
                 <p style="font-size:13px;color:#000">近期作业</p>
                 <p id="newest" @click="homework">{{item.courseInfo.currentExerciseChapter}}</p>
               </el-col>
+              </el-row>
+              <el-row>
+                <el-row style="font-size:12px;text-align:right">
+                  <el-col :span="10" :offset="13">邀请码：{{item.courseClass.classCode}}</el-col>
+                </el-row>
+              </el-row>
             </el-row>
           </el-card>
         </el-col>
@@ -62,7 +69,7 @@ export default {
           courseID: 3,
           courseName: "JavaEE",
           teacherName: "范鸿飞",
-          currentExerciseChapter: null
+          currentExerciseChapter: "JAVA I/O 课后作业"
         },
         courseClass: {
           id: 3,
@@ -77,7 +84,7 @@ export default {
             courseID: 1,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            currentExerciseChapter: null
+            currentExerciseChapter: "JAVA I/O 课后作业"
           },
           courseClass: {
             id: 1,
@@ -91,13 +98,13 @@ export default {
             courseID: 2,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            currentExerciseChapter: null
+            currentExerciseChapter: "JAVA I/O 课后作业"
           },
           courseClass: {
             id: 2,
             courseID: 2,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100002"
           }
         },
         {
@@ -111,7 +118,7 @@ export default {
             id: 3,
             courseID: 3,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100003"
           }
         }
       ]
@@ -135,7 +142,7 @@ export default {
   }, */
   methods: {
     submit: function() {
-     /*  axios
+      /*  axios
         .get("/api/getCourseByCode", {
           params: {
             courseCode: this.code
@@ -168,7 +175,7 @@ export default {
         .catch(err => {
           console.log(err);
         }); */
-      this.code=""
+      this.code = "";
     },
     courseDetail: function(courseID) {
       this.$router.push({
@@ -211,15 +218,17 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 13px
 }
 #newest:hover {
   text-decoration: underline;
 }
 .top {
   /*   background-color: rgba(54, 88, 241, 0.808);*/
-  background-image: url(../../assets/course/img-2.jpg);
+  background-image: url(../../assets/course/img-5.jpg);
   /* background-image: image-set(); */
   height: 100px;
+  background-size: cover;
 }
 .bottom {
   height: 90px;

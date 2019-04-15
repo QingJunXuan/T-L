@@ -2,9 +2,11 @@
   <div style="height:550px">
     <el-col :span="20" :offset="2">
       <el-row>
-          <el-col :span="16" :offset="4">
-              <el-card style="margin-top:10px;height:200px"><p>demo1</p></el-card>
-          </el-col>
+        <el-col :span="16" :offset="4">
+          <el-card style="margin-top:10px;height:200px">
+            <p>demo1</p>
+          </el-card>
+        </el-col>
       </el-row>
       <el-row :gutter="40">
         <el-col :span="8" v-for="(item,index) in items" :key="index">
@@ -14,15 +16,29 @@
                 id="name"
                 @click="courseDetail(item.courseInfo.courseID)"
               >{{item.courseInfo.courseName}}</p>
-              <el-col :span="5" :offset="18" style="margin-top:10px">
-                <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
-              </el-col>
+              <el-row>
+                <el-col :span="5" :offset="18" style="margin-top:10px">
+                  <span style="font-size: 10px;color: rgb(238, 235, 235);">老师：{{item.courseInfo.teacherName}}</span>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="5" :offset="18">
+                  <span style="font-size: 10px;color: rgb(238, 235, 235);">ID：{{item.courseInfo.teacherID}}</span>
+                </el-col>
+              </el-row>
             </el-row>
-            <el-row class="bottom">
-              <el-col :span="16" :offset="4">
-                <p style="font-size:13px;color:#000">近期作业</p>
-                <p id="newest" @click="homework">{{item.courseInfo.currentExerciseChapter}}</p>
-              </el-col>
+            <el-row style="height: 90px;">
+              <el-row>
+                <el-col :span="16" :offset="1" style="text-align:left">
+                  <p style="font-size:13px;color:#000">近期作业</p>
+                  <p id="newest" @click="homework">{{item.courseInfo.currentExerciseChapter}}</p>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-row style="font-size:12px;text-align:right">
+                  <el-col :span="10" :offset="13">邀请码：{{item.courseClass.classCode}}</el-col>
+                </el-row>
+              </el-row>
             </el-row>
           </el-card>
         </el-col>
@@ -31,7 +47,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 export default {
   name: "tCourseManage",
   data() {
@@ -39,27 +54,14 @@ export default {
       code: "",
       isPlus: false,
       isConfirm: false,
-      courseConfirm: {
-        courseInfo: {
-          courseID: 3,
-          courseName: "JavaEE",
-          teacherName: "范鸿飞",
-          currentExerciseChapter: null
-        },
-        courseClass: {
-          id: 3,
-          courseID: 3,
-          classNum: 1,
-          classCode: "100001"
-        }
-      },
       items: [
         {
           courseInfo: {
             courseID: 1,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            currentExerciseChapter: null
+            teacherID:123,
+            currentExerciseChapter: "JAVA I/O 课后作业"
           },
           courseClass: {
             id: 1,
@@ -73,13 +75,14 @@ export default {
             courseID: 2,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            currentExerciseChapter: null
+            teacherID:123,
+            currentExerciseChapter: "JAVA I/O 课后作业"
           },
           courseClass: {
             id: 2,
             courseID: 2,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100002"
           }
         },
         {
@@ -87,13 +90,14 @@ export default {
             courseID: 3,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            currentExerciseChapter: null
+            teacherID:123,
+            currentExerciseChapter: "JAVA I/O 课后作业"
           },
           courseClass: {
             id: 3,
             courseID: 3,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100003"
           }
         }
       ]
@@ -157,18 +161,20 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 13px;
 }
 #newest:hover {
   text-decoration: underline;
 }
 .top {
   /*   background-color: rgba(54, 88, 241, 0.808);*/
-  background-image: url(../../assets/course/img-2.jpg);
+  background-image: url(../../assets/course/img-5.jpg);
   /* background-image: image-set(); */
   height: 100px;
-}
+  background-size: cover;
+} /* 
 .bottom {
   height: 90px;
   text-align: left;
-}
+} */
 </style>

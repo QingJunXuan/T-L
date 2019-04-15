@@ -6,10 +6,6 @@
           <el-col :span="4" style="margin-top:10px">
             <el-button size="mini" @click="edit">编辑课程</el-button>
           </el-col>
-          <el-col :span="2" style="margin-top:10px">
-            <div v-if="!analysisMode"><el-button size="mini" @click="analysisMode = true">分析课程</el-button></div>
-            <div v-else><el-button size="mini" @click="analysisMode = false">退出分析课程</el-button></div>
-          </el-col>
         </el-row>
         <el-row>
           <el-col :span="7" :offset="1" v-for="(item,index) in items" :key="index">
@@ -17,19 +13,12 @@
               <el-row class="top">
                 <p
                   id="name"
-                  v-if="!analysisMode"
-                  @click="courseDetail(item.courseInfo.courseID)"
-                >{{item.courseInfo.courseName}}</p>
-                <p
-                  id="toAnalysis"
-                  v-else
-                  @click="$router.push('/adminManage/courseAnalysis')"
                 >{{item.courseInfo.courseName}}</p>
                 <el-row><el-col :span="5" :offset="18" style="margin-top:10px">
-                  <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
+                  <span style="font-size: 10px;color: rgb(238, 235, 235);">老师：{{item.courseInfo.teacherName}}</span>
                 </el-col></el-row>
                 <el-row><el-col :span="5" :offset="18" >
-                  <span id="teacherID">ID：{{item.courseInfo.teacherID}}</span>
+                  <span style="font-size: 10px;color: rgb(238, 235, 235);">ID：{{item.courseInfo.teacherID}}</span>
                 </el-col></el-row>
               </el-row>
               <el-row class="bottom">
@@ -51,6 +40,7 @@
 </template>
 <script>
 export default {
+  name:'courseList',
   data() {
     return {
       rate: null,
@@ -91,7 +81,7 @@ export default {
             id: 2,
             courseID: 2,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100002"
           }
         },
         {
@@ -110,7 +100,7 @@ export default {
             id: 3,
             courseID: 3,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100003"
           }
         }
       ],
@@ -120,7 +110,7 @@ export default {
   methods: {
     edit() {
       this.$router.push({
-        path: "/adminManage/edit"
+        path: "/adminManage/courseGraph"
       });
     },
   }
@@ -133,37 +123,6 @@ body {
   height: 100%;
   padding: 0;
   margin: 0;
-}
-.header {
-  height: 60px;
-  background-color: cadetblue;
-  color: #fff;
-  font-size: 17px;
-  font-weight: 700px;
-  font-family: "Courier New", Courier, monospace;
-}
-.logo {
-  /* width:230px; */
-  height: 60px;
-  font-size: 20px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-.logo-width {
-  width: 200px;
-}
-.subhead {
-  font: 12px 黑体;
-  font-weight: bold;
-  position: absolute;
-  letter-spacing: 3px;
-}
-.icon-right {
-  text-align: right;
-  float: right;
-  line-height: 60px;
-  padding-right: 40px;
-  font-size: 25px;
 }
 .top {
   /*   background-color: rgba(54, 88, 241, 0.808);*/
@@ -194,11 +153,6 @@ body {
 }
 #toAnalysis:hover {
   text-decoration: underline;
-}
-
-#teacher {
-  font-size: 10px;
-  color: rgb(238, 235, 235);
 }
 #newest {
   font-size: 11px;
