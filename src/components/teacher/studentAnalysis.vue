@@ -78,7 +78,7 @@
                     class="select-title"
                     v-if="comparison !== 2 && gradeAttribute !== 3"
                   >选择{{cOptions[comparison].label}}</el-row>
-                  <el-row v-if="comparison !== 0">
+                  <el-row v-if="!(comparison === 0 || comparison === 2 || gradeAttribute === 3)">
                     <el-select
                       multiple
                       size="small"
@@ -93,17 +93,6 @@
                         :value="item.value"
                       ></el-option>
                     </el-select>
-                  </el-row>
-                  <el-row v-if="comparison === 0 && gradeAttribute === 3">
-                    <el-row>
-                      <el-cascader
-                        :options="studentOptions"
-                        v-model="studentMap[0]"
-                        @change="handleChange(0)"
-                        filterable
-                        clearable
-                      ></el-cascader>
-                    </el-row>
                   </el-row>
                   <el-row v-if="comparison === 0 && gradeAttribute !== 3">
                     <el-row>

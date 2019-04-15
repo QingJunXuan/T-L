@@ -9,7 +9,7 @@
           <el-col :span="3"><el-button type="primary" size="small"><i class="el-icon-search" style="margin-right: 10px"></i>搜索</el-button></el-col>
         </el-row>
         <el-row style="margin-top: 20px">
-          <el-table :data="studentInfo">
+          <el-table :data="studentInfo" @row-click="goAnalysis">
             <el-table-column label="学号" align="center">
               <template slot-scope="scope">
                 {{scope.row.id}}
@@ -48,28 +48,7 @@
       data() {
         return {
           // 学生信息
-          studentInfo: [
-            {
-              id: '1612341',
-              name: '学生1',
-              email: '11111@qq.com'
-            },
-            {
-              id: '1612342',
-              name: '学生2',
-              email: '11111@qq.com'
-            },
-            {
-              id: '1612343',
-              name: '学生3',
-              email: '11111@qq.com'
-            },
-            {
-              id: '1612344',
-              name: '学生4',
-              email: '11111@qq.com'
-            }
-          ],
+          studentInfo: [],
           listLoading: false,
           searchId: '',
         }
@@ -82,7 +61,50 @@
           } else {
             this.$router.go(-1)
           }
-        }
+        },
+        goAnalysis(row, column, cell, event) {
+          // 传值
+          this.$router.push('/teacher/studentAnalysis');
+        },
+         // 获取列表
+    getStudentInfo(index) {
+      this.$http
+        .get(
+          // 传值班级号
+          "http://localhost:8080/getStudentsByClassID?courseClassID=1",
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let studentList = JSON.parse(response.bodyText);
+              if (studentList.state === 1) {
+                let i = 0;
+                while (i < studentList.data.length) {
+                  this.studentInfo.push({
+                    id: studentList.data[i].workID,
+                    name: studentList.data[i].name,
+                    email: studentList.data[i].mail
+                  });
+                  i++;
+                }
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+      },
+      mounted() {
+        this.getStudentInfo();
       }
     }
 </script>

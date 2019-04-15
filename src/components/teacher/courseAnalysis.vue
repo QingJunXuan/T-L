@@ -84,6 +84,7 @@
                       :options="studentOptions"
                       v-model="studentMap[0]"
                       @change="handleChange(0)"
+                      size="small"
                       filterable
                       clearable
                     ></el-cascader>
