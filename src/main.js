@@ -22,7 +22,8 @@ router.beforeEach((to, from, next) => {
   let user = localStorage.getItem('username');
   if (!user && to.path !== '/home') {
     next({path: '/home'})
-  } else {
+  } 
+  else {
     next()
   }
 });

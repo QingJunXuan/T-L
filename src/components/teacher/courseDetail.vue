@@ -215,10 +215,15 @@ export default {
       });
     },
     editChapter() {
-      this.$router.push('/teacher/chapterEdit')
+      this.$router.push({
+        path: "/teacher/chapterEdit",
+        query: {
+          id: this.courseID
+        }
+      });
     },
     courseBack() {
-      this.$router.back({ path: "/student/courseManagement" });
+      this.$router.push({ path: "/teacher/courseManagement" });
     },
     stuDetail(){
       this.$router.push('/teacher/studentList');

@@ -9,7 +9,7 @@
             </el-button>
           </el-col>
           <el-col align="right" :span="12">
-            <el-select v-model="index" placeholder="跳转学生">
+            <el-select v-model="index" placeholder="跳转到学生" filterable>
               <el-option
                 v-for="item in studentOptions"
                 :key="item.value"
@@ -46,7 +46,7 @@
           <div>总成绩：{{totalScore[index]}}</div>
           <div v-for="i in question.length" :key="i" align="start" class="question">
             <div>{{i}}.{{question[i - 1].content}}({{question[i-1].score}}分)</div>
-            <div class="answer">答案：{{studentInfo[index].answer[i - 1]}}</div>
+            <div class="answer">答案：{{studentInfo[index].answer[i - 1].content}}</div>
             <div style="margin-top: 15px">
               <span>得分</span>
               <span style="margin-left: 10px">
@@ -67,7 +67,6 @@
           </div>
         </el-card>
         <el-row style="margin-top: 20px">
-          <el-button>保存</el-button>
           <el-button>提交</el-button>
         </el-row>
       </div>
@@ -83,21 +82,10 @@ export default {
       // 题目信息
       question: [
         {
+          id: 1,
           content: "第1题的题目",
           score: "10"
         },
-        {
-          content: "第2题的题目",
-          score: "10"
-        },
-        {
-          content: "第3题的题目",
-          score: "15"
-        },
-        {
-          content: "第4题的题目",
-          score: "15"
-        }
       ],
       index: 0,
       // 学生信息和答案
@@ -108,32 +96,12 @@ export default {
           answer: ["第1题的答案", "第2题的答案", "第3题的答案", "第4题的答案"],
           score: [0, 0, 0, 0]
         },
-        {
-          id: "1612342",
-          name: "学生2",
-          answer: ["第1题的答案", "第2题的答案", "第3题的答案", "第4题的答案"],
-          score: [0, 0, 0, 0]
-        },
-        {
-          id: "1612343",
-          name: "学生3",
-          answer: ["第1题的答案", "第2题的答案", "第3题的答案", "第4题的答案"],
-          score: [0, 0, 0, 0]
-        }
       ],
       studentOptions: [
         {
           value: 0,
           label: "1612341 学生1"
         },
-        {
-          value: 1,
-          label: "1612341 学生2"
-        },
-        {
-          value: 2,
-          label: "1612341 学生3"
-        }
       ],
       submitLoading: false,
       questionLoading: false,
@@ -170,7 +138,129 @@ export default {
       } else {
         this.$router.go(-1);
       }
+    },
+    getExercises() {
+      this.question = [];
+      this.$http
+        .get(
+          // 传值chapterid
+          "http://localhost:8080/question/view?chapterId=1&type=review",
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let exerciseList = JSON.parse(response.bodyText);
+              if (exerciseList.state === 1) {
+                let i = 0;
+                while (i < exerciseList.data.length) {
+                  if (exerciseList.data[i].exerciseType === 2) {
+                    this.question.push({
+                      id: exerciseList.data[i].exercise.exerciseId,
+                      content: exerciseList.data[i].exercise.exerciseContent,
+                      score: exerciseList.data[i].exercise.exercisePoint,
+                    });
+                  }
+                  i++;
+                }
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getStudentInfo(index) {
+      this.studentInfo = [];
+      this.studentOptions = [];
+      this.$http
+        .get(
+          // 传值班级号
+          "http://localhost:8080/getStudentsByClassID?courseClassID=1",
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let studentList = JSON.parse(response.bodyText);
+              if (studentList.state === 1) {
+                let i = 0;
+                while (i < studentList.data.length) {
+                  this.studentInfo.push({
+                    answer: [],
+                    score: [],
+                    id: studentList.data[i].workID,
+                    name: studentList.data[i].name,
+                    studentId: studentList.data[i].userID
+                  });
+                  this.studentOptions.push({
+                    value: i,
+                    label: studentList.data[i].workID + ' ' + studentList.data[i].name
+                  })
+                  for (let k = 0;k < this.question.length;k++) {
+                    this.studentInfo[i].score.push(0);
+                    //this.getAnswers(i, this.question[k].id, this.studentInfo[i].studentId)
+                    this.studentInfo[i].answer.push({
+                      id: i,
+                      content: '学生答案'
+                    })
+                  }
+                  i++;
+                }
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getAnswers(index, exerciseId, studentId) {
+      this.$http
+        .get(
+          'http://localhost:8080/question/findOneAnswer?exerciseId=' + exerciseId + '&studentId=1'
+          // + studentId
+          ,{
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let answer = JSON.parse(response.bodyText);
+              if (answer.state === 1) {
+                this.studentInfo[index].answer.push({
+                  id: answer.data.id,
+                  content: answer.data.studentAnswer
+                })
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
     }
+  },
+  created() {
+    this.getStudentInfo();
   },
   computed: {
     totalScore() {

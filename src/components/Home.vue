@@ -232,6 +232,7 @@
                   type: 'success',
                   duration: 2000
                 });
+                this.loginTableVisible = false;
                 setTimeout(function () {
                   that.$router.push('/');
                   //TODO: 根据身份跳转

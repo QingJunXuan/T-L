@@ -28,10 +28,10 @@ Vue.use(Router)
 Vue.prototype.$ajax=axios
 export default new Router({
   routes: [
-   /*  {
+   {
       path: '/',
       redirect: '/home'
-    },  */
+    },
     {
       path: '/',
       component: Header,
