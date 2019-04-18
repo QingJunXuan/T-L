@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'/* 
 import { stat } from 'fs';
 import { addListener } from 'cluster'; */
+import { stat } from 'fs';
 
 Vue.use(Vuex)
 
@@ -62,13 +63,18 @@ export default new Vuex.Store({
                 createTime: "2019-03-28T04:53:06.000+0000",
                 updateTime: "2019-04-03T06:23:53.000+0000",
                 teacherID: 443,
-                courseName: "软件测试",
+                courseName: "软件工程",
                 teacherName: "范鸿飞",
-                courseYear: 2018,
+                courseYear: "2018",
                 courseSemester: "秋季",
                 startTime: "2019-03-28",
                 endTime: "2019-03-29",
-                successor: ["start"],
+                successor: [],
+               /*  class: [{
+                    classNum: 1
+                },{
+                    classNum:2
+                }] */
             }, {
                 courseID: 1,
                 createTime: "2019-03-28T04:53:06.000+0000",
@@ -76,11 +82,11 @@ export default new Vuex.Store({
                 teacherID: 443,
                 courseName: "web",
                 teacherName: "范鸿飞",
-                courseYear: 2018,
+                courseYear: "2018",
                 courseSemester: "秋季",
                 startTime: "2019-03-28",
                 endTime: "2019-03-29",
-                successor: ["start"],
+                successor: [],
             }, {
                 courseID: 1,
                 createTime: "2019-03-28T04:53:06.000+0000",
@@ -88,11 +94,11 @@ export default new Vuex.Store({
                 teacherID: 443,
                 courseName: "软件项目与过程管理",
                 teacherName: "范鸿飞",
-                courseYear: 2018,
+                courseYear: "2018",
                 courseSemester: "秋季",
                 startTime: "2019-03-28",
                 endTime: "2019-03-29",
-                successor: ["start","web"],
+                successor: ["软件工程"],
             },
         ],
         data: [{
@@ -100,22 +106,22 @@ export default new Vuex.Store({
             x: 200,
             y: 0
         }, {
-            name: '软件测试',
+            name: '软件工程',
             x: 100,
             y: 100,
-        },{
+        }, {
             name: "web",
-            x: 270,
-            y: 300
-        },{
+            x: 300,
+            y: 100
+        }, {
             name: "软件项目与过程管理",
-            x: 400,
-            y: 190
+            x: 220,
+            y: 270
         },],//node：name+坐标信息
         links: [
             {
                 source: 'start',
-                target: '软件测试',
+                target: '软件工程',
                 label: {
                     normal: {
                         show: false
@@ -124,7 +130,7 @@ export default new Vuex.Store({
                 /* lineStyle: {
                     normal: { curveness: 0.1 }
                 } */
-            },{ 
+            }, {
                 source: 'start',
                 target: 'web',
                 label: {
@@ -136,7 +142,7 @@ export default new Vuex.Store({
                     normal: { curveness: 0.1 }
                 } */
             },{
-                source: 'start',
+                source: '软件工程',
                 target: '软件项目与过程管理',
                 label: {
                     normal: {
@@ -144,7 +150,7 @@ export default new Vuex.Store({
                     }
                 },
                 lineStyle: {
-                    normal: { curveness: 0.1 }
+                    normal: { curveness: 0 }
                 }
             }
         ],//连线信息
@@ -268,7 +274,9 @@ export default new Vuex.Store({
             state.courseList[change.index].courseName=change.name */
             //修改data里的name
             var oldName = state.data[change.index].name
+            console.log(oldName)
             state.data[change.index].name = change.name
+            console.log(state.data[change.index].name)
             //修改links里的name
             var length = state.links.length
             for (var i = 0; i < length; i++) {
@@ -283,15 +291,18 @@ export default new Vuex.Store({
             }
         },
         editLinks(state, change) {
+            var oldLength = state.courseList[change.index-1].successor.length
             var newLength = change.new.length
-            var name = state.data[change.index]
+            var name = state.data[change.index].name
 
             var array = state.links.filter(function (item) {
-                if (item.target !== name) {
+                if (item.target != name) {
                     return item
                 }
             })
-            if (newLength == 0) {
+            console.log(array,"array")
+            if (newLength == 0 ) {
+                
                 var addLink = {
                     target: name,
                     source: "start",
@@ -305,7 +316,7 @@ export default new Vuex.Store({
                     }
                 };
                 array.push(addLink)
-            } else {
+            } else if(newLength!=0){
                 for (var i = 0; i < newLength; i++) {
                     var addLink = {
                         target: name,
@@ -322,14 +333,15 @@ export default new Vuex.Store({
                     array.push(addLink)
                 }
             }
-            state.links=array
+            state.links = array
+            console.log(state.links,"links")
         },
-        edgeStyle(state,index){
-            var value=state.links[index].label.normal.show
-            if(value==false){
-                state.links[index].label.normal.show=true
-            }else{
-                state.links[index].label.normal.show=false
+        edgeStyle(state, index) {
+            var value = state.links[index].label.normal.show
+            if (value == false) {
+                state.links[index].label.normal.show = true
+            } else {
+                state.links[index].label.normal.show = false
             }
 
         }

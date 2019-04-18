@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :style="screenWidth">
     <el-row class="header">
       <el-col :span="10" class="logo logo-width">
         <div>
@@ -35,7 +35,11 @@
 export default {
   name:'adminManage',
   data() {
-    return {};
+    return {
+      screenWidth:{
+        width:window.screen.width,
+      }
+    };
   },
   methods: {
     chart() {

@@ -3,8 +3,8 @@
     <el-col :span="20" :offset="2">
       <el-row>
         <el-col :span="16" :offset="4">
-          <el-card style="margin-top:10px;height:200px">
-            <p>demo1</p>
+          <el-card style="margin-top:10px;height:300px;text-align:center" body-style="{padding:'0px'}">
+            <graph></graph>
           </el-card>
         </el-col>
       </el-row>
@@ -17,7 +17,7 @@
                 @click="courseDetail(item.courseInfo.courseID)"
               >{{item.courseInfo.courseName}}</p>
               <el-row>
-                <el-col :span="5" :offset="18" style="margin-top:10px">
+                <el-col :span="5" :offset="18" style="margin-top:0px">
                   <span style="font-size: 10px;color: rgb(238, 235, 235);">老师：{{item.courseInfo.teacherName}}</span>
                 </el-col>
               </el-row>
@@ -31,7 +31,7 @@
               <el-row>
                 <el-col :span="16" :offset="1" style="text-align:left">
                   <p style="font-size:13px;color:#000">近期作业</p>
-                  <p id="newest" @click="homework">{{item.courseInfo.currentExerciseChapter}}</p>
+                  <p id="newest" @click="homework(item.courseInfo.currentExerciseChapter)">{{item.courseInfo.currentExerciseChapter}}</p>
                 </el-col>
               </el-row>
               <el-row>
@@ -47,8 +47,12 @@
   </div>
 </template>
 <script>
+import graph from './courseGraph.vue'
 export default {
   name: "tCourseManage",
+  components:{
+    graph
+  },
   data() {
     return {
       code: "",
@@ -128,11 +132,11 @@ export default {
         }
       });
     },
-    homework() {
+    homework(chapterID) {
       this.$router.push({
-        path: "/teacher/currentHomework",
+        path: "chapterDetail",
         query: {
-          chapterID: chapterID
+          id: chapterID
         }
       });
     }

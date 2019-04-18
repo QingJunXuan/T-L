@@ -8,6 +8,7 @@ import sCourseDetail from '../components/student/courseDetail.vue'
 import sChapterDetail from '../components/student/chapterDetail.vue'
 import tCourseManage from '../components/teacher/courseManage.vue'
 import tCourseDetail from '../components/teacher/courseDetail.vue'
+import tChapterDetail from '../components/teacher/chapterDetail.vue'
 import tChapterCatalog from '../components/teacher/chapterCatalog.vue'
 import tPointEdit from '../components/teacher/pointEdit.vue'
 import preExerciseEdit from '../components/teacher/preExerciseEdit.vue'
@@ -22,15 +23,21 @@ import teacherList from '../components/admin/teacherList.vue'
 import aCourseAnalysis from '../components/admin/courseAnalysis.vue'
 import aCourseGraph from '../components/admin/courseGraph.vue'
 import adminManage from '../components/admin/adminManage.vue'
-
+import spoint from '../components/student/sPoint.vue'
+import preExercise from '../components/student/preExercise.vue'
+import revExercise from '../components/student/revExercise.vue'
+import tpoint from '../components/teacher/tPoint.vue'
+import tpreExercise from '../components/teacher/preExercise.vue'
+import trevExercise from '../components/teacher/revExercise.vue'
+import chapterGraph from '../components/student/chapterGraph.vue'
 Vue.use(Router)
 Vue.prototype.$ajax=axios
 export default new Router({
   routes: [
-   /*  {
+    {
       path: '/',
       redirect: '/home'
-    },  */
+    }, 
     {
       path: '/',
       component: Header,
@@ -49,22 +56,44 @@ export default new Router({
         meta: {
           keepAlive: true // 需要缓存
         }
-      },],
-    }, {
-      path: '/student/courseDetail',
-      name: 'sCourseDetail',
-      component: sCourseDetail,
-    }, {
-      path: '/student/chapterDetail',
-      name: 'sChapterDetail',
-      component: sChapterDetail,
-      meta: {
-        keepAlive: true
-      }
-    }, {
+      }, {
+        path: 'test',
+        name: 'sChapterGraph',
+        component: chapterGraph
+      },{
+        path: 'chapterDetail',
+        name: 'sChapterDetail',
+        component: sChapterDetail,
+        meta: {
+          keepAlive: true
+        },
+        children: [
+          {
+            path:'point',
+            name:'point',
+            component:spoint,
+          },
+          {
+            path:'preExercise',
+            name:'preExercise',
+            component:preExercise,
+          },
+          {
+            path:'revExercise',
+            name:'revExercise',
+            component:revExercise,
+          }
+        ]
+      },
+    ],},
+    {
       path: '/student/feedback',
       name: 'feedback',
       component: feedback
+    },{
+      path: '/student/courseDetail',
+      name: 'sCourseDetail',
+      component: sCourseDetail,
     }, {
       path: '/teacher',
       component: Header,
@@ -76,6 +105,30 @@ export default new Router({
           meta: {
             keepAlive: true // 需要缓存
           }
+        },{
+          path: 'chapterDetail',
+          name: 'tChapterDetail',
+          component: tChapterDetail,
+          meta: {
+            keepAlive: true
+          },
+          children: [
+            {
+              path:'point',
+              name:'tpoint',
+              component:tpoint,
+            },
+            {
+              path:'preExercise',
+              name:'tpreExercise',
+              component:tpreExercise,
+            },
+            {
+              path:'revExercise',
+              name:'trevExercise',
+              component:trevExercise,
+            }
+          ]
         },
         {
           path:'chapterEdit',

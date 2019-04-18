@@ -7,22 +7,26 @@
         </el-col>
       </el-row>
       <el-row>
-        <div style="line-height:200px">JAVA</div>
+        <div style="line-height:150px">JAVA</div>
       </el-row>
       <el-row>
-        <el-col :span="2" :offset="22"><el-button type="text" @click="feedback">教学反馈</el-button></el-col>
+        <el-col :span="2" :offset="22">
+          <el-button type="text" @click="feedback">教学反馈</el-button>
+        </el-col>
       </el-row>
     </el-row>
     <el-row>
       <div class="tabs">
         <el-col :span="4" :offset="6">
           <div @click="getNotice" class="tabBack" :class="{'clickDiv':isNotice}">
+
             <el-button
               @click="getNotice"
               type="text"
               class="tab"
               :class="{'clickButton':isNotice}"
             >公告</el-button>
+
           </div>
         </el-col>
         <el-col :span="4">
@@ -38,15 +42,17 @@
       </div>
     </el-row>
     <el-row>
-      <div style="background-color:rgba(118, 162, 163, 0.26);">
+      <div>
+        <!-- style="background-color:rgba(118, 162, 163, 0.26);" -->
         <div v-show="isNotice" class="noticeBack">
           <el-col :span="10" :offset="7">
             <div class="notice">{{notice}}</div>
           </el-col>
         </div>
-        <div v-show="isLesson" class="noticeBack">
-          <el-col :span="14" :offset="5" style="margin-top:-50px">
-            <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+        <div v-show="isLesson" class="lessonBack">
+          <el-col :span="12" :offset="6" style="padding-top:20px;margin-bottom:40px">
+            <graph></graph>
+            <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"  default-expand-all></el-tree>
           </el-col>
         </div>
         <div v-show="isAnalysis" class="analysisBack">
@@ -63,19 +69,25 @@
   </div>
 </template>
 <script>
+import graph from './chapterGraph.vue'
+import axios from 'axios'
 export default {
   name: "sCourseDetail",
+  components:{
+    graph,
+  },
   data() {
     return {
       courseID: 1,
-      isNotice: true,
-      isLesson: false,
+      isNotice: false,
+      isLesson: true,
       isAnalysis: false,
       notice: "Java是一门面向对象编程语言.",
       //data: null,
       rate: 20,
       lesson: null,
-      /* data: [
+      /*
+      data: [
         {
           label: "一级 1",
           children: [
@@ -83,10 +95,10 @@ export default {
               label: "二级 1-1"
             },
             {
-              label: "课前"
+              label: "课前预习题"
             },
             {
-              label: "课后"
+              label: "课后作业题"
             }
           ]
         },
@@ -98,7 +110,10 @@ export default {
             },
             {
               label: "二级 2-2"
-            }
+            },
+            {
+              label: "课前预习题"
+            },
           ]
         },
         {
@@ -109,10 +124,18 @@ export default {
             },
             {
               label: "二级 3-2"
-            }
+            },
+            {
+              label: "课前预习题"
+            },
           ]
         }
-      ], */
+      ], 
+      defaultProps: {
+        children: "children",
+        label: "label"
+      },*/
+      
       data: [
         {
           id: 1,
@@ -153,7 +176,7 @@ export default {
       defaultProps: {
         children: "subCatalog",
         label: "contentName"
-      }
+      } 
     };
   },
   created() {
@@ -217,20 +240,23 @@ export default {
       }
     },
     handleNodeClick(object) {
-      this.$router.push({
-        path: "chapterDetail",
-        query: {
-          id: object.id
-        }
-      });
+      console.log(object);
+      if (object.subCatalog.length == 0) {
+        this.$router.push({
+          path: "chapterDetail",
+          query: {
+            id: object.id
+          }
+        });
+      }
     },
     courseBack() {
-      this.$router.back({ path: "/student/courseManagement" });
+      this.$router.push({ path: "/student/courseManagement" });
     },
-    feedback(){
+    feedback() {
       this.$router.push({
-        path:'/student/feedback'
-      })
+        path: "/student/feedback"
+      });
     }
   }
 };
@@ -244,29 +270,26 @@ body {
   margin: 0;
 }
 .courseBack {
-  height: 300px;
+  height: 240px;
   /* background-color: cadetblue; */
   /* line-height: 350px; */
   font-size: 25px;
   font-weight: 700;
-  color: rgb(92, 87, 87);
-  background-image: url("../../assets/course/img-8.jpg");
+  color: rgb(236, 235, 235);
+  background-image: url("../../assets/skillsbg.jpg");
   background-size: cover;
 }
 .tabs {
-  height: 70px;
-  background-color: rgba(95, 158, 160, 0.8);
-} /* 
-.tabBack:hover {
-  background-color: rgba(172, 200, 201, 0.8);
-} */
+  height: 60px;
+  background-color: #292929;
+}
 .clickDiv {
-  background-color: rgba(83, 139, 141, 0.8);
+  background-color:rgba(255, 255, 255, 0.1);
 }
 .tab {
-  line-height: 50px;
-  height: 70px;
-  color: rgba(255, 255, 255, 0.85);
+  line-height: 40px;
+  height: 60px;
+  color: rgba(255, 255, 255,0.85);
 }
 .tab:hover {
   color: #fff;
@@ -286,15 +309,42 @@ body {
 }
 .noticeBack {
   padding: 150px 0;
+  height: 100px;
+}
+.lessonBack{
+  padding: 20px 0;
 }
 .analysisBack {
   padding: 20px 0;
   height: 500px;
 }
 .el-tree {
-  background-color: rgba(118, 162, 163, 0.26);
+  background-color: #fff;
+}
+.el-tree-node__content{
+  background-color: rgb(221, 240, 240);
+  height: 50px;
+  border: #ddd;
+  border-bottom-style: dashed;
 }
 .el-tree-node__content:hover {
-  background-color: rgb(95, 158, 160, 0.8);
+  background-color:rgb(204, 221, 221);
+
 }
+.el-tree-node:focus>.el-tree-node__content{
+   background-color:rgb(204, 221, 221);
+}
+.el-tree-node__children .el-tree-node__content{
+  background-color: #fff;
+  height: 50px;
+  border: #ddd;
+  border-bottom-style: dashed;
+}
+.el-tree-node__children .el-tree-node__content:hover{
+  background-color: rgb(251, 251, 251);
+}
+.el-tree-node__children .el-tree-node:focus>.el-tree-node__content {
+  background-color: rgb(255, 251, 251);
+}
+
 </style>

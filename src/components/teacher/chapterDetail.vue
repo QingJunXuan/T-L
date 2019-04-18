@@ -12,7 +12,7 @@
       <el-menu-item>
           <span>
             <el-button type="text" @click="goBack">
-              <i class="el-icon-back" style="margin-right: 6px;color:#fff"></i><span style="color:#fff">返 回</span>
+              <i class="el-icon-back" aria-setsize="100px" style="color:#fff"></i><span style="color:#fff">返 回</span>
             </el-button>
           </span>
         </el-menu-item>
@@ -25,7 +25,7 @@
               <el-row class="vertical-middle">
                 <el-col :span="16">
                   <router-link
-                    :to="{name: 'point', query:{id: index1.toString() + index2, name: item2.name}}"
+                    :to="{name: 'tpoint', query:{id: index1.toString() + index2, name: item2.name}}"
                     class="router-link-active"
                   >
                     <el-menu-item :index="index1.toString() + index2">{{item2.name}}</el-menu-item>
@@ -35,13 +35,13 @@
             </div>
             <!-- 初始化页面状态 -->
             <router-link
-              :to="{name: 'preExercise', query:{sid: index1 + 'pre'}}"
+              :to="{name: 'tpreExercise', query:{sid: index1 + 'pre'}}"
               class="router-link-active"
             >
               <el-menu-item :index="index1.toString() + 'pre'">课前摸底习题</el-menu-item>
             </router-link>
             <router-link
-              :to="{name: 'revExercise', query:{sid: index1 + 'rev'}}"
+              :to="{name: 'trevExercise', query:{sid: index1 + 'rev'}}"
               class="router-link-active"
             >
               <el-menu-item :index="index1.toString() + 'rev'">课后习题</el-menu-item>
@@ -57,8 +57,9 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
-  name: "sChapterDetail",
+  name: "tChapterDetail",
   data() {
     return {
       // 章节知识点列表
@@ -149,7 +150,7 @@ export default {
         this.$router.push({ path: "/" });
         return false;
       } else {
-        this.$router.push("/student/courseDetail");
+        this.$router.push("/teacher/courseDetail");
       }
     },
     handleChapterClose() {
@@ -181,7 +182,6 @@ a {
 
 .exit {
   position: absolute;
-  left: 100px;
 }
 
 .vertical-middle {

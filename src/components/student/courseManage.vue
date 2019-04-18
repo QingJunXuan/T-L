@@ -20,10 +20,10 @@
             </el-row>
             <el-row style="height:90px">
               <el-row>
-              <el-col :span="16" :offset="1" style="text-align:left">
-                <p style="font-size:13px;color:#000">近期作业</p>
-                <p id="newest" @click="homework">{{item.courseInfo.currentExerciseChapter}}</p>
-              </el-col>
+                <el-col :span="16" :offset="1" style="text-align:left">
+                  <p style="font-size:13px;color:#000">近期作业</p>
+                  <p id="newest" @click="homework(item.courseClass.currentExerciseChapter)">{{item.courseClass.currentExerciseChapter}}</p>
+                </el-col>
               </el-row>
               <el-row>
                 <el-row style="font-size:12px;text-align:right">
@@ -46,7 +46,11 @@
         </span>
       </el-dialog>
       <el-dialog :visible.sync="isConfirm" title="课程信息确认" width="25%" center>
-        <span>{{courseConfirm.courseInfo.courseName}}{{courseConfirm.courseInfo.teacherName}}</span>
+        <div style="text-align:center">
+        <p>课程：{{courseConfirm.courseInfo.courseName}}</p>
+        <p>教师：{{courseConfirm.courseInfo.teacherName}}</p>
+        <p>邀请码：{{courseConfirm.courseClass.classCode}}</p>
+        </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="isConfirm=false" size="mini">返回</el-button>
           <el-button type="primary" @click="confirm" size="mini">确认</el-button>
@@ -68,14 +72,14 @@ export default {
         courseInfo: {
           courseID: 3,
           courseName: "JavaEE",
-          teacherName: "范鸿飞",
-          currentExerciseChapter: "JAVA I/O 课后作业"
+          teacherName: "范鸿飞"
         },
         courseClass: {
           id: 3,
           courseID: 3,
           classNum: 1,
-          classCode: "100001"
+          classCode: "100001",
+          currentExerciseChapter: -1
         }
       },
       items: [
@@ -83,48 +87,48 @@ export default {
           courseInfo: {
             courseID: 1,
             courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            currentExerciseChapter: "JAVA I/O 课后作业"
+            teacherName: "范鸿飞"
           },
           courseClass: {
             id: 1,
             courseID: 1,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100001",
+            currentExerciseChapter: -1
           }
         },
         {
           courseInfo: {
             courseID: 2,
             courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            currentExerciseChapter: "JAVA I/O 课后作业"
+            teacherName: "范鸿飞"
           },
           courseClass: {
             id: 2,
             courseID: 2,
             classNum: 1,
-            classCode: "100002"
+            classCode: "100002",
+            currentExerciseChapter: -1
           }
         },
         {
           courseInfo: {
             courseID: 3,
             courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            currentExerciseChapter: null
+            teacherName: "范鸿飞"
           },
           courseClass: {
             id: 3,
             courseID: 3,
             classNum: 1,
-            classCode: "100003"
+            classCode: "100003",
+            currentExerciseChapter: -1
           }
         }
       ]
     };
   },
-  /*  created() {
+ /*  created() {
     axios
       .get("/api/getStuCourseList", {
         params: {
@@ -133,8 +137,25 @@ export default {
       })
       .then(resp => {
         this.items = resp.data;
+        var length = this.items.length;
+        for (var i = 0; i < length; i++) {
+          var chapterNode = this.items[i].courseClass.currentExerciseChapter;
+          axios
+            .get("/api/getChapterByID", {
+              params: {
+                chapterID: chapterNode
+              }
+            })
+            .then(resp => {
+              this.items[i].courseClass.chapterName =
+                resp.data.contentName;
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        }
         console.log(resp.data);
-        console.log(this.items)
+        console.log(this.items);
       })
       .catch(err => {
         console.log(err);
@@ -169,6 +190,8 @@ export default {
           }
         })
         .then(resp => {
+          //==============================将新获得的课程添加到当前列表
+          this.items.push(this.courseConfirm)
           console.log(resp);
           this.$message(resp.message)
         })
@@ -185,7 +208,7 @@ export default {
         }
       });
     },
-    homework() {
+    homework(chapterID) {
       this.$router.push({
         path: "/student/currentHomework",
         query: {
@@ -218,7 +241,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 13px
+  height: 13px;
 }
 #newest:hover {
   text-decoration: underline;

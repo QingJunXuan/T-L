@@ -1,22 +1,22 @@
 <template>
-  <el-container>
+  <el-container :style="screenWidth">
     <el-main>
       <div>
         <el-col :span="12" :offset="2">
-          <div style="height:540px;margin-top:-20px;padding-right:10px" ref="graph"></div>
+          <div style="height:520px;margin-top:0px;padding-right:10px;border:1px solid #ddd" ref="graph"></div>
         </el-col>
         <el-col :span="8" :offset="1">
-          <el-card
-            id="edit"
-            style="width:100%;height:480px;left:10%;"
-            body-style="{padding:'0px'}"
-          >
+          <el-card id="edit" style="width:100%;height:520px;left:10%;" body-style="{padding:'0px'}">
             <el-row style="padding-bottom:10px" v-show="isAdd">
               <p style="text-align:center;font-size:13px">填写下面的表单新建课程</p>
               <p style="text-align:center;font-size:12px">删除或编辑课程，请点击左侧课程关系图中对应的节点</p>
             </el-row>
-            <el-row style="padding-bottom:10px" v-show="isEdit">
-              <p style="text-align:center;font-size:13px;margin-bottom:-3px">修改下面的表单编辑课程</p>
+            <el-row style="padding-bottom:10px" v-show="isEditClass">
+              <p style="text-align:center;font-size:13px;margin-bottom:-3px">修改下面的表单进行编辑</p>
+              <el-button @click="addVisible" size="mini" type="text">返回添加课程</el-button>
+            </el-row>
+            <el-row style="padding-bottom:10px" v-show="isEditCourse">
+              <p style="text-align:center;font-size:13px;margin-bottom:-3px">编辑课程名或前继课程</p>
               <el-button @click="addVisible" size="mini" type="text">返回添加课程</el-button>
             </el-row>
             <el-form
@@ -45,6 +45,7 @@
                       type="year"
                       placeholder="选择学年"
                       style="width: 100%;"
+                      :picker-options="pickerOptions2"
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>
@@ -87,7 +88,7 @@
                   </el-form-item>
                 </el-col>
               </el-form-item>
-              <el-form-item prop="successor" label="前继课程" style="text-align:left">
+              <el-form-item prop="successor" label="前继课程" style="text-align:left;" >
                 <el-select v-model="ruleForm.successor" multiple collapse-tags placeholder="前继课程">
                   <el-option
                     v-for="(item,index) in allCourse"
@@ -96,6 +97,9 @@
                     :value="item.courseName"
                   ></el-option>
                 </el-select>
+              </el-form-item>
+              <el-form-item label="班级个数" prop="classNum" :rules="[{ required: true, message: '请输入班级个数'},{ type: 'number', message: '必须为数字值'}]" style="width:80%">
+                    <el-input type="num" v-model.number="classNum" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item style="margin-left:-100px;padding-top:10px">
                 <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
@@ -115,7 +119,7 @@
               </div>
             </el-row>-->
             <el-form
-              v-show="isEdit"
+              v-show="isEditClass"
               :model="ruleForm2"
               :rules="rules"
               ref="ruleForm2"
@@ -124,7 +128,7 @@
               size="mini"
             >
               <el-form-item label="课程名称" prop="courseName">
-                <el-input v-model="ruleForm2.courseName"></el-input>
+                <el-input v-model="ruleForm2.courseName" :disabled="true"></el-input>
               </el-form-item>
               <el-form-item label="教师名称" prop="teacherName">
                 <el-input v-model="ruleForm2.teacherName"></el-input>
@@ -140,6 +144,7 @@
                       type="year"
                       placeholder="选择学年"
                       style="width: 100%;"
+                      :picker-options="pickerOptions2"
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>
@@ -183,7 +188,7 @@
                 </el-col>
               </el-form-item>
               <el-form-item prop="successor" label="前继课程" style="text-align:left">
-                <el-select v-model="ruleForm2.successor" multiple collapse-tags placeholder="前继课程">
+                <el-select v-model="ruleForm2.successor" multiple collapse-tags placeholder="前继课程" :disabled="true">
                   <el-option
                     v-for="(item,index) in allCourse"
                     :key="index"
@@ -192,18 +197,59 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
+               <el-form-item label="班级个数" prop="classNum" :rules="[{ required: true, message: '请输入班级个数'},{ type: 'number', message: '必须为数字值'}]" style="width:80%">
+                    <el-input type="num" v-model.number="classNum" auto-complete="off"></el-input>
+              </el-form-item>
               <el-form-item style="margin-left:-100px;padding-top:30px">
-                <el-button type="primary" @click="submitForm2('ruleForm2')">提交修改</el-button>
-                <el-button @click="resetForm('ruleForm2')">重置</el-button>
+                <el-button type="primary" @click="editClass">提交修改</el-button>
+                <el-button type="text" @click="addVisible">取消</el-button>
+                <!-- <el-button @click="resetForm('ruleForm2')">重置</el-button> -->
+              </el-form-item>
+            </el-form>
+            <el-form
+              v-show="isEditCourse"
+              :model="ruleForm3"
+              :rules="rules"
+              ref="ruleForm3"
+              label-width="100px"
+              class="demo-ruleForm"
+              size="mini"
+            >
+              <el-form-item label="课程名称" prop="courseName">
+                <el-input v-model="ruleForm3.courseName"></el-input>
+              </el-form-item>
+              <el-form-item prop="successor" label="前继课程" style="text-align:left">
+                <el-select v-model="ruleForm3.successor" multiple collapse-tags placeholder="前继课程">
+                  <el-option
+                    v-for="(item,index) in filterAllCourse"
+                    :key="index"
+                    :label="item.courseName"
+                    :value="item.courseName"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item style="margin-left:-100px;padding-top:30px">
+                <el-button type="primary" @click="submitForm3('ruleForm3')">提交修改</el-button>
+                <el-button type="text" @click="addVisible">取消</el-button>
               </el-form-item>
             </el-form>
           </el-card>
         </el-col>
-        <el-dialog title="请选择对该课程进行的操作" :visible.sync="dialog" width="30%" center>
+        <el-dialog title="请选择要进行的操作" :visible.sync="dialog2" width="30%" center>
           <p style="text-align:center">
-            <el-button @click="editVisible" size="small" type="primary">编 辑</el-button>
-            <el-button @click="delCourse" size="small" type="danger">删 除</el-button>
+            <el-button @click="editClassVisible" size="small" type="primary">编 辑</el-button>
+            <el-button @click="delClass" size="small" type="danger">删 除</el-button>
           </p>
+        </el-dialog>
+        <el-dialog title="点击对应项编辑课程" :visible.sync="dialog1">
+          <P style="margin-top:-20px">
+          <el-button type="text" @click="editCourseVisible"><span style="font-size:12px">(点击修改课程名或前继课程)</span></el-button></p>
+          <el-table :data="dupCourse" border style="width: 100%" @row-click="rowClick">
+            <el-table-column prop="teacherName" label="教师" width="100"></el-table-column>
+            <el-table-column prop="startTime" label="开课时间" width="180"></el-table-column>
+            <el-table-column prop="endTime" label="结束时间"></el-table-column>
+             <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
+          </el-table>
         </el-dialog>
       </div>
     </el-main>
@@ -216,17 +262,70 @@ export default {
   name: "courseGraph",
   data() {
     return {
+      screenWidth: {
+        width: window.screen.width
+      },
       isAdd: true,
-      isDel: false,
-      isEdit: false,
-      dialog: false,
+      isEditClass: false,
+      isEditCourse: false,
+      dialog1: false,
+      dialog2: false,
       dataIndex: 0,
+      rowIndex: 0,
       data: store.state.data,
       links: store.state.links,
-      allCourse: store.state.courseList,
+      allCourse: store.state.courseList, //不重名列表用于显示左侧
+      dupCourse: [
+        {
+          courseID: 1,
+          createTime: "2019-03-28T04:53:06.000+0000",
+          updateTime: "2019-04-03T06:23:53.000+0000",
+          teacherID: 443,
+          courseName: "软件测试",
+          teacherName: "张老师",
+          courseYear: "2018",
+          courseSemester: "秋季",
+          startTime: "2019-03-28",
+          endTime: "2019-03-29",
+          successor: []
+          /*  class: [{
+                    classNum: 1
+                },{
+                    classNum:2
+                }] */
+        },
+        {
+          courseID: 1,
+          createTime: "2019-03-28T04:53:06.000+0000",
+          updateTime: "2019-04-03T06:23:53.000+0000",
+          teacherID: 443,
+          courseName: "软件测试",
+          teacherName: "李老师",
+          courseYear: "2018",
+          courseSemester: "秋季",
+          startTime: "2019-03-28",
+          endTime: "2019-03-29",
+          successor: []
+        },
+        {
+          courseID: 1,
+          createTime: "2019-03-28T04:53:06.000+0000",
+          updateTime: "2019-04-03T06:23:53.000+0000",
+          teacherID: 443,
+          courseName: "软件测试",
+          teacherName: "王老师",
+          courseYear: "2018",
+          courseSemester: "秋季",
+          startTime: "2019-03-28",
+          endTime: "2019-03-30",
+          successor: []
+        }
+      ],
+
       loading: true,
       pickerOptions0: this.startTime(),
       pickerOptions1: this.endTime(),
+      pickerOptions2: this.courseYear(),
       courses: [
         { courseName: "java" },
         { courseName: "软件测试" },
@@ -237,6 +336,7 @@ export default {
       //避免清除
       relayForm: {},
       //添加
+      classNum:null,
       ruleForm: {
         courseName: "",
         teacherName: "",
@@ -257,6 +357,7 @@ export default {
         endTime: null,
         successor: []
       },
+      ruleForm3: {},
       rules: {
         courseName: [
           { required: true, message: "请输入课程名称", trigger: "blur" },
@@ -264,7 +365,7 @@ export default {
         ],
         teacherName: [
           { required: true, message: "请输入教师姓名", trigger: "blur" },
-          { min: 1, max: 5, message: "长度在 1 到 5 个字符", trigger: "blur" }
+          { min: 1, max: 10, message: "长度在 1 到 10 个字符", trigger: "blur" }
         ],
         teacherID: [
           { required: true, message: "请输入教师工号", trigger: "blur" }
@@ -318,6 +419,16 @@ export default {
       .catch(err => {
         console.log(err);
       }); */
+    console.log(this.screenWidth.width);
+  },
+  computed:{
+    filterAllCourse:function(){
+      var filterForm = Object.assign({},this.allCourse)
+      delete filterForm[this.dataIndex-1]
+      console.log(this.allCourse)
+      console.log(filterForm)
+      return filterForm
+    }
   },
   mounted() {
     //console.log(this.data);
@@ -357,6 +468,13 @@ export default {
         }
       };
     },
+    courseYear() {
+      return {
+        disabledDate: time => {
+          return time.getTime() < Date.now();
+        }
+      };
+    },
     setTime(val) {
       var result =
         val.getFullYear() + "-" + (val.getMonth() + 1) + "-" + val.getDate();
@@ -366,12 +484,9 @@ export default {
       var result = val.getFullYear();
       return result;
     },
-    /* handleClick(params){
-      alert("a")
-    }, */
-    edgeFunc(){
-      store.commit('edgeStyle',this.dataIndex)
-          this.test()
+    edgeFunc() {
+      store.commit("edgeStyle", this.dataIndex);
+      this.test();
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -379,11 +494,12 @@ export default {
           var length = this.data.length;
           for (var i = 0; i < length; i++) {
             if (this.ruleForm.courseName == this.data[i].name) {
-              if (this.ruleForm.courseName == "satrt") {
+              if (this.ruleForm.courseName == "start") {
                 alert("不可添加名为“start”的课程");
               } else {
-                alert("该课程已存在");
-              }
+                //直接向后端提交
+                this.$message("添加成功");
+                }
               return 1;
             }
           }
@@ -397,6 +513,8 @@ export default {
     },
     submitForm2(formName) {
       this.$refs[formName].validate(valid => {
+
+        //提交后端
         if (valid) {
           var length = this.data.length;
           for (var i = 0; i < length; i++) {
@@ -404,21 +522,26 @@ export default {
               this.ruleForm2.courseName == this.data[i].name &&
               this.ruleForm2.courseName != this.data[this.dataIndex].name
             ) {
-              if (this.ruleForm2.courseName == "satrt") {
+              if (this.ruleForm2.courseName == "start") {
                 alert("不可更改课程名为“start”");
               } else {
-                alert("该课程已存在");
+                //提交给后端
+                this.$message("修改成功");
               }
               return 1;
             }
           }
-          this.editCourse();
+          this.editClass();
         } else {
           console.log("error submit!!");
           return false;
-        }
+        } 
       });
       this.resetForm(formName);
+    },
+    submitForm3(formName) {
+      //console.log(this.dataIndex)
+      this.editCourse();
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
@@ -469,58 +592,83 @@ export default {
           store.commit("addLinks", addLink);
         }
       }
-      var addCourse=Object.assign({},this.ruleForm)
+      var addCourse = Object.assign({}, this.ruleForm);
       store.commit("addCourse", addCourse);
-      console.log(addCourse)
+      console.log(addCourse);
       this.test();
 
-      //==================向后端提交=========================
-      //alert添加成功
+      //==================向后端提交ruleForm和classNum=========================
+      //message添加成功
     },
     addVisible() {
       if (this.isAdd == false) {
-        this.isDel = false;
-        this.isEdit = false;
+        this.isEditCourse = false;
+        this.isEditClass = false;
         this.isAdd = true;
       }
     },
-    editVisible() {
-      this.dialog = false;
+    rowClick(row) {
+      this.dialog2 = true;
+      console.log(row);
+      this.rowIndex = row;
+      console.log(this.rowIndex);
+      //dubCourse
+    },
+    editClassVisible() {
+      this.dialog1 = false;
+      this.dialog2 = false;
       this.isAdd = false;
-      this.isEdit = true;
+      this.isEditClass = true;
 
-      var a = store.state.courseList[this.dataIndex - 1];
+      var a = Object.assign({}, this.rowIndex);
+      //var a = this.rowIndex;
       console.log(a);
       if (a.length == 11) {
         delete a["courseID"];
         delete a["createTime"];
         delete a["updateTime"];
       }
+      a["courseYear"] = new Date(a["courseYear"]);
       a["startTime"] = new Date(a["startTime"]);
       a["endTime"] = new Date(a["endTime"]);
       this.ruleForm2 = a;
     },
+    editClass() {
+      var length = this.dupCourse.length;
+
+      var editClass = Object.assign({}, this.ruleForm2);
+      //提交ruleForm2
+      this.resetForm('ruleForm2')
+      this.isEditClass=false;
+      this.isAdd=true
+      this.$message('修改成功')
+      
+      //================向后端提交ruleForm2和classNum==========================
+      //提交之后返回成功后，message修改成功
+    },
+    editCourseVisible() {
+      this.dialog1 = false;
+      this.isAdd=false;
+      this.isEditClass=false
+      this.isEditCourse = true;
+      
+      this.ruleForm3= Object.assign({}, this.allCourse[this.dataIndex - 1]);
+      console.log(this.ruleForm3)
+    },
     editCourse() {
       var oldName = store.state.data[this.dataIndex].name;
-      var newName = this.ruleForm2.courseName;
-      var length = this.allCourse.length;
-      var oldLinks; //该节点原来的前继节点们
-      var newLinks = this.ruleForm2.successor; //该节点修改后的前继节点们
-
+      var newName = this.ruleForm3.courseName;
+      var oldLinks = this.allCourse[this.dataIndex - 1].successor; //该节点原来的前继节点们
+      var newLinks = this.ruleForm3.successor; //该节点修改后的前继节点
+      console.log(oldLinks,newLinks)
       //如果名字被更改，更新courseList、data和links里的名称
       if (newName != oldName) {
         store.commit("editName", { name: newName, index: this.dataIndex });
-        console.log(this.data)
-      }
-      //可用filter
-      for (var i = 0; i < length; i++) {
-        if (this.allCourse[i].courseName == oldName) {
-          oldLinks = this.allCourse[i].successor;
-          //return 0
-        }
+        console.log(this.data);
       }
       //links
       var isEqual = oldLinks.sort().toString() === newLinks.sort().toString();
+      console.log(isEqual)
       if (isEqual == false) {
         /*    //更改links
         //去重
@@ -550,19 +698,21 @@ export default {
           }
         } */
 
-        store.commit("editLinks", { new: newLinks, index: dataIndex });
-        console.log(this.links)
-        //修改courseList
-
-         var editCourse=Object.assign({},this.ruleForm)
-        store.commit("editCourseList", {
-          form: editCourse,
-          index: this.dataIndex
-        });
-        console.log(this.allCourse)
+        store.commit("editLinks", { new: newLinks, index: this.dataIndex });
+        console.log(this.links);
       }
-      //================向后端提交==========================
-      //提交之后返回成功后，alert修改成功
+      //修改courseList
+      var editCourse = Object.assign({}, this.ruleForm3);
+      store.commit("editCourseList", {
+        form: editCourse,
+        index: this.dataIndex
+      });
+      console.log(this.allCourse)
+      //向后台提交，返回成功信息后message
+      this.isEditCourse=false;
+      this.isAdd=true;
+      this.test()
+      this.$message('修改成功'); 
     },
     selsChange(arr) {
       this.multipleSelection = arr;
@@ -576,9 +726,16 @@ export default {
       //this.test();
       this.test();
     }, */
-    delCourse() {
-      this.dialog = false;
-      this.resetForm('ruleForm2')
+    delClass(){
+      //splice
+      this.dialog2=false;
+      this.dupCourse.splice(this.rowIndex,1)
+      console.log(this.dupCourse)
+      //后端
+    },
+    delCourse() {//直接删除所有该名的课程
+      this.dialog1 = false;
+      this.resetForm("ruleForm2");
       store.commit("delNode2", this.dataIndex);
       this.test();
       //====================向后端提交====================
@@ -588,22 +745,16 @@ export default {
         series: [
           {
             data: store.state.data,
-            links:store.state.links
+            links: store.state.links
           }
         ]
       };
-      console.log("test")
+      console.log("test");
       this.initGraph().setOption(option);
-      console.log("test2")
+      console.log("test2");
     },
     draw() {
       var myChart = this.initGraph();
-      //myChart.showLoading();
-      /* var graph = this.$echarts.dataTool.gexf.parse(xml)
-      graph.nodes.forEach( function(node) {
-        //node.itemStyle.color = "#ddd"
-        node.symbolSize = 10
-      }); */
       var option = {
         title: {
           text: "课程关系图"
@@ -611,10 +762,10 @@ export default {
         tooltip: {},
         animationDurationUpdate: 1500,
         animationEasingUpdate: "quinticInOut",
-        toolbox:{
-          feature:{
+        toolbox: {
+          feature: {
             //保存为图片
-            saveAsImage:{show:true},
+            saveAsImage: { show: true }
             /* dataZoom:{
               show:true,
               title:{
@@ -630,7 +781,7 @@ export default {
             type: "graph",
             layout: "none",
             symbolSize: 40,
-            color:'#ec7814',
+            color: "#ec7814",
             roam: true,
             label: {
               normal: {
@@ -644,7 +795,7 @@ export default {
               normal: {
                 textStyle: {
                   fontSize: 10,
-                  fontColor:"#000"
+                  fontColor: "#000"
                 }
               }
             },
@@ -664,16 +815,16 @@ export default {
       myChart.setOption(option);
       var that = this;
       myChart.on("click", function(params) {
-        console.log(params)
+        console.log(params);
         //点击高亮
-        
+
         if (params.dataType == "edge") {
           //that.handleClick(params);
           that.dataIndex = params.dataIndex;
-          store.commit('edgeStyle',that.dataIndex)
-          myChart.setOption(option)
+          store.commit("edgeStyle", that.dataIndex);
+          myChart.setOption(option);
         } else if (params.dataType == "node") {
-         /*  that.myChart.dispatchAction({
+          /*  that.myChart.dispatchAction({
           type: "focusNodeAdjacency",
           // 使用 dataIndex 来定位节点。
           dataIndex: params.dataIndex
@@ -682,7 +833,18 @@ export default {
           if (that.dataIndex == 0) {
             alert("不可对该节点进行操作");
           } else {
-            that.dialog = true;
+            //点击节点获取同名列表
+            /*  this.$axios
+      .get("/api/getDupCourse")
+      .then(resp => {
+        console.log(resp);
+        that.dupCourse=resp.data
+      })
+      .catch(err => {
+        console.log(err);
+      }); */
+
+            that.dialog1 = true;
           }
         }
       });

@@ -7,7 +7,7 @@
         </el-col>
       </el-row>
       <el-row>
-        <div style="line-height:200px">JAVA</div>
+        <div style="line-height:150px">JAVA</div>
       </el-row>
       <el-row>
         <el-col :span="1" :offset="21"><el-button type="text" @click="stuDetail">学生</el-button></el-col>
@@ -39,7 +39,7 @@
       </div>
     </el-row>
     <el-row>
-      <div style="background-color:rgba(118, 162, 163, 0.26);">
+      <div>
         <div v-show="isNotice" class="noticeBack">
           <el-col :span="10" :offset="7">
             <div class="notice">{{textarea}}</div>
@@ -48,13 +48,17 @@
         </div>
         <div v-show="isLesson" class="noticeBack">
           <el-row>
-            <el-col :span="1" :offset="17" style="margin-top:-90px">
+            <el-col :span="1" :offset="17" style="margin-top:-130px">
               <el-button type="text" @click="editChapter">编辑章节</el-button>
             </el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" :offset="6" style="margin-top:-40px">
-              <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+            <el-col :span="12" :offset="6" style="margin-top:-80px;margin-bottom:40px">
+
+              <el-row><graph></graph></el-row>
+              <el-row>
+              <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick" default-expand-all></el-tree>
+              </el-row>
             </el-col>
           </el-row>
         </div>
@@ -70,17 +74,20 @@
   </div>
 </template>
 <script>
-import axios from "axios";
+import graph from './chapterGraph.vue'
 export default {
   name: "sCourseDetail",
+  components:{
+    graph
+  },
   data() {
     return {
       courseID: 1,
-      isNotice: true,
-      isLesson: false,
+      isNotice: false,
+      isLesson: true,
       isGrade: false,
       notice: "Java是一门面向对象编程语言.",
-      textarea: "",
+      textarea: "请输入课程介绍",
       //data: null,
       rate: 20,
       lesson: null,
@@ -207,12 +214,14 @@ export default {
       })
     },
     handleNodeClick(object) {
-      this.$router.push({
-        path: "/student/courseDetail",
-        query: {
-          id: object.id
-        }
-      });
+      if (object.subCatalog.length == 0) {
+        this.$router.push({
+          path: "chapterDetail",
+          query: {
+            id: object.id
+          }
+        });
+      };
     },
     editChapter() {
       this.$router.push('/teacher/chapterEdit')
@@ -238,28 +247,28 @@ body {
   margin: 0;
 }
 .courseBack {
-  height: 300px;
+  height: 240px;
   /* background-color: cadetblue; */
   /* line-height: 350px; */
   font-size: 25px;
   font-weight: 700;
-  color: rgb(92, 87, 87);
-  background-image: url("../../assets/course/img-8.jpg");
+  color: rgb(235,235,235);
+  background-image: url("../../assets/about.jpg");
   background-size: cover;
 }
 .tabs {
-  height: 70px;
-  background-color: rgba(95, 158, 160, 0.8);
+  height: 60px;
+  background-color: #292929;
 } /* 
 .tabBack:hover {
   background-color: rgba(172, 200, 201, 0.8);
 } */
 .clickDiv {
-  background-color: rgba(83, 139, 141, 0.8);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .tab {
-  line-height: 50px;
-  height: 70px;
+  line-height: 40px;
+  height: 60px;
   color: rgba(255, 255, 255, 0.85);
 }
 .tab:hover {
@@ -281,6 +290,7 @@ body {
 }
 .noticeBack {
   padding: 150px 0;
+  height: 100px;
 }
 .gradeBack {
   padding: 20px 0;
@@ -290,10 +300,34 @@ body {
 .grade {
   height: 80px;
 }
+
 .el-tree {
-  background-color: rgba(118, 162, 163, 0.26);
+  background-color: #fff;
+}
+.el-tree-node__content{
+  background-color: rgb(221, 240, 240);
+  height: 50px;
+  border: #ddd;
+  border-bottom-style: dashed;
 }
 .el-tree-node__content:hover {
-  background-color: rgb(95, 158, 160, 0.8);
+  background-color:rgb(204, 221, 221);
+
 }
+.el-tree-node:focus>.el-tree-node__content{
+   background-color:rgb(204, 221, 221);
+}
+.el-tree-node__children .el-tree-node__content{
+  background-color: #fff;
+  height: 50px;
+  border: #ddd;
+  border-bottom-style: dashed;
+}
+.el-tree-node__children .el-tree-node__content:hover{
+  background-color: rgb(251, 251, 251);
+}
+.el-tree-node__children .el-tree-node:focus>.el-tree-node__content {
+  background-color: rgb(255, 251, 251);
+}
+
 </style>
