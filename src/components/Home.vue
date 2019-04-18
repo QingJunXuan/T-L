@@ -7,7 +7,14 @@
             <div style="display: inline-block">
               <h6>中国领先的在线教育平台</h6>
               <h3>教与学平台</h3>
-              <el-button @click="loginTableVisible = true">JOIN US!</el-button>
+              <div v-if="!getUser()">
+                <el-button @click="loginTableVisible = true">JOIN US!</el-button>
+              </div>
+              <div v-else>
+                <el-button @click="$router.push('/student')">学生主页</el-button>
+                <el-button @click="$router.push('/teacher')" style="margin-left: 10px">教师主页</el-button>
+                <el-button @click="$router.push('/adminManage')" style="margin-left: 10px">管理员主页</el-button>
+              </div>
             </div>
           </div>
         </div>
@@ -214,6 +221,9 @@
         };
       },
       methods: {
+        getUser() {
+          return localStorage.getItem('username');
+        },
         handleLogin(ev) {
           this.$refs.ruleForm.validate((valid) => {
             let that = this;
@@ -226,6 +236,7 @@
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('username', this.ruleForm.account);
                 that.logining = false;
+                bus.$emit('isLogin', true);
                 that.$notify({
                   title: '登录成功',
                   message: '页面即将跳转',
@@ -234,7 +245,7 @@
                 });
                 this.loginTableVisible = false;
                 setTimeout(function () {
-                  that.$router.push('/');
+                  //location.reload();
                   //TODO: 根据身份跳转
                 }, 2000)
               }, response => {

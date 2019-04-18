@@ -43,6 +43,7 @@ export default new Router({
     }, {
       path: '/student',
       component: Header,
+      redirect: '/student/courseManagement',
       children: [{
         path: 'courseManagement',
         name: 'sCourseManagement',
@@ -50,29 +51,30 @@ export default new Router({
         meta: {
           keepAlive: true // 需要缓存
         }
-      },],
-    }, {
-      path: '/student/courseDetail',
-      name: 'sCourseDetail',
-      component: sCourseDetail,
-    },{
-      path: '/student/studentAnalysis',
-      name: 'sStudentAnalysis',
-      component: sStudentAnalysis,
-    }, {
-      path: '/student/chapterDetail',
-      name: 'sChapterDetail',
-      component: sChapterDetail,
-      meta: {
-        keepAlive: true
-      }
-    }, {
-      path: '/student/feedback',
-      name: 'feedback',
-      component: feedback
+      },{
+        path: 'courseDetail',
+        name: 'sCourseDetail',
+        component: sCourseDetail,
+      },{
+        path: 'studentAnalysis',
+        name: 'sStudentAnalysis',
+        component: sStudentAnalysis,
+      }, {
+        path: 'chapterDetail',
+        name: 'sChapterDetail',
+        component: sChapterDetail,
+        meta: {
+          keepAlive: true
+        }
+      }, {
+        path: 'feedback',
+        name: 'feedback',
+        component: feedback
+      }, ],
     }, {
       path: '/teacher',
       component: Header,
+      redirect: '/teacher/courseManagement',
       children: [
         {
           path: 'courseManagement',
@@ -123,16 +125,18 @@ export default new Router({
           path: 'courseAnalysis',
           name: 'tCourseAnalysis',
           component: tCourseAnalysis
-        }
+        },
+        {
+          path: 'courseDetail',
+          name: 'tCourseDetail',
+          component: tCourseDetail,
+        },
       ]
-    }, {
-      path: '/teacher/courseDetail',
-      name: 'tCourseDetail',
-      component: tCourseDetail,
-    },
+    }, 
     {
       path:'/adminManage',
       component:adminManage,
+      redirect: '/adminManage/courseList',
       name:'adminManage',
       children:[
         {

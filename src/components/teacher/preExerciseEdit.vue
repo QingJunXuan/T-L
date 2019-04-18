@@ -49,7 +49,7 @@
             </p>
             <el-row style="margin-top: 20px">
               <el-col :span="24">
-                <div align="end">
+                <div>
                   <span>分值</span>
                   <span style="margin-left: 5px">
                     <el-input
@@ -338,7 +338,7 @@ export default {
           if (this.exerciseNew.new) {
             let exerciseEntity = {
             // 传值chapterid
-            chapterId: 1,
+            chapterId: '1',
             exerciseType: 1,
             exerciseNumber: index + 1,
             exerciseContent: this.exerciseNew.question,
@@ -353,7 +353,8 @@ export default {
                 exerciseEntity,
                 {
                   headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token")
+                    'Authorization': "Bearer " + localStorage.getItem("token"),
+                    'Content-Type': "application/json"
                   }
                 }
               )
@@ -364,6 +365,7 @@ export default {
                       type: "success",
                       message: "习题添加成功!"
                     });
+                    alert(response.bodyText);
                     this.addOptions(JSON.parse(response.bodyText).data.exerciseId);
                   } else {
                     this.$message({ type: "error", message: "习题添加失败!" });

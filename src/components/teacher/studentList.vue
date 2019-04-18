@@ -1,44 +1,43 @@
 <template>
   <el-container>
-    <el-main>
-      <div class="main" align="start">
-        <el-button @click="goBack">
-          <i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回
-        </el-button>
-        <h4>学生列表</h4>
-        <el-row :gutter="30">
-          <el-col :span="8">
-            <el-input placeholder="按学号查找" v-model="searchId" size="small"></el-input>
-          </el-col>
-          <el-col :span="3">
-            <el-button type="primary" size="small">
-              <i class="el-icon-search" style="margin-right: 10px"></i>搜索
+    <el-main class="background">
+      <el-card class="card" :body-style="{ padding: '0' }">
+        <div class="cardbody">
+          <div class="header" align="start">
+            <el-button @click="goBack" type="text" class="backbutton">
+              <i class="el-icon-arrow-left" style="margin-right: 6px"></i>课程详情
             </el-button>
-          </el-col>
-        </el-row>
-        <el-row style="margin-top: 20px">
-          <el-table :data="studentInfo" @row-click="goAnalysis">
-            <el-table-column label="学号" align="center">
-              <template slot-scope="scope">{{scope.row.id}}</template>
-            </el-table-column>
-            <el-table-column label="姓名" align="center">
-              <template slot-scope="scope">{{scope.row.name}}</template>
-            </el-table-column>
-            <el-table-column label="联系方式" align="center">
-              <template slot-scope="scope">{{scope.row.email}}</template>
-            </el-table-column>
-          </el-table>
-        </el-row>
-        <el-row style="margin-top: 30px">
-          <div align="center">
-            <el-pagination
-              :page-size="20"
-              layout="prev, pager, next"
-              :total="studentCount"
-            ></el-pagination>
           </div>
-        </el-row>
-      </div>
+          <div>
+            <el-row :gutter="30" class="margin" style="padding-left: 20px">
+              <el-col :span="8">
+                <el-input placeholder="按学号查找" v-model="searchId" size="small"></el-input>
+              </el-col>
+              <el-col :span="3">
+                <el-button type="primary" size="small" class="searchbutton">
+                  <i class="el-icon-search" style="margin-right: 10px"></i>搜索
+                </el-button>
+              </el-col>
+            </el-row>
+            <el-row class="margin">
+              <el-table :data="studentInfo" @row-click="goAnalysis" size="small" class="table">
+                <el-table-column label="学号" align="center">
+                  <template slot-scope="scope"><p>{{scope.row.id}}</p></template>
+                </el-table-column>
+                <el-table-column label="姓名" align="center">
+                  <template slot-scope="scope"><p>{{scope.row.name}}</p></template>
+                </el-table-column>
+                <el-table-column label="联系方式" align="center">
+                  <template slot-scope="scope"><p>{{scope.row.email}}</p></template>
+                </el-table-column>
+              </el-table>
+            </el-row>
+          </div>
+          <div class="bottom page">
+            <el-pagination :page-size="20" layout="prev, pager, next" small :total="studentCount"></el-pagination>
+          </div>
+        </div>
+      </el-card>
     </el-main>
   </el-container>
 </template>
@@ -66,7 +65,7 @@ export default {
     },
     goAnalysis(row, column, cell, event) {
       // 传值
-      this.$router.push("/teacher/studentAnalysis");
+      this.$router.push({path: '/teacher/studentAnalysis', query: {studentID: row.id, studentName: row.name}});
     },
     // 获取列表
     getStudentInfo(index) {
@@ -114,10 +113,60 @@ export default {
 </script>
 
 <style scoped>
-.main {
-  padding-top: 10px;
+.background {
+  background-color: rgba(118, 162, 163, 0.26);
+}
+
+.card {
   margin: 0 auto;
   width: 900px;
-  min-height: 650px;
+  height: 680px;
+}
+
+.header {
+  height: 42px;
+  background-color: rgb(95, 158, 160, 0.8);
+
+  box-shadow: 0 -1px 5px #aaaaaa;
+}
+
+.cardbody {
+  height: 680px; 
+  position: relative;
+}
+
+.backbutton {
+  padding-left: 10px;
+  color: #fff;
+}
+
+.margin {
+  margin-top: 12px;
+}
+
+.searchbutton {
+  background-color: rgb(95, 158, 160, 0.8);
+  border-color: rgb(95, 158, 160, 0.8);
+}
+
+.table {
+  border-top: 1px solid #e7edf5;
+}
+
+.table p {
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
+.page {
+  color: rgba(118, 162, 163, 0.26);
+}
+
+.bottom {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
 </style>

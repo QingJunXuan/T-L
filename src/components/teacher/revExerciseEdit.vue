@@ -65,7 +65,7 @@
             </p>
             <el-row style="margin-top: 20px">
               <el-col :span="24">
-                <div align="end">
+                <div>
                   <span>分值</span>
                   <span style="margin-left: 5px">
                     <el-input
@@ -177,7 +177,7 @@
               ></el-input>
             </p>
           </div>
-          <div align="end">
+          <div>
             <span>分值</span>
             <span style="margin-left: 5px">
               <el-input size="mini" type="number" v-model="subjectNew.score" style="width: 80px"></el-input>

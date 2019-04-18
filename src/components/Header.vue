@@ -74,7 +74,8 @@
         }).then(() => {
           localStorage.removeItem('username');
           localStorage.removeItem('token');
-          this.$router.push('/home');
+          location.reload();
+          this.isLogin = false;
         }).catch(() => {
 
         });
@@ -91,8 +92,7 @@
         this.isLogin = true;
         this.sysUserName = user;
       }
-
-    }
+    },
   }
 
 </script>
