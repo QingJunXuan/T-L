@@ -6,9 +6,10 @@ import Header from '../components/Header.vue'
 import sCourseManage from '../components/student/courseManage.vue'
 import sCourseDetail from '../components/student/courseDetail.vue'
 import sChapterDetail from '../components/student/chapterDetail.vue'
+import tChapterDetail from '../components/teacher/chapterDetail.vue'
+import sStudentAnalysis from '../components/student/studentAnalysis.vue'
 import tCourseManage from '../components/teacher/courseManage.vue'
 import tCourseDetail from '../components/teacher/courseDetail.vue'
-import tChapterDetail from '../components/teacher/chapterDetail.vue'
 import tChapterCatalog from '../components/teacher/chapterCatalog.vue'
 import tPointEdit from '../components/teacher/pointEdit.vue'
 import preExerciseEdit from '../components/teacher/preExerciseEdit.vue'
@@ -30,14 +31,16 @@ import tpoint from '../components/teacher/tPoint.vue'
 import tpreExercise from '../components/teacher/preExercise.vue'
 import trevExercise from '../components/teacher/revExercise.vue'
 import chapterGraph from '../components/student/chapterGraph.vue'
+
 Vue.use(Router)
 Vue.prototype.$ajax=axios
+
 export default new Router({
   routes: [
-    {
+   {
       path: '/',
       redirect: '/home'
-    }, 
+    },
     {
       path: '/',
       component: Header,
@@ -49,6 +52,7 @@ export default new Router({
     }, {
       path: '/student',
       component: Header,
+      redirect: '/student/courseManagement',
       children: [{
         path: 'courseManagement',
         name: 'sCourseManagement',
@@ -56,17 +60,18 @@ export default new Router({
         meta: {
           keepAlive: true // 需要缓存
         }
-      }, {
-        path: 'test',
-        name: 'sChapterGraph',
-        component: chapterGraph
       },{
+        path: 'courseDetail',
+        name: 'sCourseDetail',
+        component: sCourseDetail,
+      },{
+        path: 'studentAnalysis',
+        name: 'sStudentAnalysis',
+        component: sStudentAnalysis,
+      }, {
         path: 'chapterDetail',
         name: 'sChapterDetail',
         component: sChapterDetail,
-        meta: {
-          keepAlive: true
-        },
         children: [
           {
             path:'point',
@@ -83,20 +88,19 @@ export default new Router({
             name:'revExercise',
             component:revExercise,
           }
-        ]
-      },
-    ],},
-    {
-      path: '/student/feedback',
-      name: 'feedback',
-      component: feedback
-    },{
-      path: '/student/courseDetail',
-      name: 'sCourseDetail',
-      component: sCourseDetail,
+        ],
+        meta: {
+          keepAlive: true
+        },
+      }, {
+        path: 'feedback',
+        name: 'feedback',
+        component: feedback
+      }, ],
     }, {
       path: '/teacher',
       component: Header,
+      redirect: '/teacher/courseManagement',
       children: [
         {
           path: 'courseManagement',
@@ -105,6 +109,28 @@ export default new Router({
           meta: {
             keepAlive: true // 需要缓存
           }
+        },
+        {
+          path:'chapterEdit',
+          name:'tChapterCatalog',
+          component:tChapterCatalog,
+          children: [
+            {
+              path:'pointEdit',
+              name:'pointEdit',
+              component:tPointEdit,
+            },
+            {
+              path:'preEdit',
+              name:'preExerciseEdit',
+              component:preExerciseEdit,
+            },
+            {
+              path:'revEdit',
+              name:'revExerciseEdit',
+              component:revExerciseEdit,
+            }
+          ]
         },{
           path: 'chapterDetail',
           name: 'tChapterDetail',
@@ -131,28 +157,6 @@ export default new Router({
           ]
         },
         {
-          path:'chapterEdit',
-          name:'tChapterCatalog',
-          component:tChapterCatalog,
-          children: [
-            {
-              path:'pointEdit',
-              name:'pointEdit',
-              component:tPointEdit,
-            },
-            {
-              path:'preEdit',
-              name:'preExerciseEdit',
-              component:preExerciseEdit,
-            },
-            {
-              path:'revEdit',
-              name:'revExerciseEdit',
-              component:revExerciseEdit,
-            }
-          ]
-        },
-        {
           path:'mark',
           name:'exerciseMark',
           component:tExerciseMark,
@@ -171,16 +175,18 @@ export default new Router({
           path: 'courseAnalysis',
           name: 'tCourseAnalysis',
           component: tCourseAnalysis
-        }
+        },
+        {
+          path: 'courseDetail',
+          name: 'tCourseDetail',
+          component: tCourseDetail,
+        },
       ]
-    }, {
-      path: '/teacher/courseDetail',
-      name: 'tCourseDetail',
-      component: tCourseDetail,
-    },
+    }, 
     {
       path:'/adminManage',
       component:adminManage,
+      redirect: '/adminManage/courseList',
       name:'adminManage',
       children:[
         {
@@ -204,7 +210,6 @@ export default new Router({
           component: aCourseGraph
         }
       ]
-
     }],
   mode: 'history',
   scrollBehavior(to, from, savedPosition) {

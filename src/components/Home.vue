@@ -7,7 +7,14 @@
             <div style="display: inline-block">
               <h6>中国领先的在线教育平台</h6>
               <h3>教与学平台</h3>
-              <el-button @click="loginTableVisible = true">JOIN US!</el-button>
+              <div v-if="!getUser()">
+                <el-button @click="loginTableVisible = true">JOIN US!</el-button>
+              </div>
+              <div v-else>
+                <el-button @click="$router.push('/student')">学生主页</el-button>
+                <el-button @click="$router.push('/teacher')" style="margin-left: 10px">教师主页</el-button>
+                <el-button @click="$router.push('/adminManage')" style="margin-left: 10px">管理员主页</el-button>
+              </div>
             </div>
           </div>
         </div>
@@ -214,26 +221,31 @@
         };
       },
       methods: {
+        getUser() {
+          return localStorage.getItem('username');
+        },
         handleLogin(ev) {
           this.$refs.ruleForm.validate((valid) => {
             let that = this;
             if (valid) {
               that.logining = true;
-              that.$http.post('/api/auth', {
+              that.$http.post('http://localhost:8080/auth', {
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }).then(response => {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('username', this.ruleForm.account);
                 that.logining = false;
+                bus.$emit('isLogin', true);
                 that.$notify({
                   title: '登录成功',
                   message: '页面即将跳转',
                   type: 'success',
                   duration: 2000
                 });
+                this.loginTableVisible = false;
                 setTimeout(function () {
-                  that.$router.push('/');
+                  //location.reload();
                   //TODO: 根据身份跳转
                 }, 2000)
               }, response => {
@@ -257,7 +269,7 @@
                 mail: this.ruleForm1.email,
                 password: this.ruleForm1.password,
                 name: this.ruleForm1.name,
-                workID: this.ruleForm1.number,
+                work_id: this.ruleForm1.number,
                 role: this.ruleForm1.auth,
                 gender: this.ruleForm1.gender
               }).then(response => {

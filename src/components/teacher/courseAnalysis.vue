@@ -1,458 +1,934 @@
 <template>
   <el-container>
     <el-main>
-      <div style="padding-top: 10px; margin: 0 auto; width: 900px; min-height: 650px" align="start">
-        <div>
-          <el-button @click="goBack"><i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回</el-button>
-        </div>
-        <div>
+      <div class="main" align="start">
+        <el-row>
+          <el-button @click="goBack">
+            <i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回
+          </el-button>
+        </el-row>
+        <el-row>
           <h4>课程评分</h4>
           <el-rate
             v-model="courseGrade"
             disabled
             show-score
             text-color="#ff9900"
-            score-template="{value}">
-          </el-rate>
-        </div>
-        <el-row :gutter="10" style="margin-top: 40px">
-          <el-col :span="6">
-            <template>
-              <el-select v-model="xy" @change="handleComparison">
-                <el-option
-                v-for="item in xyOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-                </el-option>
-              </el-select>
-            </template>
-          </el-col>
-          <el-col :span="6">
-            <template>
-              <el-select v-model="comparison" @change="handleDetail">
-                <el-option
-                :disabled="item.disabled"
-                v-for="item in cOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-                </el-option>
-              </el-select>
-            </template>
-          </el-col>
-          <el-col :span="6" v-if="comparison === 0">
-            <template>
-              <el-select v-model="aclass">
-                <el-option
-                v-for="item in classOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-                </el-option>
-              </el-select>
-            </template>
-          </el-col>
-          <el-col :span="6">
-            <template>
-              <el-select multiple v-model="detail" :multiple-limit="cOptions[comparison].limit">
-                <el-option
-                v-for="item in detailOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-                </el-option>
-              </el-select>
-            </template>
-          </el-col>
+            score-template="{value}"
+          ></el-rate>
         </el-row>
-        <el-row>
-          <div id="myChart" style="width: 100%;height: 500px;margin-top: 40px"></div>
-        </el-row>
+        <el-collapse v-model="activeNames" style="margin-top: 20px">
+          <el-collapse-item title="成绩分析" name="1">
+            <el-row :gutter="10">
+              <el-col :span="6" style="padding-top: 4%">
+                <el-row class="select-title">指标</el-row>
+                <el-row>
+                  <el-select v-model="xy" @change="handleComparison" size="small">
+                    <el-option
+                      v-for="item in xyOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row>
+                  <el-select
+                    v-model="gradeAttribute"
+                    @change="handleGrade"
+                    v-if="xy === 0"
+                    size="small"
+                    class="select"
+                  >
+                    <el-option
+                      v-for="item in gradeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row class="select-title">对比组</el-row>
+                <el-row>
+                  <el-select v-model="comparison" @change="handleDetail" size="small">
+                    <el-option
+                      :disabled="item.disabled"
+                      v-for="item in cOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row class="select-title">选择{{cOptions[comparison].label}}</el-row>
+                <el-row v-if="comparison !== 0">
+                  <el-select
+                    multiple
+                    size="small"
+                    v-model="detailValue"
+                    @change="handleDetailValue"
+                    :multiple-limit="cOptions[comparison].limit+4"
+                    :filterable="cOptions[comparison].filterable"
+                  >
+                    <el-option
+                      v-for="item in detailOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row v-if="comparison === 0 && gradeAttribute === 3">
+                  <el-row>
+                    <el-cascader
+                      :options="studentOptions"
+                      v-model="studentMap[0]"
+                      @change="handleChange(0)"
+                      size="small"
+                      filterable
+                      clearable
+                    ></el-cascader>
+                  </el-row>
+                </el-row>
+                <el-row v-if="comparison === 0 && gradeAttribute !== 3">
+                  <el-row>
+                    <el-cascader
+                      :options="studentOptions"
+                      v-model="studentMap[0]"
+                      @change="handleChange(0)"
+                      filterable
+                      size="small"
+                      clearable
+                    ></el-cascader>
+                  </el-row>
+                  <el-row class="select">
+                    <el-cascader
+                      :options="studentOptions"
+                      v-model="studentMap[1]"
+                      @change="handleChange(1)"
+                      filterable
+                      size="small"
+                      clearable
+                    ></el-cascader>
+                  </el-row>
+                  <el-row class="select">
+                    <el-cascader
+                      :options="studentOptions"
+                      v-model="studentMap[2]"
+                      @change="handleChange(2)"
+                      filterable
+                      size="small"
+                      clearable
+                    ></el-cascader>
+                  </el-row>
+                  <el-row class="select">
+                    <el-cascader
+                      :options="studentOptions"
+                      v-model="studentMap[3]"
+                      @change="handleChange(3)"
+                      filterable
+                      size="small"
+                      clearable
+                    ></el-cascader>
+                  </el-row>
+                </el-row>
+                <el-row class="select">
+                  <el-button type="primary" @click="getCharts" style="width: 70%" size="small">确定</el-button>
+                </el-row>
+              </el-col>
+              <el-col :span="18">
+                <div id="myChart" style="width: 90%;height: 500px;margin-top: 40px"></div>
+              </el-col>
+            </el-row>
+            <el-row v-if="comparison === 0">
+              <el-row v-for="(item, index) in detail" :key="index">
+                <el-row style="height: 100px" v-if="item !== undefined">
+                  <el-button type="text" @click="goStudentAnalysis">{{item.label}}</el-button>
+                  <el-row>
+                    <el-col :span="4">最近学习到章节3</el-col>
+                    <el-col :span="4">平均课前成绩：85</el-col>
+                    <el-col :span="4">平均课后成绩：85</el-col>
+                    <el-col :span="4">平均总成绩：85</el-col>
+                    <el-col :span="4">最近班级排名：10↑</el-col>
+                  </el-row>
+                </el-row>
+              </el-row>
+            </el-row>
+          </el-collapse-item>
+          <el-collapse-item title="反馈信息" name="2">
+            <el-row :gutter="10">
+              <el-col :span="4">
+                <el-select v-model="chapter" @change="handleResponse" size="small">
+                  <el-option
+                    v-for="item in chapterOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="4">
+                <el-input size="small" placeholder="输入关键词"></el-input>
+              </el-col>
+              <el-col :span="4">
+                <el-button type="primary" size="small">搜索</el-button>
+              </el-col>
+            </el-row>
+            <el-row style="margin-top: 15px">
+              <el-col :span="2">章节评分</el-col>
+              <el-col :span="4">
+                  <el-rate
+                    v-model="courseGrade"
+                    disabled
+                    show-score
+                    text-color="#ff9900"
+                    score-template="{value}"
+                  ></el-rate>
+              </el-col>
+            </el-row>
+            <div style="height: 150px; margin-top: 20px">
+              <el-row>章节1</el-row>
+              <el-row>1612345 学生1 2019-01-01 12:12:12</el-row>
+              <el-row>评分：4.2</el-row>
+              <el-row>
+                <div style="height: 100px">反馈内容</div>
+              </el-row>
+            </div>
+            <div style="height: 150px">
+              <el-row>章节2</el-row>
+              <el-row>1612345 学生1 2019-01-01 12:12:12</el-row>
+              <el-row>评分：4.2</el-row>
+              <el-row>
+                <div style="height: 100px">反馈内容</div>
+              </el-row>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
       </div>
     </el-main>
   </el-container>
 </template>
 
 <script>
-import echarts from 'echarts';
-    export default {
-      name: "courseAnalysis",
-      data() {
-        return {
-          courseGrade: 4.5,
-          xyOptions: [
-            {
-              value: 0,
-              label: '章节-平均成绩'
-            },
-            {
-              value: 1,
-              label: '分数段-人数'
-            },
-            {
-              value: 2,
-              label: '章节-评分'
-            },
-            {
-              value: 3,
-              label: '评分-人数'
-            },
-            {
-              value: 4,
-              label: '年份-总成绩'
-            },
-            {
-              value: 5,
-              label: '学期-总成绩'
-            },
-            {
-              value: 6,
-              label: '班级-总成绩'
-            }
-          ],
-          cOptions: [
-            {
-              value: 0,
-              label: '学生',
-              disabled: false,
-              limit: 4,
-            },
-            {
-              value: 1,
-              label: '性别',
-              disabled: false,
-              limit: 1,
-            },
-            {
-              value: 2,
-              label: '班级',
-              disabled: false,
-              limit: 4,
-            },
-            {
-              value: 3,
-              label: '教师',
-              disabled: false,
-              limit: 4,
-            },
-            {
-              value: 4,
-              label: '学期',
-              disabled: false,
-              limit: 4,
-            },
-            {
-              value: 5,
-              label: '年份',
-              disabled: false,
-              limit: 4,
-            },
-            {
-              value: 6,
-              label: '章节',
-              disabled: true,
-              limit: 4,
-            },
-          ],
-          gradeOptions: [
-            {
-              value: 0,
-              label: '课前平均成绩'
-            },
-            {
-              value: 1,
-              label: '课后平均成绩'
-            },
-            {
-              value: 2,
-              label: '总平均成绩'
-            }
-          ],
-          genderOptions: [
-            {
-              value: 0,
-              label: '全部'
-            },
-            {
-              value: 1,
-              label: '只看男生'
-            },
-            {
-              value: 2,
-              label: '只看女生'
-            }
-          ],
-          detail: [],
-          xy: 0,
-          comparison: 0,
-          xData: [],
-          yData: [],
-          cData: [],
-          studentOptions: [
-            {
-              value: 0,
-              label: '学生1'
-            },
-            {
-              value: 1,
-              label: '学生2'
-            }
-          ],
-          students: [],
-          teacherOptions: [
-            {
-              value: 0,
-              label: '老师1'
-            },
-            {
-              value: 1,
-              label: '老师2'
-            }
-          ],
-          teachers: [],
-          classOptions: [
-            {
-              value: 0,
-              label: '班级1'
-            },
-            {
-              value: 1,
-              label: '班级2'
-            }
-          ],
-          aclass: 0,
-          classes: [],
-          semesterOptions: [
-            {
-              value: 0,
-              label: '学期1'
-            },
-            {
-              value: 1,
-              label: '学期2'
-            }
-          ],
-          semesters: [],
-          yearOptions: [
-            {
-              value: 0,
-              label: '2018'
-            },
-            {
-              value: 1,
-              label: '2019'
-            }
-          ],
-          years: [],
-          chapterOptions: [
-            {
-              value: 0,
-              label: '章节1'
-            },
-            {
-              value: 1,
-              label: '章节2'
-            }
-          ],
-          chapters: [],
+import echarts from "echarts";
+export default {
+  name: "courseAnalysis",
+  data() {
+    return {
+      activeNames: ["1"],
+      courseGrade: 4.5,
+      xyOptions: [
+        {
+          value: 0,
+          label: "章节-平均成绩",
+          xName: "章节",
+          yName: "平均成绩"
+        },
+        {
+          value: 1,
+          label: "分数段-人数",
+          xName: "分数段",
+          yName: "人数"
+        },
+        {
+          value: 2,
+          label: "章节-评分",
+          xName: "章节",
+          yName: "评分"
+        },
+        {
+          value: 3,
+          label: "评分-人数",
+          xName: "评分",
+          yName: "人数"
+        },
+        {
+          value: 4,
+          label: "年份-总成绩",
+          xName: "年份",
+          yName: "总成绩"
+        },
+        {
+          value: 5,
+          label: "年份-评分",
+          xName: "年份",
+          yName: "评分"
+        },
+        {
+          value: 6,
+          label: "学期-总成绩",
+          xName: "学期",
+          yName: "总成绩"
+        },
+        {
+          value: 7,
+          label: "学期-评分",
+          xName: "学期",
+          yName: "评分"
+        },
+        {
+          value: 8,
+          label: "班级-总成绩",
+          xName: "班级",
+          yName: "总成绩"
+        },
+        {
+          value: 9,
+          label: "班级-评分",
+          xName: "班级",
+          yName: "评分"
         }
-      },
-      methods: {
-        goBack() {
-          if (window.history.length <= 1) {
-            this.$router.push({path:'/'})
-            return false
-          } else {
-            this.$router.go(-1)
+      ],
+      cOptions: [
+        {
+          value: 0,
+          label: "学生",
+          disabled: false,
+          limit: 4,
+          filterable: false
+        },
+        {
+          value: 1,
+          label: "性别",
+          disabled: false,
+          limit: 1,
+          filterable: false
+        },
+        {
+          value: 2,
+          label: "班级",
+          disabled: false,
+          limit: 4,
+          filterable: false
+        },
+        {
+          value: 3,
+          label: "教师",
+          disabled: false,
+          limit: 4,
+          filterable: true
+        },
+        {
+          value: 4,
+          label: "学期",
+          disabled: false,
+          limit: 4,
+          filterable: false
+        },
+        {
+          value: 5,
+          label: "学年",
+          disabled: false,
+          limit: 4,
+          filterable: false
+        },
+        {
+          value: 6,
+          label: "章节",
+          disabled: true,
+          limit: 4,
+          filterable: true
+        }
+      ],
+      gradeOptions: [
+        {
+          value: 0,
+          label: "总平均成绩"
+        },
+        {
+          value: 1,
+          label: "课前平均成绩"
+        },
+        {
+          value: 2,
+          label: "课后平均成绩"
+        },
+        {
+          value: 3,
+          label: "课前-课后平均成绩"
+        }
+      ],
+      genderOptions: [
+        {
+          value: 0,
+          label: "全部"
+        },
+        {
+          value: 1,
+          label: "只看男生"
+        },
+        {
+          value: 2,
+          label: "只看女生"
+        }
+      ],
+      gradeAttribute: 0,
+      detail: [],
+      detailValue: [],
+      xy: 0,
+      comparison: 0,
+      xData: [],
+      yData: [],
+      studentOptions: [],
+      students: [],
+      teacherOptions: [
+        {
+          value: 0,
+          label: "老师1"
+        },
+        {
+          value: 1,
+          label: "老师2"
+        }
+      ],
+      teachers: [],
+      classOptions: [],
+      classes: [],
+      semesterOptions: [],
+      semesters: [],
+      yearOptions: [],
+      years: [],
+      chapterOptions: [],
+      chapters: [],
+      chapter: 0,
+      studentMap: [],
+      // 章节
+      chapterList: [],
+      // 成绩 只能数字
+      gradeList: [[88, 93, 90], [76, 82, 85], [90, 89, 95]],
+      // 课程评分 只能数字
+      evaluateList: [[4.3, 3.8, 4.1], [4.5, 4.2, 3.7]],
+      // 课前成绩 只能数字
+      gradePreList: [[88, 93, 90], [76, 82, 85], [90, 89, 95]],
+      // 课后成绩 只能数字
+      gradeRevList: [[88, 93, 90], [76, 82, 85], [90, 89, 95]],
+      // 成绩阶段
+      gradeEnumList: [60, 70, 80, 90],
+      // 评分阶段
+      evaluateEnumList: [1, 2, 3, 4],
+      // 人数 只能数字
+      amountList: [[8, 17, 29, 18], [7, 19, 22, 24], [12, 16, 31, 13]],
+      // 年份
+      yearList: [],
+      // 学期
+      semesterList: [],
+      // 班级
+      classList: [],
+      colors: ["#003366", "#4cabce", "#e5323e"]
+    };
+  },
+  methods: {
+    // 返回
+    goBack() {
+      if (window.history.length <= 1) {
+        this.$router.push({ path: "/" });
+        return false;
+      } else {
+        this.$router.go(-1);
+      }
+    },
+    goStudentAnalysis() {
+      this.$router.push("/teacher/studentAnalysis");
+    },
+    // 获取列表
+    getStudentOptions(index) {
+      this.$http
+        .get(
+          "http://localhost:8080/getStudentsByClassID?courseClassID=" +
+            this.studentOptions[index].value,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        },
-        handleComparison() {
-          switch(this.xy) {
-            case 0: {
-              this.comparison = 0;
-              this.detail = [];
-              for (let i = 0;i < this.cOptions.length;i++) {
-                if (i === 6) this.cOptions[i].disabled = true;
-                else this.cOptions[i].disabled = false;
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let studentList = JSON.parse(response.bodyText);
+              if (studentList.state === 1) {
+                let i = 0;
+                while (i < studentList.data.length) {
+                  this.studentOptions[index].children.push({
+                    value: i,
+                    label: studentList.data[i].name,
+                    disabled: false
+                  });
+                  i++;
+                }
               }
-              break;
-            }
-            case 1: {
-              this.comparison = 1;
-              this.detail = [];
-              for (let i = 0;i < this.cOptions.length;i++) {
-                if (i === 0 || i === 6) this.cOptions[i].disabled = true;
-                else this.cOptions[i].disabled = false;
-              }
-              break;
-            }
-            case 2: {
-              this.comparison = 3;
-              this.detail = [];
-              for (let i = 0;i < this.cOptions.length;i++) {
-                if (i < 3 || i === 6) this.cOptions[i].disabled = true;
-                else this.cOptions[i].disabled = false;
-              }
-              break;
-            }
-            case 3: {
-              this.comparison = 6;
-              this.detail = [];
-              for (let i = 0;i < this.cOptions.length;i++) {
-                if (i === 6) this.cOptions[i].disabled = false;
-                else this.cOptions[i].disabled = true;
-              }
-              break;
-            }
-            case 4: {
-              this.comparison = 2;
-              this.detail = [];
-              for (let i = 0;i < this.cOptions.length;i++) {
-                if (i === 2 || i === 3) this.cOptions[i].disabled = false;
-                else this.cOptions[i].disabled = true;
-              }
-              break;
-            }
-            case 5: {
-              this.comparison = 2;
-              this.detail = [];
-              for (let i = 0;i < this.cOptions.length;i++) {
-                if (i === 2 || i === 3) this.cOptions[i].disabled = false;
-                else this.cOptions[i].disabled = true;
-              }
-              break;
-            }
-            case 6: {
-              this.comparison = 4;
-              this.detail = [];
-              for (let i = 0;i < this.cOptions.length;i++) {
-                if (i === 4 || i === 5) this.cOptions[i].disabled = false;
-                else this.cOptions[i].disabled = true;
-              }
-              break;
-            }
-            default: break;
-          }
-        },
-        handleDetail() {
-          this.detail = [];
-        },
-        drawChart(){
-        // 基于准备好的dom，初始化echarts实例
-        let myChart = this.$echarts.init(document.getElementById('myChart'))
-        // 绘制图表
-        myChart.setOption({
-          color: ['#003366', '#006699', '#4cabce', '#e5323e'],
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'cross'
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
             }
           },
-          legend: {
-        data: ['Forest', 'Steppe', 'Desert', 'Wetland']
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
     },
-    toolbox: {
-        show: true,
-        orient: 'vertical',
-        left: 'right',
-        top: 'center',
-        feature: {
-            mark: {show: true},
-            //dataView: {show: true, readOnly: false},
-            magicType: {show: true, type: ['line', 'bar', 'stack', 'tiled']},
-            restore: {show: true},
-            saveAsImage: {show: true}
-        }
+    getClassOptions() {
+      this.classOptions = [];
+      this.studentOptions = [];
+      // 登录时存teacherID
+      // 根据课程号和老师id
+      this.$http
+        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let classList = JSON.parse(response.bodyText);
+              let i = 0;
+              while (i < classList.data.length) {
+                this.classOptions.push({
+                  value: classList.data[i].courseClass.id,
+                  label: classList.data[i].courseClass.classNum + "班"
+                });
+                this.studentOptions.push({
+                  value: classList.data[i].courseClass.id,
+                  label: classList.data[i].courseClass.classNum + "班",
+                  children: []
+                });
+                this.classList.push(
+                  classList.data[i].courseClass.classNum + "班"
+                );
+                this.getStudentOptions(i);
+                i++;
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
     },
-    calculable: true,
-    xAxis: [
-        {
-            type: 'category',
-            name: '章节',
-            axisTick: {show: false},
-            data: ['2012', '2013', '2014', '2015', '2016']
+    getTeacherOptions() {
+      // TODO: 获取教师列表
+    },
+    getSemesterOptions() {
+      this.semesterOptions = [];
+      // 登录时存teacherID
+      this.$http
+        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let courseList = JSON.parse(response.bodyText);
+              let i = 0;
+              while (i < courseList.data.length) {
+                this.semesterOptions.push({
+                  value: i,
+                  label:
+                    courseList.data[i].courseInfo.courseYear +
+                    courseList.data[i].courseInfo.courseSemester
+                });
+                this.semesterList.push(
+                  courseList.data[i].courseInfo.courseYear +
+                    courseList.data[i].courseInfo.courseSemester
+                );
+                i++;
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getYearOptions() {
+      this.yearOptions = [];
+      // 登录时存teacherID
+      this.$http
+        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let courseList = JSON.parse(response.bodyText);
+              let i = 0;
+              while (i < courseList.data.length) {
+                this.yearOptions.push({
+                  value: i,
+                  label: courseList.data[i].courseInfo.courseYear + "年"
+                });
+                this.yearList.push(
+                  courseList.data[i].courseInfo.courseYear + "年"
+                );
+                i++;
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getChapterOptions() {
+      this.chapterOptions = [];
+      // 登录时存teacherID
+      this.$http
+        .get("http://localhost:8080/getCourseCatalog?courseID=1", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let courseList = JSON.parse(response.bodyText);
+              let i = 0;
+              while (i < courseList.data.length) {
+                this.chapterOptions.push({
+                  value: i,
+                  label:
+                    "第" +
+                    courseList.data[i].id +
+                    "章-" +
+                    courseList.data[i].contentName
+                });
+                this.chapterList.push(courseList.data[i].contentName);
+                i++;
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    // 下拉框事件
+    handleComparison() {
+      switch (this.xy) {
+        // 章节-平均成绩
+        case 0: {
+          this.comparison = 0;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 6) this.cOptions[i].disabled = true;
+            else this.cOptions[i].disabled = false;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.chapterList;
+          this.yData = this.gradeList;
+          break;
         }
-    ],
-    yAxis: [
-        {
-          name: '分数',
-          
-            type: 'value'
+        // 分数段-人数
+        case 1: {
+          this.comparison = 1;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 0 || i === 6) this.cOptions[i].disabled = true;
+            else this.cOptions[i].disabled = false;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.gradeEnumList;
+          this.yData = this.amountList;
+          break;
         }
-    ],
-    series: [
-        {
-            name: 'Forest',
-            type: 'bar',
-            barGap: 0,
-            data: [320, 332, 301, 334, 390]
-        },
-        {
-            name: 'Steppe',
-            type: 'bar',
-            barGap: 0,
-            data: [220, 182, 191, 234, 290]
-        },
-        {
-            name: 'Desert',
-            type: 'bar',
-            barGap: 0,
-            data: [150, 232, 201, 154, 190]
-        },
-        {
-            name: 'Wetland',
-            type: 'bar',
-            barGap: 0,
-            data: [98, 77, 101, 99, 40]
+        // 章节-评分
+        case 2: {
+          this.comparison = 3;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i < 3 || i === 6) this.cOptions[i].disabled = true;
+            else this.cOptions[i].disabled = false;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.chapterList;
+          this.yData = this.evaluateList;
+          break;
         }
-    ]
-        });
+        // 评分-人数
+        case 3: {
+          this.comparison = 6;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 6) this.cOptions[i].disabled = false;
+            else this.cOptions[i].disabled = true;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.evaluateEnumList;
+          this.yData = this.amountList;
+          break;
+        }
+        // 年份-总成绩
+        case 4: {
+          this.comparison = 2;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 2 || i === 3) this.cOptions[i].disabled = false;
+            else this.cOptions[i].disabled = true;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.yearList;
+          this.yData = this.gradeList;
+          break;
+        }
+        // 年份-评分
+        case 5: {
+          this.comparison = 2;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 2 || i === 3) this.cOptions[i].disabled = false;
+            else this.cOptions[i].disabled = true;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.yearList;
+          this.yData = this.evaluateList;
+          break;
+        }
+        // 学期-总成绩
+        case 6: {
+          this.comparison = 2;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 2 || i === 3) this.cOptions[i].disabled = false;
+            else this.cOptions[i].disabled = true;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.semesterList;
+          this.yData = this.gradeList;
+          break;
+        }
+        // 学期-评分
+        case 7: {
+          this.comparison = 2;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 2 || i === 3) this.cOptions[i].disabled = false;
+            else this.cOptions[i].disabled = true;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.semesterList;
+          this.yData = this.evaluateList;
+          break;
+        }
+        // 班级-总成绩
+        case 8: {
+          this.comparison = 4;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 4 || i === 5) this.cOptions[i].disabled = false;
+            else this.cOptions[i].disabled = true;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.classList;
+          this.yData = this.gradeList;
+          break;
+        }
+        // 班级-评分
+        case 9: {
+          this.comparison = 4;
+          this.detail = [];
+          for (let i = 0; i < this.cOptions.length; i++) {
+            if (i === 4 || i === 5) this.cOptions[i].disabled = false;
+            else this.cOptions[i].disabled = true;
+          }
+          this.xData.length = 0;
+          this.yData.length = 0;
+          this.xData = this.classList;
+          this.yData = this.evaluateList;
+          break;
+        }
+        default:
+          break;
       }
     },
-    mounted() {
+    handleGrade() {},
+    handleDetail() {
+      this.detailValue = [];
+      this.detail = [];
+    },
+    handleDetailValue(val) {
+      this.detail = [];
+      for (let i in val) {
+        this.detail.push(this.detailOptions[i]);
+      }
+    },
+    handleChange(index) {
+      let val = this.studentMap[index];
+      if (Object.keys(val).length === 0) {
+        this.detail[index] = undefined;
+      } else {
+        if (this.detail[index] !== undefined) {
+          let lOld = this.detail[index][0];
+          let rOld = this.detail[index][1];
+          this.studentOptions[lOld - 1].children[rOld].disabled = false;
+        }
+        let lNew = val[0];
+        let rNew = val[1];
+        this.studentOptions[lNew - 1].children[rNew].disabled = true;
+        this.detail[index] = this.objDeepCopy(
+          this.studentOptions[lNew - 1].children[rNew]
+        );
+      }
+    },
+    handleResponse() {},
+    // 按键事件
+    getCharts() {
+      // TODO: 发送请求获取图表数据
       this.drawChart();
     },
-    computed: {
-      detailOptions() {
-        let result = [];
-        switch(this.comparison) {
-            case 0: {
-              result = this.studentOptions;
-              break;
-            }
-            case 1: {
-              result = this.genderOptions;
-              break;
-            }
-            case 2: {
-              result = this.classOptions;
-              break;
-            }
-            case 3: {
-              result = this.teacherOptions;
-              break;
-            }
-            case 4: {
-              result = this.semesterOptions;
-              break;
-            }
-            case 5: {
-              result = this.yearOptions;
-              break;
-            }
-            case 6: {
-              result = this.chapterOptions;
-              break;
-            }
-          }
-          return result;
+    // 图表绘制
+    drawChart() {
+      // 基于准备好的dom，初始化echarts实例
+      let myChart = this.$echarts.init(document.getElementById("myChart"));
+      let seriesData = [];
+      let colorOptions = [];
+      let legendData = [];
+      for (let i = 0; i < this.yData.length; i++) {
+        seriesData.push({
+          name: "对比组" + i,
+          type: "bar",
+          barGap: 0,
+          data: this.yData[i]
+        });
+        colorOptions.push(this.colors[i]);
+        legendData.push("对比组" + i);
       }
+      // 绘制图表
+      myChart.setOption({
+        color: colorOptions,
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "cross"
+          }
+        },
+        legend: {
+          data: legendData
+        },
+        toolbox: {
+          show: true,
+          orient: "vertical",
+          right: "20px",
+          top: "center",
+          itemGap: 20,
+          feature: {
+            mark: { show: true },
+            //dataView: {show: true, readOnly: false},
+            magicType: { show: true, type: ["line", "bar", "stack", "tiled"] },
+            restore: { show: true },
+            saveAsImage: { show: true }
+          }
+        },
+        calculable: true,
+        xAxis: [
+          {
+            type: "category",
+            name: this.xyOptions[this.xy].xName,
+            axisTick: { show: false },
+            data: this.xData
+          }
+        ],
+        yAxis: [
+          {
+            name: this.xyOptions[this.xy].yName,
+            type: "value"
+          }
+        ],
+        series: seriesData
+      });
+    },
+    // 深拷贝
+    objDeepCopy(source) {
+      let sourceCopy = source instanceof Array ? [] : {};
+      for (let item in source) {
+        if (source.hasOwnProperty(item)) {
+          sourceCopy[item] =
+            typeof source[item] === "object"
+              ? this.objDeepCopy(source[item])
+              : source[item];
+        }
+      }
+      return sourceCopy;
+    }
+  },
+  created() {
+    this.getClassOptions();
+    this.getSemesterOptions();
+    this.getYearOptions();
+    this.getChapterOptions();
+    this.xData = this.chapterList;
+    this.yData = this.gradeList;
+    this.detail = new Array(4);
+    this.studentMap = new Array(4);
+  },
+  mounted() {
+    this.drawChart();
+  },
+  computed: {
+    detailOptions() {
+      let result = [];
+      switch (this.comparison) {
+        case 0: {
+          result = this.studentOptions;
+          break;
+        }
+        case 1: {
+          result = this.genderOptions;
+          break;
+        }
+        case 2: {
+          result = this.classOptions;
+          break;
+        }
+        case 3: {
+          result = this.teacherOptions;
+          break;
+        }
+        case 4: {
+          result = this.semesterOptions;
+          break;
+        }
+        case 5: {
+          result = this.yearOptions;
+          break;
+        }
+        case 6: {
+          result = this.chapterOptions;
+          break;
+        }
+      }
+      return result;
     }
   }
+};
 </script>
 
 <style scoped>
+.main {
+  padding-top: 10px;
+  margin: 0 auto;
+  width: 80%;
+  min-height: 650px;
+}
 
+.main .select {
+  margin-top: 15px;
+}
+
+.main .select-title {
+  font-size: 13px;
+  margin: 15px 0 10px 0;
+}
 </style>
