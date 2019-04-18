@@ -61,10 +61,6 @@ export default new Router({
           keepAlive: true // 需要缓存
         }
       },{
-        path: 'courseDetail',
-        name: 'sCourseDetail',
-        component: sCourseDetail,
-      },{
         path: 'studentAnalysis',
         name: 'sStudentAnalysis',
         component: sStudentAnalysis,
@@ -92,11 +88,17 @@ export default new Router({
         meta: {
           keepAlive: true
         },
-      }, {
-        path: 'feedback',
-        name: 'feedback',
-        component: feedback
       }, ],
+    },
+    {
+      path: '/student/feedback',
+      name: 'feedback',
+      component: feedback
+    },
+    {
+      path: '/student/courseDetail',
+      name: 'sCourseDetail',
+      component: sCourseDetail,
     }, {
       path: '/teacher',
       component: Header,
