@@ -276,7 +276,7 @@ body {
   font-size: 25px;
   font-weight: 700;
   color: rgb(236, 235, 235);
-  background-image: url("../../assets/skillsbg.jpg");
+  background-image: url("../../assets/img2.jpg");
   background-size: cover;
 }
 .tabs {

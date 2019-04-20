@@ -1,142 +1,94 @@
 <template>
   <div style="margin:0 auto;width:700px">
-    <div>
-      <h5 align="start">
-        总分：{{totalPoint}} 分
-        <span v-if="after">得分：{{totalScore}} 分</span>
-      </h5>
-      <el-form ref="answer" :model="answer" v-show="before">
-        <!-- 单选题 -->
-        <h4 align="start">单选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px"
-          align="start"
-          v-for="(item,index) in single"
-          :key="index"
+    <h4 align="start">
+      客观题（<span>{{totalPoint}}</span>分）
+      <span v-show="after">得分：{{totalScore}} 分</span>
+    </h4>
+    <el-form ref="answer" :model="answer" v-show="before">
+      <div
+        style="margin-top:15px;font-size:14px"
+        align="start"
+        v-for="(item,index) in exercises"
+        :key="index"
+      >
+        <p
+          style="margin-left:5px"
+        >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）<span v-if="item.exercise.exerciseType===2">（多选）</span></p>
+        <el-form-item
+          style="margin-top:10px;margin-left:10px;padding-bottom:10px"
+          v-if="item.exercise.exerciseType===1"
         >
-          <p
-            style="margin-left:5px"
-          >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</p>
-          <el-form-item style="margin-top:10px;margin-left:10px;padding-bottom:10px">
-            <el-radio-group v-model="answer[index]">
-              <el-radio
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </div>
-
-        <!-- 多选题 -->
-        <h4 align="start">多选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px"
-          align="start"
-          v-for="(item,index) in multiple"
-          :key="index"
-        >
-          <p
-            style="margin-left:5px"
-          >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</p>
-          <el-form-item style="margin-left: 10px">
-            <el-checkbox-group v-model="answer[index+this.singleLength]">
-              <el-checkbox
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-        </div>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm('answer')" size="mini" round>提交</el-button>
+          <el-radio-group v-model="answer[index]">
+            <el-radio
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              :value="i - 1"
+              :label="i - 1"
+            >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+          </el-radio-group>
         </el-form-item>
-      </el-form>
-
-      <div v-show="after">
-        <!-- 单选题 -->
-        <h4 align="start">单选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px;padding-bottom:10px"
-          align="start"
-          v-for="(item,index) in single"
-          :key="index"
-        >
-          <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
-            <span
-              style="font-size:12px;color:rgb(100,100,100)"
-            >
-              你的选择：
-              <span style="color:red;">{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
-            </span>
-            <span style="font-size:12px;color:rgb(100,100,100)" v-if="afterRate">
-              得分：
-              <span style="color:red;">{{score[index]}}</span> 分
-            </span>
-          </p>
+        <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===2">
+          <el-checkbox-group v-model="answer[index]">
+            <el-checkbox
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              :value="i - 1"
+              :label="i - 1"
+            >{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </div>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('answer')" size="mini">确认提交</el-button>
+      </el-form-item>
+    </el-form>
+    <div v-show="after">
+      <div
+        style="margin-top:15px;font-size:14px;padding-bottom:10px"
+        align="start"
+        v-for="(item,index) in exercises"
+        :key="index"
+      >
+        <p style="margin-left:5px">
+          {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
           <span
-            v-for="j in item.exerciseChoiceList.length"
-            :key="j"
-            :value="j - 1"
-            :label="j - 1"
-            style="margin-left:10px"
+            style="font-size:12px;color:rgb(100,100,100)"
           >
-            <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
-          </span>
-          <div
-            style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-            v-if="afterRate"
-          >{{item.exercise.exerciseAnalysis}}</div>
-        </div>
-        <!-- 多选题 -->
-        <h4 align="start">多选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px;padding-bottom:10px"
-          align="start"
-          v-for="(item,index) in multiple"
-          :key="index"
-        >
-          <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
+            你的选择：
             <span
-              style="font-size:12px;color:rgb(100,100,100)"
-            >
-              你的选择：
-              <!-- ======================================================== -->
+              style="color:red;"
+              v-if="item.exercise.exerciseType===1"
+            >{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
+            <span style="color:red;" v-else-if="item.exercise.exerciseType===2">
               <span
-                style="color:red;"
-              >{{String.fromCharCode(answer[index+this.singleLength]+65)}}&nbsp;&nbsp;</span>
+                v-for="(num,index) in answer[index]"
+                :key="index"
+              >{{String.fromCharCode(num+65)}}</span>
             </span>
-            <span style="font-size:12px;color:rgb(100,100,100)" v-if="afterRate">
-              得分：
-              <span style="color:red;">{{score[index+this.singleLength]}}</span> 分
-            </span>
-          </p>
-          <span
-            v-for="j in item.exerciseChoiceList.length"
-            :key="j"
-            :value="j - 1"
-            :label="j - 1"
-            style="margin-left:10px"
-          >
-            <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
           </span>
-          <div
-            style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-            v-if="afterRate"
-          >解析：{{item.exercise.exerciseAnalysis}}</div>
-        </div>
+          <span style="font-size:12px;color:rgb(100,100,100)">
+            得分：
+            <span style="color:red;">{{score[index]}}</span> 分
+          </span>
+        </p>
+        <span
+          v-for="j in item.exerciseChoiceList.length"
+          :key="j"
+          :value="j - 1"
+          :label="j - 1"
+          style="margin-left:10px"
+        >
+          <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
+        </span>
+        <div
+          style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
+        >解析：{{item.exercise.exerciseAnalysis}}</div>
       </div>
     </div>
-
   </div>
 </template>
 <script>
-//import Axios from "axios";
+import Axios from "axios";
 export default {
   data() {
     return {
@@ -144,23 +96,22 @@ export default {
       after: false,
       beforeRate: true,
       afterRate: false,
-      scored: false,
       type: 0,
       rate: 0,
-      answer: {},
-      score: {
-        0: 5,
-        1: 5,
-        2: 0,
-        3: 0,
-        4:[0,1],
+      answer: {
+        0: "",
+        1: "",
+        2: "",
+        3: []
       },
-      singleLength: 0,
-      multipleLength: 0,
+      score: {
+        0: "",
+        1: "",
+        2: "",
+        3: ""
+      },
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      single: [],
-      multiple: [],
       exercises: [
         {
           exercise: {
@@ -280,10 +231,10 @@ export default {
           exercise: {
             exerciseId: 4,
             chapterId: 1,
-            exerciseType: 1,
+            exerciseType: 2,
             exerciseNumber: 1,
             exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
+            exerciseAnswer: ["A", "B"],
             exerciseAnalysis: "因为。。。",
             exercisePoint: 5
           },
@@ -317,54 +268,75 @@ export default {
       ]
     };
   },
-  /* create() {
-    //判断当前页习题是否已作答，是否超时未作答
-    var sid = this.$route.query.sid + 1;
+  create() {
+   /*  var sid = this.$route.query.sid + 1;
     this.$axios.get("/api/question/view", {
       params: {
         chapterId: sid,
         type: "preview"
       }.then(resp => {
         this.exercises = resp.data;
-        //计算总分
-
-        //single/multiple-length 初始化
-        this.single = this.exercises.filter(function(currentValue){
-            if(currentValue.exercise.exerciseType==1)
-            return currentValue
-        })
-        this.multiple = this.exercises.filter(function(currentValue){
-            if(currentValue.exercise.exerciseType==2)
-            return currentValue
-        })
-        this.singleLength=this.single.length
-        this.multipleLength=this.multiple.length
       })
-    });
-  }, */
+    }); */
+   this.test()
+  },
+  mounted(){
+   this.test()
+  },
   methods: {
+    test(){
+       for(var i=0;i<this.exercises.length;i++){
+        this.totalPoint += this.exercises[i].exercise.exercisePoint
+      }
+      console.log(this.totalPoint)
+    },
     submitForm(formname) {
-      //var answerLength = this.answer.length;
-      if (this.answer.length == this.exercises.length) {
-        console.log(this.answer);
+      var length = 0;
+      for (var i in this.answer) {
+        length++;
+      }
+
+      //var length=Object.getOwnPropertyNames(this.answer).length
+      if (length == this.exercises.length) {
+        for (var i = 0; i < length; i++) {
+          var type = typeof this.answer[i];
+          console.log(type, "type");
+          if (type == "number") {
+            var resp = String.fromCharCode(this.answer[i] + 65);
+            var ans = this.exercises[i].exercise.exerciseAnswer;
+            if (resp == ans) {
+              this.score[i] = this.exercises[i].exercise.exercisePoint;
+            } else {
+              this.score[i] = 0;
+            }
+          } else {
+            var respNum = this.answer[i].length;
+            var array = [];
+            for (var j = 0; j < respNum; j++) {
+              array[j] = String.fromCharCode(this.answer[i][j] + 65);
+            }
+            var ansArray = this.exercises[i].exercise.exerciseAnswer;
+            var ansNum = ansArray.length;
+            var isEqual = array.sort().toString() === ansArray.toString();
+
+            if (isEqual) {
+              this.score[i] = this.exercises[i].exercise.exercisePoint;
+            } else {
+              this.score[i] = 0;
+            }
+          }
+        }
+        console.log(this.score, "score");
+
         this.before = false;
         this.after = true;
-        //对比正确答案确定   客观题“你的答案”和“得分”
-        //计算answer.length判断是否完成题目
-        
-        //调接口，获取得分
-        for (var i = 0; i < this.singleLength; i++) {
-          var code = String.fromCharCode(this.answer[i] + 65);
-          if (code == this.single.exercise.exerciseAnswer)
-            this.score[i] = this.single.exercise.exercisePoint;
-          else this.score[i] = 0;
-        }
-        for (var i = 0; i < this.multipleLength; i++) {
-          ///////////////
-          this.score[i+this.singleLength].sort
-        }
-      }else{
-        alert('有习题未完成')
+        //对比正确答案确定“得分”
+      } else {
+        alert("有习题未完成");
+      }
+
+      for(var i=0;i<this.exercises.length;i++){
+        this.totalScore+=this.score[i]
       }
     }
   }
@@ -375,4 +347,3 @@ export default {
   color: #747a81;
 }
 </style>
-

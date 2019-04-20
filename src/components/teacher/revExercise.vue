@@ -1,143 +1,102 @@
 <template>
   <div style="margin:0 auto;width:700px">
-    <div>
-      <h5 align="start">
-        总分：{{totalPoint}} 分
-        <span v-if="scored">得分：{{totalScore}} 分</span>
-      </h5>
-      <el-form ref="answer" :model="answer" v-show="before">
-        <!-- 单选题 -->
-        <h4 align="start">单选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px"
-          align="start"
-          v-for="(item,index) in single"
-          :key="index"
-        >
-          <p
-            style="margin-left:5px"
-          >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</p>
-          <el-form-item style="margin-top:10px;margin-left:10px;padding-bottom:10px">
-            <el-radio-group v-model="answer[index]">
-              <el-radio
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </div>
-
-        <!-- 多选题 -->
-        <h4 align="start">多选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px"
-          align="start"
-          v-for="(item,index) in multiple"
-          :key="index"
-        >
-          <p
-            style="margin-left:5px"
-          >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</p>
-          <el-form-item style="margin-left: 10px">
-            <el-checkbox-group v-model="answer[index+this.singleLength]">
-              <el-checkbox
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-        </div>
-
-        <!-- 主观题 -->
-        <h4 align="start">主观题</h4>
-        <div
-          style="margin-top:15px;font-size:14px"
-          align="start"
-          v-for="(item,index) in subjective"
-          :key="index"
-        >
-          <p
-            style="margin-left:5px"
-          >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</p>
-          <el-form-item style="margin-top:10px;margin-left:10px;padding-bottom:10px">
-            <el-input
-              type="textarea"
-              :rows="4"
-              placeholder="请输入答案"
-              v-model="answer[index+this.singleLength+this.multipleLength]"
-            ></el-input>
-          </el-form-item>
-        </div>
-
-        <el-form-item>
-          <el-button type="primary" @click="submitForm('answer')" size="mini" round disabled>保存</el-button>
-        </el-form-item>
-      </el-form>
-
-      <div v-show="after">
-        <!-- 单选题 -->
-        <h4 align="start">单选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px;padding-bottom:10px"
-          align="start"
-          v-for="(item,index) in single"
-          :key="index"
-        >
-          <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
-            <span
-              style="font-size:12px;color:rgb(100,100,100)"
-            >
-              你的选择：
-              <span style="color:red;">{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
-            </span>
-            <span style="font-size:12px;color:rgb(100,100,100)" v-if="afterRate">
-              得分：
-              <span style="color:red;">{{score[index]}}</span> 分
-            </span>
-          </p>
+    <h4 align="start">
+      作业题（
+      <span>{{totalPoint}}</span>分）
+      <span v-show="after" style="font-size:14px">
+        客观题得分:
+        <span style="color:red;">{{totalScore}}</span> 分
+      </span>
+      <span v-show="isScored" style="font-size:14px">
+        总得分:
+        <span style="color:red;">{{totalScore}}</span> 分
+      </span>
+    </h4>
+    <el-form ref="answer" :model="answer" v-show="before">
+      <div
+        style="margin-top:15px;font-size:14px"
+        align="start"
+        v-for="(item,index) in exercises"
+        :key="index"
+      >
+        <p style="margin-left:5px">
+          {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
           <span
-            v-for="j in item.exerciseChoiceList.length"
-            :key="j"
-            :value="j - 1"
-            :label="j - 1"
-            style="margin-left:10px"
-          >
-            <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
-          </span>
-          <div
-            style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-            v-if="afterRate"
-          >{{item.exercise.exerciseAnalysis}}</div>
-        </div>
-        <!-- 多选题 -->
-        <h4 align="start">多选题</h4>
-        <div
-          style="margin-top:15px;font-size:14px;padding-bottom:10px"
-          align="start"
-          v-for="(item,index) in multiple"
-          :key="index"
+            v-if="item.exercise.exerciseType===5"
+          >（多选）</span>
+        </p>
+        <!-- 单选 -->
+        <el-form-item
+          style="margin-top:10px;margin-left:10px;padding-bottom:10px"
+          v-if="item.exercise.exerciseType===4"
         >
-          <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
-            <span
-              style="font-size:12px;color:rgb(100,100,100)"
-            >
-              你的选择：
-              <!-- ======================================================== -->
+          <el-radio-group v-model="answer[index]">
+            <el-radio
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              :value="i - 1"
+              :label="i - 1"
+            >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 多选 -->
+        <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===5">
+          <el-checkbox-group v-model="answer[index]">
+            <el-checkbox
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              :value="i - 1"
+              :label="i - 1"
+            >{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <!-- 主观 -->
+        <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===6">
+          <el-input type="textarea" :rows="4" placeholder="请输入答案" v-model="answer[index]"></el-input>
+        </el-form-item>
+      </div>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('answer')" size="mini" disabled>保 存</el-button>
+      </el-form-item>
+    </el-form>
+    <div v-show="after">
+      <div
+        style="margin-top:15px;font-size:14px;padding-bottom:10px"
+        align="start"
+        v-for="(item,index) in exercises"
+        :key="index"
+      >
+        <p style="margin-left:5px">
+          {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
+          <span
+            v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
+          >
+            <span style="font-size:12px;color:rgb(100,100,100)">
+              你的选择:
               <span
                 style="color:red;"
-              >{{String.fromCharCode(answer[index+this.singleLength]+65)}}&nbsp;&nbsp;</span>
+                v-if="item.exercise.exerciseType===4"
+              >{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
+              <span style="color:red;" v-else-if="item.exercise.exerciseType===5">
+                <span
+                  v-for="(num,index) in answer[index]"
+                  :key="index"
+                >{{String.fromCharCode(num+65)}}</span>
+              </span>
             </span>
-            <span style="font-size:12px;color:rgb(100,100,100)" v-if="afterRate">
-              得分：
-              <span style="color:red;">{{score[index+this.singleLength]}}</span> 分
+            <span style="font-size:12px;color:rgb(100,100,100)" v-show="isRated">
+              得分:
+              <span style="color:red;">{{score[index]}}</span> 分
             </span>
-          </p>
+          </span>
+          <span v-else-if="item.exercise.exerciseType===6 && isScored==true">
+            <span style="font-size:12px;color:rgb(100,100,100)">
+              得分:
+              <span style="color:red;">{{score[index]}}</span> 分
+            </span>
+          </span>
+        </p>
+        <span v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5">
           <span
             v-for="j in item.exerciseChoiceList.length"
             :key="j"
@@ -147,93 +106,72 @@
           >
             <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
           </span>
-          <div
-            style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-            v-if="afterRate"
-          >解析：{{item.exercise.exerciseAnalysis}}</div>
-        </div>
-        <h4 align="start">主观题</h4>
+        </span>
         <div
-          style="margin-top:15px;font-size:14px;padding-bottom:10px"
-          align="start"
-          v-for="(item,index) in subjective"
-          :key="index"
-        >
-          <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
-            <span
-              style="font-size:12px;color:rgb(100,100,100)"
-              v-if="scored"
-            >
-              得分：
-              <span style="color:red;">{{score[index]}}</span> 分
-              <!-- =============评分数组注意更换==================== -->
-            </span>
-          </p>
-          <div
-            style="margin-top: 0px; background-color: #fcfcfc; min-height: 80px; padding: 10px 10px 10px 10px"
-          >你的答案：{{answer[index+this.singleLength+this.multipleLength]}}</div>
-          <div
-            style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-            v-if="scored"
-          >解析：{{item.exercise.exerciseAnalysis}}</div>
-        </div>
+          v-else-if="item.exercise.exerciseType===6"
+          style="padding:10px;background-color:#ddd;height:50px"
+        >你的答案：{{answer[index]}}</div>
+
+        <div
+          v-show="isRated"
+          style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
+        >解析：{{item.exercise.exerciseAnalysis}}</div>
       </div>
     </div>
-    <!-- 评分 -->
-    <div
-      style="margin-top: 10px;margin-bottom:20px; background-color: #747a81; min-height: 80px; padding: 5px 10px 5px 10px"
-    >
-      <p style="color:#fff;margin-bottom:5px">评分</p>
-      <el-row v-if="beforeRate">
-        <el-rate
-          v-model="rate"
-          :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-          :allow-half="half"
-          style="padding-bottom:10px"
-        ></el-rate>
-        <el-button type="primary" size="mini" @click="submit('answer')" round disabled>提交</el-button>
-      </el-row>
-      <el-row v-if="afterRate">
-        <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
-      </el-row>
+    <div v-if="isRated==false" style="background-color:#545c64;height:110px">
+      <p style="padding-top:10px;color:#fff">评分<span style="font-size:12px;">（评分后方可提交作业）</span></p>
+      <el-rate
+        v-model="rate"
+        :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
+        :allow-half="half"
+        style="margin-top:-5px;padding-bottom:10px"
+      ></el-rate>
+      <el-button size="mini" type="primary" @click="submit" round disabled>提 交</el-button>
+    </div>
+    <div v-else style="background-color:#545c64;height:90px">
+      <p style="padding-top:10px;color:#fff">评分</p>
+
+      <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
     </div>
   </div>
 </template>
 <script>
+import Axios from "axios";
 export default {
-  name:"trevExercise",
   data() {
     return {
-      half:true,
+      half: true,
       before: true,
       after: false,
-      beforeRate: true,
-      afterRate: false,
-      scored: false,
+      isScored: false,
+      isRated: false,
+      //beforeRate: true,
+      //afterRate: false,
       type: 0,
       rate: 0,
-      answer: {},
-      score: {
-        0: 5,
-        1: 5,
-        2: 0,
-        3: 0
+
+      answer: {
+        0: null,
+        1: null,
+        2: null,
+        3: [],
+        4: null
       },
-      singleLength: 0,
-      multipleLength: 0,
-      subjectiveLength: 0,
+      score: {
+        0: null,
+        1: null,
+        2: null,
+        3: null,
+        4: null
+      },
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      single: [],
-      multiple: [],
-      subjective: [],
       exercises: [
         {
           exercise: {
             exerciseId: 1,
             chapterId: 1,
-            exerciseType: 1,
+            exerciseType: 4,
             exerciseNumber: 1,
             exerciseContent: "选出下列正确的一项",
             exerciseAnswer: "A",
@@ -271,7 +209,7 @@ export default {
           exercise: {
             exerciseId: 2,
             chapterId: 1,
-            exerciseType: 1,
+            exerciseType: 4,
             exerciseNumber: 1,
             exerciseContent: "选出下列正确的一项",
             exerciseAnswer: "A",
@@ -309,7 +247,7 @@ export default {
           exercise: {
             exerciseId: 3,
             chapterId: 1,
-            exerciseType: 1,
+            exerciseType: 4,
             exerciseNumber: 1,
             exerciseContent: "选出下列正确的一项",
             exerciseAnswer: "A",
@@ -347,10 +285,10 @@ export default {
           exercise: {
             exerciseId: 4,
             chapterId: 1,
-            exerciseType: 1,
+            exerciseType: 5,
             exerciseNumber: 1,
             exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
+            exerciseAnswer: ["A", "B"],
             exerciseAnalysis: "因为。。。",
             exercisePoint: 5
           },
@@ -380,73 +318,119 @@ export default {
               choice: "default"
             }
           ]
+        },
+        {
+          exercise: {
+            exerciseId: 4,
+            chapterId: 1,
+            exerciseType: 6,
+            exerciseNumber: 1,
+            exerciseContent: "主观题测试",
+            exerciseAnswer: "aaaaa",
+            exerciseAnalysis: "因为。。。",
+            exercisePoint: 5
+          }
         }
       ]
     };
   },
-  /* create() {
-    //判断当前页习题是否已作答，是否超时未作答，老师是否评分
-    var sid = this.$route.query.sid + 1;
+  create() {
+    /*  var sid = this.$route.query.sid + 1;
     this.$axios.get("/api/question/view", {
       params: {
         chapterId: sid,
-        type: "review"
+        type: "preview"
       }.then(resp => {
         this.exercises = resp.data;
-        //计算总分
-
-        //single/multiple-length /subjective 初始化
-        this.single = this.exercises.filter(function(currentValue){
-            if(currentValue.exercise.exerciseType==1)
-            return currentValue
-        })
-        this.multiple = this.exercises.filter(function(currentValue){
-            if(currentValue.exercise.exerciseType==2)
-            return currentValue
-        })
-        this.subjective = this.exercises.filter(function(currentValue){
-            if(currentValue.exercise.exerciseType==3)
-            return currentValue
-        })
-        this.singleLength=this.single.length
-        this.multipleLength=this.multiple.length
       })
-    });
-  }, */
+    }); */
+    //进入界面确定界面状态  before after isScored 总得分
+  },
+  mounted() {
+    this.test();
+  },
   methods: {
-    submitForm(formname) {
-      if (this.answer.length == this.exercises.length) {
-        console.log(this.answer);
-        this.before = false;
-        this.after = true;
-        //对比正确答案确定   客观题“你的答案”和“得分”
-        //计算answer.length判断是否完成题目
-        //不计算，调接口
-        for (var i = 0; i < this.singleLength; i++) {
-          var code = String.fromCharCode(this.answer[i] + 65);
-          if (code == this.single.exercise.exerciseAnswer)
-            this.score[i] = this.single.exercise.exercisePoint;
-          else this.score[i] = 0;
-
-          //this.totalScore += this.score[i] //计算总分
-        }
-        for (var i = 0; i < this.multipleLength; i++) {
-          ///////////////
-        }
-      } else {
-        alert("有习题未完成");
+    test() {
+      for (var i = 0; i < this.exercises.length; i++) {
+        this.totalPoint += this.exercises[i].exercise.exercisePoint;
       }
+      console.log(this.totalPoint, "totalPoint");
     },
-    submit(formname) {
-      if (this.before == true) {
-        alert("请先完成习题");
-      } else if (this.rate != 0) {
-        this.beforeRate = false;
-        this.afterRate = true;
-        //在此处一起提交
-        //老师评分后重新计算totalScore
-        //调接口，获得得分
+    submitForm(formname) {
+      var length = 0;
+      for (var i in this.answer) {
+        length++;
       }
+      console.log(length, "length");
+
+      //var length=Object.getOwnPropertyNames(this.answer).length
+      //if (length == this.exercises.length) {
+      var count = 0;
+      for (var i = 0; i < length; i++) {
+        if (this.answer[i] != null) {
+          console.log(count);
+          var type = typeof this.answer[i];
+          console.log(type, "type");
+          if (type == "number") {
+            var resp = String.fromCharCode(this.answer[i] + 65);
+            var ans = this.exercises[i].exercise.exerciseAnswer;
+            if (resp == ans) {
+              this.score[i] = this.exercises[i].exercise.exercisePoint;
+            } else {
+              this.score[i] = 0;
+            }
+          } else if (type == "object") {
+            console.log("1");
+            var respNum = this.answer[i].length;
+            console.log(respNum, "respNum");
+            console.log("2");
+            var array = [];
+            for (var j = 0; j < respNum; j++) {
+              array[j] = String.fromCharCode(this.answer[i][j] + 65);
+            }
+            var ansArray = this.exercises[i].exercise.exerciseAnswer;
+            var ansNum = ansArray.length;
+            console.log(ansNum, "ansNum");
+            var isEqual = array.sort().toString() === ansArray.toString();
+
+            if (isEqual) {
+              this.score[i] = this.exercises[i].exercise.exercisePoint;
+            } else {
+              this.score[i] = 0;
+            }
+          } else if (type == "string") {
+            this.score[i] = 0;
+          }
+          if (i == this.exercises.length - 1) {
+            this.before = false;
+            this.after = true;
+          }
+        } else {
+          alert("有习题未完成");
+          break;
+        }
+      }
+      console.log(this.score, "score");
+
+      //对比正确答案确定“得分”
+      //}
+      /* else {
+      } */
+      var total = 0
+      for (var i = 0; i < this.exercises.length; i++) {  
+        total += this.score[i];
+      }
+      this.totalScore=total
+    },
+    submit() {
+      if (this.before == true) {
+        alert("请先完成题目");
+      } else if (this.rate == 0) {
+        alert("评分不可为0");
+      } else {
+        this.isRated = true;
+      }
+      //提交给后端
     }
   }
 };
@@ -456,4 +440,3 @@ export default {
   color: #747a81;
 }
 </style>
-
