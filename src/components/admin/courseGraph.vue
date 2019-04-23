@@ -953,8 +953,8 @@ export default {
               }
               this.$message("添加成功");
             }
-          },
-          err => {
+          })
+          .catcch(err => {
             console.log("err", err);
           }
         );
