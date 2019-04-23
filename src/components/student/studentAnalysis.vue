@@ -1,135 +1,182 @@
 <template>
   <el-container>
-    <el-main>
-      <div class="main" align="start">
-        <el-row>
-          <el-button @click="goBack">
-            <i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回
-          </el-button>
-        </el-row>
-        <el-row>
-          <h4>1612345 学生姓名</h4>
-        </el-row>
-        <el-row>
-          <el-col :span="4">
-            <h4>平均课前成绩：85</h4>
-          </el-col>
-          <el-col :span="4">
-            <h4>平均课后成绩：85</h4>
-          </el-col>
-          <el-col :span="4">
-            <h4>平均总成绩：85</h4>
-          </el-col>
-          <el-col :span="4">
-            <h4>最近学习到：章节3</h4>
-          </el-col>
-          <el-col :span="4">
-            <h4>最近班级排名：10↑</h4>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-collapse v-model="activeNames">
-            
-
-            <el-collapse-item title="成绩分析" name="1">
-              <el-row :gutter="10" >
-                <el-col :span="6" style="padding-top: 4%">
-                  <el-row class="select-title">指标</el-row>
-                  <el-row>
-                    <el-select v-model="xy" @change="handleComparison" size="small">
-                      <el-option
-                        v-for="item in xyOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                  <el-row>
-                    <el-select
-                      v-model="gradeAttribute"
-                      @change="handleGrade"
-                      size="small"
-                      v-if="xy === 0"
-                      class="select"
-                    >
-                      <el-option
-                        v-for="item in gradeOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                  <el-row class="select-title" v-if="gradeAttribute !== 3">对比组</el-row>
-                  <el-row v-if="gradeAttribute !== 3">
-                    <el-select v-model="comparison" @change="handleDetail" size="small">
-                      <el-option
-                        :disabled="item.disabled"
-                        v-for="item in cOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                  <el-row
-                    class="select-title"
-                    v-if="comparison !== 2 && gradeAttribute !== 3"
-                  >选择{{cOptions[comparison].label}}</el-row>
-                  <el-row v-if="comparison !== 2 && gradeAttribute !== 3">
-                    <el-select
-                      multiple
-                      v-model="detail"
-                      size="small"
-                      :multiple-limit="cOptions[comparison].limit + 4"
-                    >
-                      <el-option
-                        v-for="item in detailOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                  <el-row class="select">
-                    <el-button type="primary" @click="getCharts" style="width: 70%">确定</el-button>
-                  </el-row>
-                </el-col>
-                <el-col :span="18">
-                  <div id="myChart" style="width: 90%;height: 500px;margin-top: 40px"></div>
-                </el-col>
-              </el-row>
-            </el-collapse-item>
-            <el-collapse-item title="成绩与反馈" name="2">
-              <div style="height: 150px">
-                <el-row>章节1</el-row>
-                <el-row :gutter="10">
-                  <el-col :span="6">课前成绩：85</el-col>
-                  <el-col :span="6">课后成绩：85</el-col>
-                  <el-col :span="6">总成绩：85</el-col>
-                </el-row>
-                <el-row>评分：4.2</el-row>
-                <el-row>
-                  <div style="height: 100px">反馈内容</div>
+    <el-main class="background">
+      <el-row
+        :gutter="10"
+        style="margin: 0 auto; width: 90%; max-height: 685px"
+        type="flex"
+        justify="center"
+      >
+        <el-col :span="2" align="right">
+          <div>
+            <el-button @click="goBack" circle style="box-shadow: 0 0 8px 1px #dbdbdb">
+              <i class="el-icon-back"></i>
+            </el-button>
+          </div>
+        </el-col>
+        <el-col :span="6" align="right">
+          <el-card class="info-card" :body-style="{ padding: '0' }">
+            <div class="cardbody">
+              <div class="info" align="start">
+                <div>
+                <span>{{studentID}}</span>
+                <span>{{studentName}}</span>
+                </div>
+                <el-row style="margin-top: 3px">
+                  <el-col :span="16" style="padding-left: 15px; padding-top: 8px"><el-progress :percentage="75" stroke-width="3" color="#41abf1" :show-text="false"></el-progress></el-col>
+                  <el-col :span="8" style="padding-left: 12px;"><div style="font-size: 12px; color: #8e8e8e">已学习3/4</div></el-col>
                 </el-row>
               </div>
-              <div style="height: 150px">
-                <el-row>章节2</el-row>
-                <el-row :gutter="10">
-                  <el-col :span="6">课前成绩：85</el-col>
-                  <el-col :span="6">课后成绩：85</el-col>
-                  <el-col :span="6">总成绩：85</el-col>
-                </el-row>
-                <el-row>评分：4.2</el-row>
+              <div align="start">
+                <el-table size="small" :data="gradeData">
+                  <el-table-column label="课前成绩" width="80px" align="center" prop="pre"></el-table-column>
+                  <el-table-column label="课后成绩" width="80px" align="center" prop="rev"></el-table-column>
+                  <el-table-column label="总成绩" width="70px" align="center" prop="avg"></el-table-column>
+                  <el-table-column label="排名" width="70px" align="center" prop="rank"></el-table-column>
+                </el-table>
+              </div>
+            </div>
+          </el-card>
+          <el-card class="select-card" :body-style="{ padding: '0' }">
+            <div class="cardbody" align="center">
+              <div style="width: 64%" align="start">
+                <el-row class="select-title">指标</el-row>
                 <el-row>
-                  <div style="height: 100px">反馈内容</div>
+                  <el-select v-model="xy" @change="handleComparison" size="small">
+                    <el-option
+                      v-for="item in xyOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row>
+                  <el-select
+                    v-model="gradeAttribute"
+                    @change="handleGrade"
+                    size="small"
+                    v-if="xy === 0"
+                    class="select"
+                  >
+                    <el-option
+                      v-for="item in gradeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row class="select-title" v-if="gradeAttribute !== 3">对比组</el-row>
+                <el-row v-if="gradeAttribute !== 3">
+                  <el-select v-model="comparison" @change="handleDetail" size="small">
+                    <el-option
+                      :disabled="item.disabled"
+                      v-for="item in cOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row
+                  class="select-title"
+                  v-if="comparison !== 2 && gradeAttribute !== 3"
+                >选择{{cOptions[comparison].label}}</el-row>
+                <el-row v-if="comparison !== 2 && gradeAttribute !== 3">
+                  <el-select
+                    multiple
+                    v-model="detail"
+                    size="small"
+                    :multiple-limit="cOptions[comparison].limit + 4"
+                  >
+                    <el-option
+                      v-for="item in detailOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
+                <el-row class="select">
+                  <el-button type="primary" @click="getCharts" size="small" class="select-button">确定</el-button>
                 </el-row>
               </div>
-            </el-collapse-item>
-          </el-collapse>
-        </el-row>
-      </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="16">
+          <el-card class="content-card" :body-style="{ padding: '0' }">
+            <div class="cardbody">
+              <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
+                <div>
+                  <el-collapse v-model="activeNames" class="collapse">
+                    <el-collapse-item title="成绩分析" name="1">
+                      <el-row>
+                        <div id="myChart" class="my-chart"></div>
+                      </el-row>
+                    </el-collapse-item>
+                    <el-collapse-item title="成绩与反馈" name="2">
+                      <div align="start" class="response">
+                        <el-row>
+                            <div class="title">章节1 IO接口</div>
+                        </el-row>
+                        <el-row :gutter="10">
+                          <el-col :span="6"><span class="grade">课前成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">课后成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">总成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">排名：15</span></el-col>
+                        </el-row>
+                        <el-row>
+                          <div>
+                              <el-rate
+                                v-model="courseGrade"
+                                disabled
+                                show-score
+                                text-color="#ff9900"
+                                score-template="{value}"
+                                class="rate"
+                              ></el-rate>
+                            </div>
+                        </el-row>
+                        <el-row style="margin-top: 13px">
+                          <div class="text">反馈内容</div>
+                        </el-row>
+                      </div>
+                      <div style="margin-top: 20px" align="start" class="response">
+                        <el-row>
+                            <div class="title">章节2 Spring基础</div>
+                        </el-row>
+                        <el-row :gutter="10">
+                          <el-col :span="6"><span class="grade">课前成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">课后成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">总成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">排名：15</span></el-col>
+                        </el-row>
+                        <el-row>
+                          <div>
+                              <el-rate
+                                v-model="courseGrade"
+                                disabled
+                                show-score
+                                text-color="#ff9900"
+                                score-template="{value}"
+                                class="rate"
+                              ></el-rate>
+                            </div>
+                        </el-row>
+                        <el-row style="margin-top: 13px">
+                          <div class="text">反馈内容</div>
+                        </el-row>
+                      </div>
+                    </el-collapse-item>
+                  </el-collapse>
+                </div>
+              </el-scrollbar>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
     </el-main>
   </el-container>
 </template>
@@ -139,7 +186,18 @@ export default {
   name: "studentAnalysis",
   data() {
     return {
-      activeNames: ['1'],
+      courseGrade: 4.5,
+      studentID: 1612345,
+      studentName: "学生姓名",
+      gradeData: [
+        {
+          pre: 85,
+          rev: 85,
+          avg: 85,
+          rank: 10
+        }
+      ],
+      activeNames: ["1"],
       xyOptions: [
         {
           value: 0,
@@ -342,7 +400,7 @@ export default {
           break;
       }
     },
-    handleGrade() { },
+    handleGrade() {},
     handleDetail() {
       this.detail = [];
     },
@@ -424,6 +482,10 @@ export default {
         }
       }
       return sourceCopy;
+    },
+    getParams() {
+      this.studentID = this.$route.query.studentID;
+      this.studentName = this.$route.query.studentName;
     }
   },
   created() {
@@ -459,18 +521,117 @@ export default {
 
 <style scoped>
 .main {
-  padding-top: 10px;
+  padding-top: 20px;
   margin: 0 auto;
   width: 80%;
-  min-height: 650px;
+  height: 650px;
 }
 
-.main .select {
+.select {
   margin-top: 15px;
 }
 
-.main .select-title {
+.select-title {
   font-size: 13px;
   margin: 15px 0 10px 0;
+}
+
+.select-button {
+  width: 100%;
+  background-color: #7cc8fb;
+  border-color: #7cc8fb;
+}
+
+.background {
+  background-image: url("../../assets/background.jpg"); /*背景图片地址*/
+  background-repeat: no-repeat; /*背景图片不重复*/
+  background-size: cover; /*背景图片拉伸铺满*/
+  width: 100%; /* 宽度为100%；*/
+}
+
+.info-card {
+  width: 300px;
+  height: 200px;
+}
+
+.info {
+  height: 50px;
+  padding: 20px 10px 15px 10px;
+  border-bottom: 1px solid #e7edf5;
+}
+
+.info > div > span {
+  font-size: 24px;
+  font-weight: bold;
+  color: #41abf1;
+  padding-left: 10px;
+}
+
+.select-card {
+  margin-top: 10px;
+  width: 300px;
+  height: 480px;
+}
+
+.content-card {
+  width: 800px;
+  height: 690px;
+}
+
+.content-card .collapse {
+  padding: 0 20px 0 20px;
+  margin-top: -5px;
+}
+
+.my-chart {
+  width: 100%;
+  height: 500px;
+  margin-top: 40px;
+}
+
+.header {
+  height: 42px;
+  border-bottom: 1px solid #eaeef3;
+}
+
+.cardbody {
+  height: 100%;
+  position: relative;
+}
+
+.search-button {
+  background-color: #7cc8fb;
+  border-color: #7cc8fb;
+}
+
+.response {
+  border-top: 1px solid #eaeef3;
+  padding: 5px 20px 20px 20px;
+}
+
+.response .title {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #41abf1;
+  padding-top: 15px;
+  padding-bottom: 2px;
+}
+
+.response .rate {
+  zoom: 90%;
+  margin-top: 4px;
+  margin-bottom: 3px;
+}
+
+.response .grade {
+  letter-spacing: 0.6px;
+  font-size: 12px;
+}
+
+.response .text {
+  min-height: 100px;
+  background-color: #fafafa;
+  padding: 5px 10px 5px 10px;
 }
 </style>

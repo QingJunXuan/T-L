@@ -83,6 +83,7 @@ export default {
   data() {
     return {
       courseID: 1,
+      classID: 1,
       isNotice: false,
       isLesson: true,
       isGrade: false,
@@ -155,6 +156,7 @@ export default {
     getParams() {
       const routerParams = this.$route.query.courseID;
       this.courseID = routerParams;
+      this.classID = this.$route.query.classID;
       //console.log(routerParams);
       this.getNotice();
     },
@@ -209,7 +211,8 @@ export default {
         path: '/teacher/mark',
         name: 'exerciseMark',
         query: {
-          chapter_id: id
+          chapterID: id,
+          classID: this.classID
         }
       })
     },
@@ -235,10 +238,20 @@ export default {
       this.$router.push({ path: "/teacher/courseManagement" });
     },
     stuDetail(){
-      this.$router.push('/teacher/studentList');
+      this.$router.push({
+        path: '/teacher/studentList',
+        query: {
+          classID: this.classID
+        }
+      });
     },
     couAnalysis(){
-      this.$router.push('/teacher/courseAnalysis');
+      this.$router.push({
+        path: '/teacher/courseAnalysis', 
+        query: {
+          courseID: this.courseID
+        }
+      });
     }
   }
 };

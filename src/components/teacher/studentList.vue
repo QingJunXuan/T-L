@@ -3,10 +3,13 @@
     <el-main class="background">
       <el-card class="card" :body-style="{ padding: '0' }">
         <div class="cardbody">
-          <div class="header" align="start">
-            <el-button @click="goBack" type="text" class="backbutton">
-              <i class="el-icon-arrow-left" style="margin-right: 6px"></i>课程详情
+          <div class="header">
+            <div style="float: left; padding-top: 5px">
+              <el-button @click="goBack" type="text" class="button">
+              <i class="el-icon-back" style="margin-right: 6px"></i>
             </el-button>
+            </div>
+            <div class="title">学生列表</div>
           </div>
           <div>
             <el-row :gutter="30" class="margin" style="padding-left: 20px">
@@ -22,13 +25,13 @@
             <el-row class="margin">
               <el-table :data="studentInfo" @row-click="goAnalysis" size="small" class="table">
                 <el-table-column label="学号" align="center">
-                  <template slot-scope="scope"><p>{{scope.row.id}}</p></template>
+                  <template slot-scope="scope"><p class="text">{{scope.row.id}}</p></template>
                 </el-table-column>
                 <el-table-column label="姓名" align="center">
-                  <template slot-scope="scope"><p>{{scope.row.name}}</p></template>
+                  <template slot-scope="scope"><p class="text">{{scope.row.name}}</p></template>
                 </el-table-column>
                 <el-table-column label="联系方式" align="center">
-                  <template slot-scope="scope"><p>{{scope.row.email}}</p></template>
+                  <template slot-scope="scope"><p class="text">{{scope.row.email}}</p></template>
                 </el-table-column>
               </el-table>
             </el-row>
@@ -47,8 +50,13 @@ export default {
   name: "studentList",
   data() {
     return {
+      classID: 0,
       // 学生信息
-      studentInfo: [],
+      studentInfo: [{
+        id: '1612345',
+        name: '学生名字',
+        email: '96234164@qq.com'
+      }],
       listLoading: false,
       searchId: "",
       studentCount: 0
@@ -73,7 +81,7 @@ export default {
       this.$http
         .get(
           // 传值班级号
-          "http://localhost:8080/getStudentsByClassID?courseClassID=1",
+          "http://localhost:8080/getStudentsByClassID?courseClassID=" + this.classID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -106,7 +114,8 @@ export default {
         );
     }
   },
-  mounted() {
+  created() {
+    this.classID = this.$route.query.classID;
     this.getStudentInfo();
   }
 };
@@ -114,7 +123,10 @@ export default {
 
 <style scoped>
 .background {
-  background-color: rgba(118, 162, 163, 0.26);
+  background-image: url('../../assets/background.jpg'); /*背景图片地址*/
+  background-repeat: no-repeat;/*背景图片不重复*/
+  background-size: cover;/*背景图片拉伸铺满*/
+  width:100%; /* 宽度为100%；*/
 }
 
 .card {
@@ -124,10 +136,8 @@ export default {
 }
 
 .header {
-  height: 42px;
-  background-color: rgb(95, 158, 160, 0.8);
-
-  box-shadow: 0 -1px 5px #aaaaaa;
+  height: 50px;
+  border-bottom: 1px solid #eaeef3;
 }
 
 .cardbody {
@@ -135,9 +145,17 @@ export default {
   position: relative;
 }
 
-.backbutton {
+.header > div > .button {
   padding-left: 10px;
-  color: #fff;
+  color: #292929;
+}
+
+.header > .title {
+  font-size: 14px;
+  padding-top: 15px;
+  font-weight: 600;
+  position: absolute;
+  left: 46.8%;
 }
 
 .margin {
@@ -145,17 +163,20 @@ export default {
 }
 
 .searchbutton {
-  background-color: rgb(95, 158, 160, 0.8);
-  border-color: rgb(95, 158, 160, 0.8);
+  background-color: #7CC8FB;
+  border-color: #7CC8FB;
 }
 
 .table {
-  border-top: 1px solid #e7edf5;
+  border-top: 1px solid #eaeef3;
 }
 
-.table p {
-  font-weight: 600;
-  font-size: 12.5px;
+.text {
+  font-weight: 430;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  margin-top: 5px;
+  height: 15px;
 }
 
 .page {
