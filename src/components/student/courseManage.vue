@@ -22,7 +22,10 @@
               <el-row>
                 <el-col :span="16" :offset="1" style="text-align:left">
                   <p style="font-size:13px;color:#000">近期作业</p>
-                  <p id="newest" @click="homework(item.courseClass.currentExerciseChapter)">{{item.courseClass.currentExerciseChapter}}</p>
+                  <p
+                    id="newest"
+                    @click="homework(item.courseClass.currentExerciseChapter)"
+                  >第 {{item.courseClass.currentExerciseChapter}} 章课后习题</p>
                 </el-col>
               </el-row>
               <el-row>
@@ -45,11 +48,11 @@
           <el-button type="primary" @click="submit" size="mini">确认</el-button>
         </span>
       </el-dialog>
-      <el-dialog :visible.sync="isConfirm" title="课程信息确认" width="25%" center>
+      <el-dialog :visible.sync="isConfirm" title="课程信息确认" width="30%" center>
         <div style="text-align:center">
-        <p>课程：{{courseConfirm.courseInfo.courseName}}</p>
-        <p>教师：{{courseConfirm.courseInfo.teacherName}}</p>
-        <p>邀请码：{{courseConfirm.courseClass.classCode}}</p>
+          <p>课程：{{courseConfirm.courseInfo.courseName}}</p>
+          <p>教师：{{courseConfirm.courseInfo.teacherName}}</p>
+          <p>邀请码：{{courseConfirm.courseClass.classCode}}</p>
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="isConfirm=false" size="mini">返回</el-button>
@@ -70,18 +73,19 @@ export default {
       isConfirm: false,
       courseConfirm: {
         courseInfo: {
-          courseID: 3,
-          courseName: "JavaEE",
-          teacherName: "范鸿飞"
+          courseID: -1,
+          courseName: "",
+          teacherName: ""
         },
         courseClass: {
-          id: 3,
-          courseID: 3,
-          classNum: 1,
-          classCode: "100001",
+          id: -1,
+          courseID: -1,
+          classNum: -1,
+          classCode: "",
           currentExerciseChapter: -1
         }
       },
+      chapterNameList:[],
       items: [
         {
           courseInfo: {
@@ -128,62 +132,84 @@ export default {
       ]
     };
   },
- /*  created() {
+  created() {
     axios
       .get("/api/getStuCourseList", {
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+        },
         params: {
           studentID: 1
         }
       })
       .then(resp => {
-        this.items = resp.data;
-        var length = this.items.length;
+        this.items = resp.data.data;
+       /*  var length = this.items.length;
+        var test=new Array()
         for (var i = 0; i < length; i++) {
+          console.log(i, "in for");
           var chapterNode = this.items[i].courseClass.currentExerciseChapter;
+          
           axios
             .get("/api/getChapterByID", {
+              headers: {
+                Authorization:
+                  "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              },
               params: {
                 chapterID: chapterNode
               }
             })
             .then(resp => {
-              this.items[i].courseClass.chapterName =
-                resp.data.contentName;
+              console.log(resp.data.data,"in");
+              //test[i] =  resp.data.data.exerciseTitle;
+              
             })
             .catch(err => {
               console.log(err);
             });
-        }
-        console.log(resp.data);
-        console.log(this.items);
+        } */
+        
+        console.log(resp, "resp");
+        console.log(resp.data, "resp.data");
+        console.log(this.items, "items");
       })
       .catch(err => {
         console.log(err);
       });
-  }, */
+  },
   methods: {
     submit: function() {
-      /*  axios
+      axios
         .get("/api/getCourseByCode", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
           params: {
             courseCode: this.code
           }
         })
         .then(resp => {
           console.log(resp.data);
-          this.courseConfirm = resp.data;
+          this.courseConfirm = resp.data.data;
           //this.items.push(resp.data);
         })
         .catch(err => {
           console.log(err);
-        }); */
+        });
       this.isConfirm = true;
     },
     confirm() {
       this.isPlus = false;
       this.isConfirm = false;
-      /* axios
-        .get("/api/getCourseByCode", {
+      axios
+        .get("/api/joinCourse", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
           params: {
             studentID: 1,
             courseClassID: this.courseConfirm.courseClass.id
@@ -191,13 +217,13 @@ export default {
         })
         .then(resp => {
           //==============================将新获得的课程添加到当前列表
-          this.items.push(this.courseConfirm)
+          this.items.push(this.courseConfirm);
           console.log(resp);
-          this.$message(resp.message)
+          this.$message(resp.message);
         })
         .catch(err => {
           console.log(err);
-        }); */
+        });
       this.code = "";
     },
     courseDetail: function(courseID) {
@@ -210,7 +236,7 @@ export default {
     },
     homework(chapterID) {
       this.$router.push({
-        path: "/student/currentHomework",
+        path: "/student/chapterDetail",
         query: {
           chapterID: chapterID
         }

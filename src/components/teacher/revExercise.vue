@@ -1,5 +1,6 @@
 <template>
-  <div style="margin:0 auto;width:700px">
+<div>
+  <div style="margin:0 auto;width:700px" v-if="haveRev">
     <h4 align="start">
       作业题（
       <span>{{totalPoint}}</span>分）
@@ -12,7 +13,7 @@
         <span style="color:red;">{{totalScore}}</span> 分
       </span>
     </h4>
-    <el-form ref="answer" :model="answer" v-show="before">
+    <el-form  v-show="before">
       <div
         style="margin-top:15px;font-size:14px"
         align="start"
@@ -22,15 +23,15 @@
         <p style="margin-left:5px">
           {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
           <span
-            v-if="item.exercise.exerciseType===5"
+            v-if="item.exercise.exerciseType===2"
           >（多选）</span>
         </p>
         <!-- 单选 -->
         <el-form-item
           style="margin-top:10px;margin-left:10px;padding-bottom:10px"
-          v-if="item.exercise.exerciseType===4"
+          v-if="item.exercise.exerciseType===1"
         >
-          <el-radio-group v-model="answer[index]">
+          <el-radio-group >
             <el-radio
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
@@ -40,8 +41,8 @@
           </el-radio-group>
         </el-form-item>
         <!-- 多选 -->
-        <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===5">
-          <el-checkbox-group v-model="answer[index]">
+        <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===2">
+          <el-checkbox-group >
             <el-checkbox
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
@@ -51,73 +52,15 @@
           </el-checkbox-group>
         </el-form-item>
         <!-- 主观 -->
-        <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===6">
-          <el-input type="textarea" :rows="4" placeholder="请输入答案" v-model="answer[index]"></el-input>
+        <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===3">
+          <el-input type="textarea" :rows="4" placeholder="请输入答案"></el-input>
         </el-form-item>
       </div>
       <el-form-item>
         <el-button type="primary" @click="submitForm('answer')" size="mini" disabled>保 存</el-button>
       </el-form-item>
     </el-form>
-    <div v-show="after">
-      <div
-        style="margin-top:15px;font-size:14px;padding-bottom:10px"
-        align="start"
-        v-for="(item,index) in exercises"
-        :key="index"
-      >
-        <p style="margin-left:5px">
-          {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
-          <span
-            v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
-          >
-            <span style="font-size:12px;color:rgb(100,100,100)">
-              你的选择:
-              <span
-                style="color:red;"
-                v-if="item.exercise.exerciseType===4"
-              >{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
-              <span style="color:red;" v-else-if="item.exercise.exerciseType===5">
-                <span
-                  v-for="(num,index) in answer[index]"
-                  :key="index"
-                >{{String.fromCharCode(num+65)}}</span>
-              </span>
-            </span>
-            <span style="font-size:12px;color:rgb(100,100,100)" v-show="isRated">
-              得分:
-              <span style="color:red;">{{score[index]}}</span> 分
-            </span>
-          </span>
-          <span v-else-if="item.exercise.exerciseType===6 && isScored==true">
-            <span style="font-size:12px;color:rgb(100,100,100)">
-              得分:
-              <span style="color:red;">{{score[index]}}</span> 分
-            </span>
-          </span>
-        </p>
-        <span v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5">
-          <span
-            v-for="j in item.exerciseChoiceList.length"
-            :key="j"
-            :value="j - 1"
-            :label="j - 1"
-            style="margin-left:10px"
-          >
-            <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
-          </span>
-        </span>
-        <div
-          v-else-if="item.exercise.exerciseType===6"
-          style="padding:10px;background-color:#ddd;height:50px"
-        >你的答案：{{answer[index]}}</div>
-
-        <div
-          v-show="isRated"
-          style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-        >解析：{{item.exercise.exerciseAnalysis}}</div>
-      </div>
-    </div>
+   
     <div v-if="isRated==false" style="background-color:#545c64;height:110px">
       <p style="padding-top:10px;color:#fff">评分<span style="font-size:12px;">（评分后方可提交作业）</span></p>
       <el-rate
@@ -134,12 +77,18 @@
       <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
     </div>
   </div>
+  <div v-else>
+      <h3>老师尚未发布习题</h3>
+    </div>
+  </div>
 </template>
 <script>
-import Axios from "axios";
+import axios from "axios";
 export default {
   data() {
     return {
+      haveRev:false,
+      tid:0,
       half: true,
       before: true,
       after: false,
@@ -347,7 +296,8 @@ export default {
     //进入界面确定界面状态  before after isScored 总得分
   },
   mounted() {
-    this.test();
+    //this.test();
+    this.getRev()
   },
   methods: {
     test() {
@@ -355,6 +305,34 @@ export default {
         this.totalPoint += this.exercises[i].exercise.exercisePoint;
       }
       console.log(this.totalPoint, "totalPoint");
+    },
+     getRev() {
+      const tid = this.$route.query.trevid;
+      this.tid = tid;
+      axios
+        .get("/api/question/view", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            chapterId: tid,
+            type: "preview"
+          }
+        })
+        .then(resp => {
+          console.log("rev", resp.data);
+          this.exercises = resp.data.data;
+          var length = this.exercises.length;
+          if (length != 0) {
+            this.haveRev = true;
+          }
+
+          this.test();
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     submitForm(formname) {
       var length = 0;

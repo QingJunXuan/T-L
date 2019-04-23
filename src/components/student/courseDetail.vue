@@ -11,31 +11,24 @@
       </el-row>
       <el-row>
         <el-col :span="2" :offset="22">
-          <el-button type="text" @click="feedback">教学反馈</el-button>
+          <el-button type="text" @click="feedback" style="color:#fff">教学反馈</el-button>
         </el-col>
       </el-row>
     </el-row>
     <el-row>
       <div class="tabs">
         <el-col :span="4" :offset="6">
-          <div @click="getNotice" class="tabBack" :class="{'clickDiv':isNotice}">
-
-            <el-button
-              @click="getNotice"
-              type="text"
-              class="tab"
-              :class="{'clickButton':isNotice}"
-            >公告</el-button>
-
+          <div @click="showNotice" class="tabBack" :class="{'clickDiv':isNotice}">
+            <el-button type="text" class="tab" :class="{'clickButton':isNotice}">公告</el-button>
           </div>
         </el-col>
         <el-col :span="4">
-          <div @click="setLesson" class="tabBack" :class="{'clickDiv':isLesson}">
+          <div @click="showLesson" class="tabBack" :class="{'clickDiv':isLesson}">
             <el-button type="text" class="tab" :class="{'clickButton':isLesson}">课程及练习</el-button>
           </div>
         </el-col>
         <el-col :span="4">
-          <div @click="getAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
+          <div @click="showAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
             <el-button type="text" class="tab" :class="{'clickButton':isAnalysis}">学习分析</el-button>
           </div>
         </el-col>
@@ -51,8 +44,15 @@
         </div>
         <div v-show="isLesson" class="lessonBack">
           <el-col :span="12" :offset="6" style="padding-top:20px;margin-bottom:40px">
-            <graph></graph>
-            <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"  default-expand-all></el-tree>
+            <div style="height:300px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
+            <el-tree
+              :data="tree"
+              :props="defaultProps"
+              @node-click="handleNodeClick"
+              default-expand-all
+              :expand-on-click-node="false"
+              :render-content="renderContent"
+            ></el-tree>
           </el-col>
         </div>
         <div v-show="isAnalysis" class="analysisBack">
@@ -69,12 +69,12 @@
   </div>
 </template>
 <script>
-import graph from './chapterGraph.vue'
-import axios from 'axios'
+import graph from "./chapterGraph.vue";
+import axios from "axios";
 export default {
   name: "sCourseDetail",
-  components:{
-    graph,
+  components: {
+    graph
   },
   data() {
     return {
@@ -83,60 +83,22 @@ export default {
       isLesson: true,
       isAnalysis: false,
       notice: "Java是一门面向对象编程语言.",
-      //data: null,
       rate: 20,
       lesson: null,
-      /*
+      showButton: true,
+
+      dataIndex: 0,
+      graphTree:[],
       data: [
         {
-          label: "一级 1",
-          children: [
-            {
-              label: "二级 1-1"
-            },
-            {
-              label: "课前预习题"
-            },
-            {
-              label: "课后作业题"
-            }
-          ]
-        },
-        {
-          label: "一级 2",
-          children: [
-            {
-              label: "二级 2-1"
-            },
-            {
-              label: "二级 2-2"
-            },
-            {
-              label: "课前预习题"
-            },
-          ]
-        },
-        {
-          label: "一级 3",
-          children: [
-            {
-              label: "二级 3-1"
-            },
-            {
-              label: "二级 3-2"
-            },
-            {
-              label: "课前预习题"
-            },
-          ]
+          name: "start",
+          x: 200,
+          y: 0
         }
-      ], 
-      defaultProps: {
-        children: "children",
-        label: "label"
-      },*/
-      
-      data: [
+      ], //node：name+坐标信息
+      links: [], //连线信息
+
+      tree: [
         {
           id: 1,
           createTime: "2019-03-30T06:16:14.000+0000",
@@ -176,7 +138,7 @@ export default {
       defaultProps: {
         children: "subCatalog",
         label: "contentName"
-      } 
+      }
     };
   },
   created() {
@@ -185,54 +147,87 @@ export default {
     const routerParams = this.$route.query.courseID;
     this.courseID = routerParams;
     console.log(this.courseID);
+    this.getChapterGraph()
+    this.getNotice();
+    this.getLesson();
+  },
+  mounted() {
+    //console.log(this.data);
+    this.draw();
   },
   methods: {
-    getParams() {
-      const routerParams = this.$route.query.courseID;
-      this.courseID = routerParams;
-      //console.log(routerParams);
-      this.getNotice();
+    getChapterGraph(){
+       axios
+      .get("/api/getChapterRelationByCourseID",{
+         headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+        params:{courseID:this.courseID}
+      })
+      .then(resp => {
+        console.log(resp.data);
+        this.graphTree=resp.data.data
+        this.init()
+      })
+      .catch(err => {
+        console.log(err);
+      });
     },
     getNotice() {
+      axios
+        .get("/api/getNoticeByCouID", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            courseID: this.courseID
+          }
+        })
+        .then(resp => {
+          console.log(resp.data, "notice data");
+          this.notice = resp.data.data.courseNotice;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getLesson() {
+      axios
+        .get("/api/getCourseCatalog", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            courseID: this.courseID
+          }
+        })
+        .then(resp => {
+          this.tree = resp.data.data;
+          console.log(resp.data, "resp.data");
+          console.log(this.courseID, "courseID");
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    showNotice() {
       if (this.isNotice == false) {
         this.isNotice = true;
         this.isLesson = false;
         this.isAnalysis = false;
-        /* axios.get("/api/getNoticeByCouID", {
-            params: {
-              courseID: this.courseID
-            }
-          }).then(resp => {
-            this.notice = resp.data.courseNotice;
-          }).catch(err => {
-            console.log(err);
-          });  */
       }
     },
-    setLesson() {
+    showLesson() {
       if (this.isLesson == false) {
         this.isNotice = false;
         this.isLesson = true;
         this.isAnalysis = false;
-
-        /* axios
-          .get("/api/getCourseCatalog", {
-            params: {
-              courseID: this.courseID
-            }
-          })
-          .then(resp => {
-            console.log(this.data);
-            //this.data = resp.data;
-            console.log(resp.data);
-            console.log(this.courseID);
-          })
-          .catch(err => {
-            console.log(err);
-          }); */
       }
     },
-    getAnalysis() {
+    showAnalysis() {
       if (this.isAnalysis == false) {
         this.isNotice = false;
         this.isLesson = false;
@@ -240,15 +235,78 @@ export default {
       }
     },
     handleNodeClick(object) {
-      console.log(object);
+      console.log(object,"node-object");
       if (object.subCatalog.length == 0) {
         this.$router.push({
-          path: "chapterDetail",
+          path: "chapterDetail/point",
           query: {
-            id: object.id
+            chapterID: object.id,
+            courseIDs: this.courseID
           }
         });
       }
+    },
+    renderContent(h, { node, data, store }) {
+      if (data.parentID == 0) {
+        return (
+          <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
+            <span>
+              <span style="color:#000;font-size:15px">
+                {"第 " + data.content + " 章 "}&nbsp;
+              </span>
+              <span>{node.label}</span>
+            </span>
+            <span>
+              <el-button
+                style="font-size: 12px;color:#000;"
+                size="mini"
+                on-click={() => this.pre(data)}
+                round
+              >
+                课前摸底
+              </el-button>
+              <el-button
+                style="font-size: 12px;"
+                size="mini"
+                type="info"
+                on-click={() => this.rev(node, data)}
+                round
+              >
+                课后作业
+              </el-button>
+            </span>
+          </span>
+        );
+      } else {
+        return (
+          <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
+            <span>
+              <span>{data.content}&nbsp;</span>
+              <span>{node.label}</span>
+            </span>
+          </span>
+        );
+      }
+    },
+    pre(data) {
+      console.log(data, "pre");
+      this.$router.push({
+        path: "chapterDetail/preExercise",
+        query: {
+          spreid: data.id,
+          courseIDs: this.courseID
+        }
+      });
+    },
+    rev(node, data) {
+      console.log(node, data, "rev");
+      this.$router.push({
+        path: "chapterDetail/revExercise",
+        query: {
+          srevid: data.id,
+          courseIDs: this.courseID
+        }
+      });
     },
     courseBack() {
       this.$router.push({ path: "/student/courseManagement" });
@@ -257,6 +315,130 @@ export default {
       this.$router.push({
         path: "/student/feedback"
       });
+    },
+    init() {
+      //var list = state.courseList
+      var length = this.graphTree.length;
+      for (var i = 0; i < length; i++) {
+        var addData = {
+          name: this.graphTree[i].chapterNode.content,
+          //category: "test",
+          x: Math.round(Math.random() * 500),
+          y: Math.round(Math.random() * 500) + 50
+        };
+        this.data.push(addData);
+        var num = this.graphTree[i].preChapterNodes.length;
+        var name = this.graphTree[i].chapterNode.content;
+        if (num == 0) {
+          //无前继节点的，连接start
+          var addLink = {
+            target: name,
+            source: "start",
+            label: {
+              normal: {
+                show: false
+              }
+            }
+            /*  lineStyle: {
+                            normal: { curveness: 0.2 }
+                        } */
+          };
+          this.links.push(addLink);
+        } else {
+          //所有前继节点
+          for (var j = 0; j < num; j++) {
+            var addLink = {
+              target: name,
+              source: this.graphTree[i].preChapterNodes[j].content,
+              label: {
+                normal: {
+                  show: false
+                }
+              }
+              /* lineStyle: {
+                                normal: { curveness: 0.2 }
+                            } */
+            };
+            this.links.push(addLink);
+          }
+        }
+      }
+      console.log(this.data, "this.data");
+      console.log(this.links, "this.links");
+      this.draw()
+    },
+    draw() {
+      console.log("draw")
+      var init = this.$refs.graph;
+      var myChart = this.$echarts.init(init);
+      var option = {
+        /*  title: {
+          text: "章节关系图"
+        }, */
+        tooltip: {},
+        animationDurationUpdate: 1500,
+        animationEasingUpdate: "quinticInOut",
+        toolbox: {
+          feature: {
+            //保存为图片
+            saveAsImage: { show: true }
+          }
+        },
+        series: [
+          {
+            type: "graph",
+            layout: "none",
+            symbolSize: 20,
+            color: "#ec7814",
+            roam: true,
+            label: {
+              normal: {
+                show: true
+              }
+            },
+            edgeSymbol: ["circle", "arrow"],
+            edgeSymbolSize: [4, 10],
+            //edgeColor:"#000",
+            edgeLabel: {
+              normal: {
+                textStyle: {
+                  fontSize: 10,
+                  fontColor: "#000"
+                }
+              }
+            },
+            //data: this.data,
+            //links: this.links,
+            data: this.data,
+            links: this.links,
+            lineStyle: {
+              normal: {
+                opacity: 0.9,
+                width: 1,
+                curveness: 0
+              }
+            }
+          }
+        ]
+      };
+      myChart.setOption(option);
+      var that = this;
+      myChart.on("click", function(params) {
+        console.log(params);
+        if (params.dataType == "edge") {
+          //that.handleClick(params);
+          that.dataIndex = params.dataIndex;
+          //显示边
+          myChart.setOption(option);
+        } else if (params.dataType == "node") {
+          that.dataIndex = params.dataIndex;
+        }
+      });
+      //取消右键的弹出菜单
+      document.oncontextmenu = function() {
+        return false;
+      };
+      that.myChart = myChart;
     }
   }
 };
@@ -284,12 +466,12 @@ body {
   background-color: #292929;
 }
 .clickDiv {
-  background-color:rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .tab {
   line-height: 40px;
   height: 60px;
-  color: rgba(255, 255, 255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 .tab:hover {
   color: #fff;
@@ -311,7 +493,7 @@ body {
   padding: 150px 0;
   height: 100px;
 }
-.lessonBack{
+.lessonBack {
   padding: 20px 0;
 }
 .analysisBack {
@@ -321,30 +503,28 @@ body {
 .el-tree {
   background-color: #fff;
 }
-.el-tree-node__content{
+.el-tree-node__content {
   background-color: rgb(221, 240, 240);
   height: 50px;
   border: #ddd;
   border-bottom-style: dashed;
 }
 .el-tree-node__content:hover {
-  background-color:rgb(204, 221, 221);
-
+  background-color: rgb(221, 240, 240);
 }
-.el-tree-node:focus>.el-tree-node__content{
-   background-color:rgb(204, 221, 221);
+.el-tree-node:focus > .el-tree-node__content {
+  background-color: rgb(204, 221, 221);
 }
-.el-tree-node__children .el-tree-node__content{
+.el-tree-node__children .el-tree-node__content {
   background-color: #fff;
   height: 50px;
   border: #ddd;
   border-bottom-style: dashed;
 }
-.el-tree-node__children .el-tree-node__content:hover{
+.el-tree-node__children .el-tree-node__content:hover {
   background-color: rgb(251, 251, 251);
 }
-.el-tree-node__children .el-tree-node:focus>.el-tree-node__content {
+.el-tree-node__children .el-tree-node:focus > .el-tree-node__content {
   background-color: rgb(255, 251, 251);
 }
-
 </style>

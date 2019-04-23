@@ -3,7 +3,10 @@
     <el-col :span="20" :offset="2">
       <el-row>
         <el-col :span="16" :offset="4">
-          <el-card style="margin-top:10px;height:300px;text-align:center" body-style="{padding:'0px'}">
+          <el-card
+            style="margin-top:10px;height:300px;text-align:center"
+            body-style="{padding:'0px'}"
+          >
             <graph></graph>
           </el-card>
         </el-col>
@@ -18,12 +21,16 @@
               >{{item.courseInfo.courseName}}</p>
               <el-row>
                 <el-col :span="5" :offset="18" style="margin-top:0px">
-                  <span style="font-size: 10px;color: rgb(238, 235, 235);">老师：{{item.courseInfo.teacherName}}</span>
+                  <span
+                    style="font-size: 10px;color: rgb(238, 235, 235);"
+                  >老师：{{item.courseInfo.teacherName}}</span>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col :span="5" :offset="18">
-                  <span style="font-size: 10px;color: rgb(238, 235, 235);">ID：{{item.courseInfo.teacherID}}</span>
+                  <span
+                    style="font-size: 10px;color: rgb(238, 235, 235);"
+                  >ID：{{item.courseInfo.teacherID}}</span>
                 </el-col>
               </el-row>
             </el-row>
@@ -31,7 +38,10 @@
               <el-row>
                 <el-col :span="16" :offset="1" style="text-align:left">
                   <p style="font-size:13px;color:#000">近期作业</p>
-                  <p id="newest" @click="homework(item.courseInfo.currentExerciseChapter)">{{item.courseInfo.currentExerciseChapter}}</p>
+                  <p
+                    id="newest"
+                    @click="homework(item.courseClass.currentExerciseChapter)"
+                  >第 {{item.courseClass.currentExerciseChapter}} 章课后习题</p>
                 </el-col>
               </el-row>
               <el-row>
@@ -47,10 +57,11 @@
   </div>
 </template>
 <script>
-import graph from './courseGraph.vue'
+import graph from "./courseGraph.vue";
+import axios from 'axios'
 export default {
   name: "tCourseManage",
-  components:{
+  components: {
     graph
   },
   data() {
@@ -64,14 +75,15 @@ export default {
             courseID: 1,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            teacherID:123,
-            currentExerciseChapter: "JAVA I/O 课后作业"
+            teacherID: 123,
+            
           },
           courseClass: {
             id: 1,
             courseID: 1,
             classNum: 1,
-            classCode: "100001"
+            classCode: "100001",
+            currentExerciseChapter: "JAVA I/O 课后作业"
           }
         },
         {
@@ -79,14 +91,15 @@ export default {
             courseID: 2,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            teacherID:123,
-            currentExerciseChapter: "JAVA I/O 课后作业"
+            teacherID: 123,
+            
           },
           courseClass: {
             id: 2,
             courseID: 2,
             classNum: 1,
-            classCode: "100002"
+            classCode: "100002",
+            currentExerciseChapter: "JAVA I/O 课后作业"
           }
         },
         {
@@ -94,35 +107,40 @@ export default {
             courseID: 3,
             courseName: "JavaEE",
             teacherName: "范鸿飞",
-            teacherID:123,
-            currentExerciseChapter: "JAVA I/O 课后作业"
+            teacherID: 123,
+            
           },
           courseClass: {
             id: 3,
             courseID: 3,
             classNum: 1,
-            classCode: "100003"
+            classCode: "100003",
+            currentExerciseChapter: "JAVA I/O 课后作业"
           }
         }
       ]
     };
   },
-  /*  created() {
+  created() {
     axios
-      .get("/api/getStuCourseList", {
+      .get("/api/getCoursesByTeacherID", {
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+        },
         params: {
-          studentID: 1
+          teacherID: 1
         }
       })
       .then(resp => {
-        this.items = resp.data;
-        console.log(resp.data);
-        console.log(this.items)
+        this.items = resp.data.data;
+        console.log(resp.data, "resp.data");
+        console.log(this.items, "items");
       })
       .catch(err => {
         console.log(err);
       });
-  }, */
+  },
   methods: {
     courseDetail: function(courseID) {
       this.$router.push({
@@ -134,9 +152,9 @@ export default {
     },
     homework(chapterID) {
       this.$router.push({
-        path: "chapterDetail",
+        path: "/teacher/chapterDetail",
         query: {
-          id: chapterID
+          chapterID: chapterID
         }
       });
     }

@@ -35,6 +35,7 @@
   </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
   name:'teacherList',
   data() {
@@ -85,6 +86,20 @@ export default {
       sels:[], 
       listLoading:false,
     };
+  },
+  created(){
+     axios.get('/api/getTeacherInfoByNID',{
+headers: {
+            'Authorization':
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          }
+    }).then(resp=>{
+      if(resp.data.state==1){
+        this.teachers=resp.data.data
+      }
+    }).catch(err=>{
+      console.log(err)
+    })
   },
   methods: {
     edit() {

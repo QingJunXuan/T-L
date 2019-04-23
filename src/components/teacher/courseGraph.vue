@@ -9,6 +9,7 @@
   </el-container>
 </template>
 <script>
+import axios from 'axios'
 export default {
   name: "tCourseGraph",
   data() {
@@ -17,7 +18,14 @@ export default {
         width: window.screen.width
       },
       dataIndex: 0,
-      data: [
+      list:[],
+      data:[{
+        name:"start",
+        x:200,
+        y:0
+      }],
+      links:[]
+     /*  data: [
         {
           name: "start",
           x: 200,
@@ -38,8 +46,9 @@ export default {
           x: 220,
           y: 270
         }
-      ], //node：name+坐标信息
-      links: [
+      ],  *///node：name+坐标信息
+    
+    /* links: [
         {
           source: "start",
           target: "软件工程",
@@ -48,9 +57,7 @@ export default {
               show: false
             }
           }
-          /* lineStyle: {
-                    normal: { curveness: 0.1 }
-                } */
+          
         },
         {
           source: "start",
@@ -60,9 +67,6 @@ export default {
               show: false
             }
           }
-          /* lineStyle: {
-                    normal: { curveness: 0.1 }
-                } */
         },
         {
           source: "软件工程",
@@ -80,19 +84,25 @@ export default {
 
       allCourse: [],
       loading: true
-    };
+    */ };
   },
   created() {
     //获取课程之间的关系，data[]，links[],设置参数
-    /*  this.$axios
-      .get("/api/getAllCourse")
+    axios
+      .get("/api/getAllCoursesRelation",{
+         headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+        }
+      })
       .then(resp => {
-        console.log(resp);
-        store.commit("set", resp.data);
+        console.log(resp.data);
+        this.list=resp.data.data
+        this.set()
       })
       .catch(err => {
         console.log(err);
-      }); */
+      });
     //console.log(this.screenWidth.width);
   },
   mounted() {
@@ -100,6 +110,56 @@ export default {
     this.draw();
   },
   methods: {
+     set() {
+            var length = this.list.length
+            for (var i = 0; i < length; i++) {
+                var addData = {
+                    name: this.list[i].courseName.courseName,
+                    //category: "test",
+                    x: Math.round(Math.random() * 200),
+                    y: Math.round(Math.random() * 200)+50
+                };
+                this.data.push(addData)
+                var num = this.list[i].preCoursesName.length;
+                var name = this.list[i].courseName.courseName
+                if (num == 0) {//无前继节点的，连接start
+                    var addLink = {
+                        target: name,
+                        source: 'start',
+                        label: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                       /*  lineStyle: {
+                            normal: { curveness: 0.2 }
+                        } */
+                    };
+                    this.links.push(addLink)
+                }
+                else {
+                    //所有前继节点
+                    for (var j = 0; j < num; j++) {
+                        var addLink = {
+                            target: name,
+                            source: this.list[i].preCoursesName[j].courseName,
+                            label: {
+                                normal: {
+                                    show: false
+                                }
+                            },
+                            /* lineStyle: {
+                                normal: { curveness: 0.2 }
+                            } */
+                        };
+                        this.links.push(addLink)
+                    }
+                }
+            }
+            console.log(this.data,"this.data")
+            console.log(this.links,"this.links")
+            this.draw()
+        },
     initGraph() {
       var init = this.$refs.graph;
       var graph = this.$echarts.init(init);

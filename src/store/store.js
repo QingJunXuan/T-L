@@ -57,7 +57,7 @@ export default new Vuex.Store({
               }
           ],//课程详细信息-ruleForm
            */
-        courseList: [
+        List: [
             {
                 courseID: 1,
                 createTime: "2019-03-28T04:53:06.000+0000",
@@ -101,7 +101,49 @@ export default new Vuex.Store({
                 successor: ["软件工程"],
             },
         ],
-        data: [{
+        courseList: [
+            {
+                courseName: {
+                  courseNameID: 1,
+                  createTime: "2019-04-20T05:08:08.000+0000",
+                  updateTime: "2019-04-20T05:08:08.000+0000",
+                  courseName: "数据结构"
+                },
+                preCoursesName: []
+            },
+            {
+              courseName: {
+                courseNameID: 2,
+                createTime: "2019-04-20T05:08:08.000+0000",
+                updateTime: "2019-04-20T05:08:08.000+0000",
+                courseName: "算法"
+              },
+              preCoursesName: [
+                {
+                  courseNameID: 1,
+                  createTime: "2019-04-20T05:08:08.000+0000",
+                  updateTime: "2019-04-20T05:08:08.000+0000",
+                  courseName: "数据结构"
+                }
+              ]
+            },
+            {
+                courseName:{
+                    courseNameID: 3,
+                    createTime: "2019-04-20T05:08:08.000+0000",
+                    updateTime: "2019-04-20T05:08:08.000+0000",
+                    courseName: "C语言"
+                  },
+                  preCoursesName:[],
+            },
+          ],
+          data:[{
+              name:"start",
+              x:250,
+              y:50,
+          }],
+          links:[],
+       /*  data: [{
             name: "start",
             x: 200,
             y: 0
@@ -127,9 +169,9 @@ export default new Vuex.Store({
                         show: false
                     }
                 },
-                /* lineStyle: {
+                 lineStyle: {
                     normal: { curveness: 0.1 }
-                } */
+                }
             }, {
                 source: 'start',
                 target: 'web',
@@ -138,9 +180,9 @@ export default new Vuex.Store({
                         show: false
                     }
                 },
-                /* lineStyle: {
+                lineStyle: {
                     normal: { curveness: 0.1 }
-                } */
+                } 
             },{
                 source: '软件工程',
                 target: '软件项目与过程管理',
@@ -154,21 +196,28 @@ export default new Vuex.Store({
                 }
             }
         ],//连线信息
+     */
     },
     mutations: {
-        set(state, list) {
+        set(state,resp){
+            state.courseList=resp.list
+            state.data=resp.data
+            state.links=resp.links
+        },
+       /*  set(state, list) {
             state.courseList = list
+            //var list = state.courseList
             var length = list.length
             for (var i = 0; i < length; i++) {
                 var addData = {
-                    name: list[i].courseName,
+                    name: list[i].courseName.courseName,
                     //category: "test",
                     x: Math.round(Math.random() * 500),
-                    y: Math.round(Math.random() * 500)
+                    y: Math.round(Math.random() * 500)+50
                 };
                 state.data.push(addData)
-                var num = list[i].successor.length;
-                var name = list[i].courseName
+                var num = list[i].preCoursesName.length;
+                var name = list[i].courseName.courseName
                 if (num == 0) {//无前继节点的，连接start
                     var addLink = {
                         target: name,
@@ -178,9 +227,9 @@ export default new Vuex.Store({
                                 show: false
                             }
                         },
-                        lineStyle: {
+                         lineStyle: {
                             normal: { curveness: 0.2 }
-                        }
+                        } 
                     };
                     state.links.push(addLink)
                 }
@@ -189,24 +238,29 @@ export default new Vuex.Store({
                     for (var j = 0; j < num; j++) {
                         var addLink = {
                             target: name,
-                            source: list[i].successor[j],
+                            source: list[i].preCoursesName[j].courseName,
                             label: {
                                 normal: {
                                     show: false
                                 }
                             },
-                            lineStyle: {
+                             lineStyle: {
                                 normal: { curveness: 0.2 }
-                            }
+                            } 
                         };
                         state.links.push(addLink)
                     }
                 }
             }
+            console.log(state.data,"state.data")
+            console.log(state.links,"state.links")
+        }, */
+        setAllCourse(state,data){
+            state.courseList=data
         },
         addCourse(state, course) {
             state.courseList.push(course)
-            console.log(state.courseList)
+            console.log(state.courseList,"state.list")
         },
         addData(state, data) {
             state.data.push(data)
@@ -266,8 +320,12 @@ export default new Vuex.Store({
             //}
 
         },
-        editCourseList(state, change) {
-            state.courseList[change.index - 1] = change.form
+        editCourseListName(state, change) {
+            state.courseList[change.index - 1].courseName.courseName = change.form.courseName
+        },
+        
+        editCourseListLinks(state, change) {
+            ///links
         },
         editName(state, change) {
             /* //修改courseList里的name
@@ -291,7 +349,6 @@ export default new Vuex.Store({
             }
         },
         editLinks(state, change) {
-            var oldLength = state.courseList[change.index-1].successor.length
             var newLength = change.new.length
             var name = state.data[change.index].name
 

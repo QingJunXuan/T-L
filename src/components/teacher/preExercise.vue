@@ -1,10 +1,11 @@
 <template>
-  <div style="margin:0 auto;width:700px">
+<div>
+  <div style="margin:0 auto;width:700px"  v-if="havePre">
     <h4 align="start">
       客观题（<span>{{totalPoint}}</span>分）
       <span v-show="after">得分：{{totalScore}} 分</span>
     </h4>
-    <el-form ref="answer" :model="answer" v-show="before">
+    <el-form  v-show="before">
       <div
         style="margin-top:15px;font-size:14px"
         align="start"
@@ -14,11 +15,12 @@
         <p
           style="margin-left:5px"
         >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</p>
+        <!-- 单选 -->
         <el-form-item
           style="margin-top:10px;margin-left:10px;padding-bottom:10px"
           v-if="item.exercise.exerciseType===1"
         >
-          <el-radio-group v-model="answer[index]">
+          <el-radio-group>
             <el-radio
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
@@ -27,8 +29,9 @@
             >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
           </el-radio-group>
         </el-form-item>
+        <!-- 多选 -->
         <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===2">
-          <el-checkbox-group v-model="answer[index]">
+          <el-checkbox-group>
             <el-checkbox
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
@@ -37,77 +40,32 @@
             >{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
+         <!-- 主观 -->
+         <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===3">
+          <el-input type="textarea" :rows="4" placeholder="请输入答案"></el-input>
+        </el-form-item>
       </div>
       <el-form-item>
         <el-button type="primary" @click="submitForm('answer')" size="mini" disabled>确认提交</el-button>
       </el-form-item>
     </el-form>
-    <div v-show="after">
-      <div
-        style="margin-top:15px;font-size:14px;padding-bottom:10px"
-        align="start"
-        v-for="(item,index) in exercises"
-        :key="index"
-      >
-        <p style="margin-left:5px">
-          {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
-          <span
-            style="font-size:12px;color:rgb(100,100,100)"
-          >
-            你的选择：
-            <span
-              style="color:red;"
-              v-if="item.exercise.exerciseType===1"
-            >{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
-            <span style="color:red;" v-else-if="item.exercise.exerciseType===2">
-              <span
-                v-for="(num,index) in answer[index]"
-                :key="index"
-              >{{String.fromCharCode(num+65)}}</span>
-            </span>
-          </span>
-          <span style="font-size:12px;color:rgb(100,100,100)">
-            得分：
-            <span style="color:red;">{{score[index]}}</span> 分
-          </span>
-        </p>
-        <span
-          v-for="j in item.exerciseChoiceList.length"
-          :key="j"
-          :value="j - 1"
-          :label="j - 1"
-          style="margin-left:10px"
-        >
-          <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
-        </span>
-        <div
-          style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-        >解析：{{item.exercise.exerciseAnalysis}}</div>
-      </div>
-    </div>
+  </div>
+<div v-else>
+<h3>老师尚未发布习题</h3>
+  </div>
   </div>
 </template>
 <script>
-import Axios from "axios";
+import axios from "axios";
 export default {
   data() {
     return {
+      tid:0,
+      havePre:false,
       before: true,
       after: false,
       type: 0,
       rate: 0,
-      answer: {
-        0: "",
-        1: "",
-        2: "",
-        3: []
-      },
-      score: {
-        0: "",
-        1: "",
-        2: "",
-        3: ""
-      },
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
       exercises: [
@@ -276,12 +234,39 @@ export default {
         this.exercises = resp.data;
       })
     }); */
-   this.test()
+   //this.test()
   },
   mounted(){
-   this.test()
+   this.getPre()
   },
   methods: {
+     getPre() {
+      const tid = this.$route.query.tpreid;
+      this.tid=tid
+      axios
+        .get("/api/question/view", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            chapterId: this.tid,
+            type: "preview"
+          }
+        })
+        .then(resp => {
+          console.log("pre", resp.data);
+          this.exercises = resp.data.data;
+          var length = this.exercises.length
+      if(length!=0){
+        this.havePre=true
+      }
+          this.test()
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     test(){
        for(var i=0;i<this.exercises.length;i++){
         this.totalPoint += this.exercises[i].exercise.exercisePoint

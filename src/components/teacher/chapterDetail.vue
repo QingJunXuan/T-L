@@ -16,35 +16,35 @@
             </el-button>
           </span>
         </el-menu-item>
-        <el-submenu v-for="(item1,index1) in catalog" :index="index1.toString()" :key="index1">
+        <el-submenu v-for="(item1,index1) in tree" :index="index1.toString()" :key="index1">
           <template slot="title">
-            <span>{{item1.chapterName}}</span>
+            <span>{{item1.content+" "+item1.contentName}}</span>
           </template>
           <div>
-            <div v-for="(item2, index2) in item1.points" :key="index1*10+index2">
+            <div v-for="(item2, index2) in item1.subCatalog" :key="index1*10+index2">
               <el-row class="vertical-middle">
                 <el-col :span="16">
                   <router-link
-                    :to="{name: 'tpoint', query:{id: index1.toString() + index2, name: item2.name}}"
+                    :to="{name: 'tpoint', query:{chapterIDt: item2.id, name: item2.contentName}}"
                     class="router-link-active"
                   >
-                    <el-menu-item :index="index1.toString() + index2">{{item2.name}}</el-menu-item>
+                    <el-menu-item :index="index1.toString() + index2">{{item2.content+" "+item2.contentName}}</el-menu-item>
                   </router-link>
                 </el-col>
               </el-row>
             </div>
             <!-- 初始化页面状态 -->
             <router-link
-              :to="{name: 'tpreExercise', query:{sid: index1 + 'pre'}}"
+              :to="{name: 'tpreExercise', query:{tpreid: item1.id}}"
               class="router-link-active"
             >
-              <el-menu-item :index="index1.toString() + 'pre'">课前摸底习题</el-menu-item>
+              <el-menu-item :index="index1.toString() + 'pre'">课前摸底</el-menu-item>
             </router-link>
             <router-link
-              :to="{name: 'trevExercise', query:{sid: index1 + 'rev'}}"
+              :to="{name: 'trevExercise', query:{trevid: item1.id}}"
               class="router-link-active"
             >
-              <el-menu-item :index="index1.toString() + 'rev'">课后习题</el-menu-item>
+              <el-menu-item :index="index1.toString() + 'rev'">课后作业</el-menu-item>
             </router-link>
           </div>
         </el-submenu>
@@ -123,15 +123,9 @@ export default {
         }
       ],
       chapterData: [],
+      courseID:0,
       updateChapterVisible: false,
-      chapterForm: {
-        name: "",
-        type: "0",
-        predecessor: []
-      },
-      chapterRules: {
-        name: [{ required: true, message: "请输入章节名", trigger: "blur" }]
-      },
+     tree:[],
       typeOptions: [
         {
           value: "0",
@@ -150,14 +144,47 @@ export default {
         this.$router.push({ path: "/" });
         return false;
       } else {
-        this.$router.push("/teacher/courseDetail");
+        this.$router.push({
+          path:"/teacher/courseDetail",
+          query:{
+            courseID:this.courseID}
+          });
       }
     },
     handleChapterClose() {
       for (let i = 0; i < this.chapterData.length; i++) {
         this.chapterData[i].disabled = false;
       }
-    }
+    },
+     getCatalog(){
+       const routerParams = this.$route.query.courseIDt;
+     this.courseID = routerParams;
+     axios
+        .get("/api/getCourseCatalog", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            courseID: this.courseID
+          }
+        })
+        .then(resp => {
+          this.tree = resp.data.data;
+          console.log(resp.data,"resp.data");
+          console.log(this.courseID,"courseID");
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }, 
+  },
+  watch: {
+  '$route' (to,from) {
+      //对路由变化做出响应
+      console.log('有变化了') //测试点击路由的反应
+      //页面需要重新加载的地方
+  }
   },
   created() {
     /* for (let i = 0; i < this.catalog.length; i++) {
@@ -167,6 +194,7 @@ export default {
         disabled: false
       });
     } */
+    this.getCatalog()
   }
 };
 </script>

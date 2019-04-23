@@ -3,45 +3,107 @@
     <el-main>
       <div>
         <el-col :span="12" :offset="2">
-          <div style="height:520px;margin-top:0px;padding-right:10px;border:1px solid #ddd" ref="graph"></div>
+          <div
+            style="height:520px;margin-top:0px;padding-right:10px;border:1px solid #ddd"
+            ref="graph"
+          ></div>
         </el-col>
         <el-col :span="8" :offset="1">
           <el-card id="edit" style="width:100%;height:520px;left:10%;" body-style="{padding:'0px'}">
-            <el-row style="padding-bottom:10px" v-show="isAdd">
-              <p style="text-align:center;font-size:13px">填写下面的表单新建课程</p>
-              <p style="text-align:center;font-size:12px">删除或编辑课程，请点击左侧课程关系图中对应的节点</p>
-            </el-row>
-            <el-row style="padding-bottom:10px" v-show="isEditClass">
-              <p style="text-align:center;font-size:13px;margin-bottom:-3px">修改下面的表单进行编辑</p>
-              <el-button @click="addVisible" size="mini" type="text">返回添加课程</el-button>
+            <el-row style="padding-bottom:10px" v-show="isAddCourse">
+              <p style="text-align:center;font-size:13px">新建课程</p>
+              <p style="text-align:center;font-size:12px">其他操作，请点击左侧课程关系图中对应的节点</p>
             </el-row>
             <el-row style="padding-bottom:10px" v-show="isEditCourse">
-              <p style="text-align:center;font-size:13px;margin-bottom:-3px">编辑课程名或前继课程</p>
-              <el-button @click="addVisible" size="mini" type="text">返回添加课程</el-button>
+              <p style="text-align:center;font-size:13px;margin-bottom:-3px">编辑课程</p>
+              <el-button @click="addCourseVisible" size="mini" type="text">返回添加课程</el-button>
+            </el-row>
+            <el-row style="padding-bottom:10px" v-show="isAddClass">
+              <p style="text-align:center;font-size:13px">为课程添加班级</p>
+              <el-button @click="addCourseVisible" size="mini" type="text">返回添加课程</el-button>
+            </el-row>
+            <el-row style="padding-bottom:10px" v-show="isEditClass">
+              <p style="text-align:center;font-size:13px;margin-bottom:-3px">编辑班级信息</p>
+              <el-button @click="addCourseVisible" size="mini" type="text">返回添加课程</el-button>
+            </el-row>
+
+            <el-row style="padding-bottom:10px" v-show="editClassNum">
+              <p style="text-align:center;font-size:13px;margin-bottom:-3px">编辑班级数量</p>
+              <el-button @click="addCourseVisible" size="mini" type="text">返回添加课程</el-button>
             </el-row>
             <el-form
-              v-show="isAdd"
-              :model="ruleForm"
-              :rules="rules"
-              ref="ruleForm"
+              v-show="isAddCourse"
+              :model="ruleForm1"
+              :rules="rules12"
+              ref="ruleForm1"
               label-width="100px"
               class="demo-ruleForm"
               size="mini"
             >
               <el-form-item label="课程名称" prop="courseName">
-                <el-input v-model="ruleForm.courseName"></el-input>
+                <el-input v-model="ruleForm1.courseName"></el-input>
               </el-form-item>
+              <el-form-item prop="successor" label="前继课程" style="text-align:left">
+                <el-select v-model="ruleForm1.successor" multiple collapse-tags placeholder="前继课程">
+                  <el-option
+                    v-for="(item,index) in allCourse"
+                    :key="index"
+                    :label="item.courseName.courseName"
+                    :value="item.courseName.courseName"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item style="margin-left:-100px;padding-top:30px">
+                <el-button type="primary" @click="submitForm1('ruleForm1')">新 建</el-button>
+              </el-form-item>
+            </el-form>
+            <el-form
+              v-show="isEditCourse"
+              :model="ruleForm2"
+              :rules="rules12"
+              ref="ruleForm2"
+              label-width="100px"
+              class="demo-ruleForm"
+              size="mini"
+            >
+              <el-form-item label="课程名称" prop="courseName">
+                <el-input v-model="ruleForm2.courseName"></el-input>
+              </el-form-item>
+              <el-form-item prop="successor" label="前继课程" style="text-align:left">
+                <el-select v-model="ruleForm2.successor" multiple collapse-tags placeholder="前继课程">
+                  <el-option
+                    v-for="(item,index) in filterAllCourse"
+                    :key="index"
+                    :label="item.courseName.courseName"
+                    :value="item.courseName.courseName"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item style="margin-left:-100px;padding-top:30px">
+                <el-button type="primary" @click="submitForm2('ruleForm2')">提交修改</el-button>
+                <el-button type="text" @click="addCourseVisible">取消</el-button>
+              </el-form-item>
+            </el-form>
+            <el-form
+              v-show="isAddClass"
+              :model="ruleForm3"
+              :rules="rules34"
+              ref="ruleForm3"
+              label-width="100px"
+              class="demo-ruleForm"
+              size="mini"
+            >
               <el-form-item label="教师名称" prop="teacherName">
-                <el-input v-model="ruleForm.teacherName"></el-input>
+                <el-input v-model="ruleForm3.teacherName"></el-input>
               </el-form-item>
               <el-form-item label="教师工号" prop="teacherID">
-                <el-input v-model="ruleForm.teacherID"></el-input>
+                <el-input v-model="ruleForm3.teacherID"></el-input>
               </el-form-item>
               <el-form-item label="学年学期" required>
                 <el-col :span="11">
                   <el-form-item prop="courseYear">
                     <el-date-picker
-                      v-model="ruleForm.courseYear"
+                      v-model="ruleForm3.courseYear"
                       type="year"
                       placeholder="选择学年"
                       style="width: 100%;"
@@ -53,7 +115,7 @@
                 <el-col :span="11">
                   <el-form-item prop="courseSemester">
                     <el-select
-                      v-model="ruleForm.courseSemester"
+                      v-model="ruleForm3.courseSemester"
                       placeholder="学期"
                       style="width: 100%;"
                     >
@@ -69,9 +131,9 @@
                     <el-date-picker
                       type="date"
                       placeholder="开始日期"
-                      v-model="ruleForm.startTime"
+                      v-model="ruleForm3.startTime"
                       style="width: 100%;"
-                      :picker-options="pickerOptions0"
+                      :picker-options="startTime(ruleForm3)"
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>
@@ -81,29 +143,19 @@
                     <el-date-picker
                       type="date"
                       placeholder="结束日期"
-                      v-model="ruleForm.endTime"
+                      v-model="ruleForm3.endTime"
                       style="width: 100%;"
-                      :picker-options="pickerOptions1"
+                      :picker-options="endTime(ruleForm3)"
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>
               </el-form-item>
-              <el-form-item prop="successor" label="前继课程" style="text-align:left;" >
-                <el-select v-model="ruleForm.successor" multiple collapse-tags placeholder="前继课程">
-                  <el-option
-                    v-for="(item,index) in allCourse"
-                    :key="index"
-                    :label="item.courseName"
-                    :value="item.courseName"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="班级个数" prop="classNum" :rules="[{ required: true, message: '请输入班级个数'},{ type: 'number', message: '必须为数字值'}]" style="width:80%">
-                    <el-input type="num" v-model.number="classNum" auto-complete="off"></el-input>
+              <el-form-item label="班级个数" prop="classNum" style="width:80%">
+                <el-input type="num" v-model.number="ruleForm3.classNum" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item style="margin-left:-100px;padding-top:10px">
-                <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-                <el-button @click="resetForm('ruleForm')">重置</el-button>
+                <el-button type="primary" @click="submitForm3('ruleForm3')">立即创建</el-button>
+                <el-button @click="resetForm('ruleForm3')">重置</el-button>
               </el-form-item>
             </el-form>
             <!--  <el-row v-show="isDel">
@@ -120,27 +172,24 @@
             </el-row>-->
             <el-form
               v-show="isEditClass"
-              :model="ruleForm2"
-              :rules="rules"
-              ref="ruleForm2"
+              :model="ruleForm4"
+              :rules="rules34"
+              ref="ruleForm4"
               label-width="100px"
               class="demo-ruleForm"
               size="mini"
             >
-              <el-form-item label="课程名称" prop="courseName">
-                <el-input v-model="ruleForm2.courseName" :disabled="true"></el-input>
-              </el-form-item>
               <el-form-item label="教师名称" prop="teacherName">
-                <el-input v-model="ruleForm2.teacherName"></el-input>
+                <el-input v-model="ruleForm4.teacherName"></el-input>
               </el-form-item>
               <el-form-item label="教师工号" prop="teacherID">
-                <el-input v-model="ruleForm2.teacherID"></el-input>
+                <el-input v-model="ruleForm4.teacherID"></el-input>
               </el-form-item>
               <el-form-item label="学年学期" required>
                 <el-col :span="11">
                   <el-form-item prop="courseYear">
                     <el-date-picker
-                      v-model="ruleForm2.courseYear"
+                      v-model="ruleForm4.courseYear"
                       type="year"
                       placeholder="选择学年"
                       style="width: 100%;"
@@ -152,7 +201,7 @@
                 <el-col :span="11">
                   <el-form-item prop="courseSemester">
                     <el-select
-                      v-model="ruleForm2.courseSemester"
+                      v-model="ruleForm4.courseSemester"
                       placeholder="学期"
                       style="width: 100%;"
                     >
@@ -168,9 +217,9 @@
                     <el-date-picker
                       type="date"
                       placeholder="开始日期"
-                      v-model="ruleForm2.startTime"
+                      v-model="ruleForm4.startTime"
                       style="width: 100%;"
-                      :picker-options="pickerOptions0"
+                      :picker-options="startTime(ruleForm4)"
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>
@@ -180,76 +229,83 @@
                     <el-date-picker
                       type="date"
                       placeholder="结束日期"
-                      v-model="ruleForm2.endTime"
+                      v-model="ruleForm4.endTime"
                       style="width: 100%;"
-                      :picker-options="pickerOptions1"
+                      :picker-options="endTime(ruleForm4)"
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>
               </el-form-item>
-              <el-form-item prop="successor" label="前继课程" style="text-align:left">
-                <el-select v-model="ruleForm2.successor" multiple collapse-tags placeholder="前继课程" :disabled="true">
-                  <el-option
-                    v-for="(item,index) in allCourse"
-                    :key="index"
-                    :label="item.courseName"
-                    :value="item.courseName"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-               <el-form-item label="班级个数" prop="classNum" :rules="[{ required: true, message: '请输入班级个数'},{ type: 'number', message: '必须为数字值'}]" style="width:80%">
-                    <el-input type="num" v-model.number="classNum" auto-complete="off"></el-input>
-              </el-form-item>
               <el-form-item style="margin-left:-100px;padding-top:30px">
-                <el-button type="primary" @click="editClass">提交修改</el-button>
-                <el-button type="text" @click="addVisible">取消</el-button>
-                <!-- <el-button @click="resetForm('ruleForm2')">重置</el-button> -->
+                <el-button type="primary" @click="submitForm4('ruleForm4')">提交修改</el-button>
+                <el-button type="text" @click="addCourseVisible">取消</el-button>
               </el-form-item>
             </el-form>
-            <el-form
-              v-show="isEditCourse"
-              :model="ruleForm3"
-              :rules="rules"
-              ref="ruleForm3"
-              label-width="100px"
-              class="demo-ruleForm"
-              size="mini"
+            <el-row  v-show="editClassNum">
+            <el-table
+              :data="rowIndex.courseClasses"
+              border
+              style="width: 100%"
             >
-              <el-form-item label="课程名称" prop="courseName">
-                <el-input v-model="ruleForm3.courseName"></el-input>
-              </el-form-item>
-              <el-form-item prop="successor" label="前继课程" style="text-align:left">
-                <el-select v-model="ruleForm3.successor" multiple collapse-tags placeholder="前继课程">
-                  <el-option
-                    v-for="(item,index) in filterAllCourse"
-                    :key="index"
-                    :label="item.courseName"
-                    :value="item.courseName"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item style="margin-left:-100px;padding-top:30px">
-                <el-button type="primary" @click="submitForm3('ruleForm3')">提交修改</el-button>
-                <el-button type="text" @click="addVisible">取消</el-button>
-              </el-form-item>
-            </el-form>
+                <el-table-column prop="classNum" label="班级" width="100"></el-table-column>
+                <el-table-column prop="classCode" label="邀请码" width="150"></el-table-column>
+                <el-table-column fixed="right" label="操作" width="80">
+                  <template slot-scope="scope">
+                    <el-button
+                      @click="delClassNum(scope)"
+                      type="text"
+                      size="small"
+                    >删除</el-button>
+                  </template>
+              </el-table-column>
+              <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
+            </el-table>
+            <div style="padding-top:20px"><el-button @click="isAddClassNum=true" size="small">新增班级</el-button></div>
+            <el-dialog :visible.sync="isAddClassNum" title="提示" center width="30%">
+             <p style="text-align:center">是否确认添加班级？</p>
+             <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="addClassNum" size="small">确 认</el-button>
+            <el-button @click="isAddClassNum=false" size="small">取 消</el-button>
+          </span>
+            </el-dialog>
+            </el-row>
           </el-card>
         </el-col>
+        <el-dialog title="请选择要进行的操作" :visible.sync="dialog1">
+          <span style="margin-top:-20px">
+            对课程进行操作：
+            <el-button type="text" @click="editCourseVisible">
+              <span style="font-size:12px">编辑</span>
+            </el-button>
+           <!--  <el-button type="text" @click="isDelCourse=true">
+              <span style="font-size:12px">删除</span>
+            </el-button> -->
+            <el-button type="text" @click="addClassVisible">
+              <span style="font-size:12px">开课</span>
+            </el-button>
+          </span>
+          <el-table :data="dupCourse" border style="width: 100%" @row-click="rowClick">
+            <el-table-column label="点击下表对应行，对班级进行操作">
+              <el-table-column prop="courseInfo.teacherName" label="教师" width="100"></el-table-column>
+              <el-table-column prop="courseInfo.startTime" label="开课时间" width="180"></el-table-column>
+              <el-table-column prop="courseInfo.endTime" label="结束时间"></el-table-column>
+            </el-table-column>
+            <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
+          </el-table>
+        </el-dialog>
+        <el-dialog title="请选择要进行的操作" :visible.sync="isDelCourse" width="30%" center>
+          <p style="text-align:center">确定要删除该课程吗？</p>
+          <span slot="footer" class="dialog-footer">
+            <el-button type="danger" @click="delCourse" size="small">确 认</el-button>
+            <el-button @click="isDelCourse=false" size="small">取 消</el-button>
+          </span>
+        </el-dialog>
         <el-dialog title="请选择要进行的操作" :visible.sync="dialog2" width="30%" center>
           <p style="text-align:center">
-            <el-button @click="editClassVisible" size="small" type="primary">编 辑</el-button>
+            <el-button @click="editClassVisible" size="small" type="primary">编辑信息</el-button>
+            <el-button @click="editClassNumVisible" size="small" type="primary">编辑班级</el-button>
             <el-button @click="delClass" size="small" type="danger">删 除</el-button>
           </p>
-        </el-dialog>
-        <el-dialog title="点击对应项编辑课程" :visible.sync="dialog1">
-          <P style="margin-top:-20px">
-          <el-button type="text" @click="editCourseVisible"><span style="font-size:12px">(点击修改课程名或前继课程)</span></el-button></p>
-          <el-table :data="dupCourse" border style="width: 100%" @row-click="rowClick">
-            <el-table-column prop="teacherName" label="教师" width="100"></el-table-column>
-            <el-table-column prop="startTime" label="开课时间" width="180"></el-table-column>
-            <el-table-column prop="endTime" label="结束时间"></el-table-column>
-             <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
-          </el-table>
         </el-dialog>
       </div>
     </el-main>
@@ -257,7 +313,7 @@
 </template>
 <script>
 import store from "../../store/store.js";
-//import dataTool from '../../dataTool.js'
+import axios from "axios";
 export default {
   name: "courseGraph",
   data() {
@@ -265,60 +321,75 @@ export default {
       screenWidth: {
         width: window.screen.width
       },
-      isAdd: true,
-      isEditClass: false,
+      isAddCourse: true,
+      isAddClass: false,
+      courseName: 0, //courseNameID
       isEditCourse: false,
+      isEditClass: false,
+      isDelCourse: false,
+      isAddClassNum:false,
       dialog1: false,
       dialog2: false,
+      editClassNum:false,
       dataIndex: 0,
       rowIndex: 0,
-      data: store.state.data,
-      links: store.state.links,
-      allCourse: store.state.courseList, //不重名列表用于显示左侧
+      data:[{
+        name:"start",
+        x:250,
+        y:0
+      }],
+      links: [],
+      allCourse: [], //不重名列表用于显示左侧
       dupCourse: [
         {
-          courseID: 1,
-          createTime: "2019-03-28T04:53:06.000+0000",
-          updateTime: "2019-04-03T06:23:53.000+0000",
-          teacherID: 443,
-          courseName: "软件测试",
-          teacherName: "张老师",
-          courseYear: "2018",
-          courseSemester: "秋季",
-          startTime: "2019-03-28",
-          endTime: "2019-03-29",
-          successor: []
-          /*  class: [{
-                    classNum: 1
-                },{
-                    classNum:2
-                }] */
+          courseInfo: {
+            courseID: 2,
+            createTime: "2019-03-28T05:00:13.000+0000",
+            updateTime: "2019-04-20T09:39:07.000+0000",
+            teacherID: 2223,
+            courseName: "5",
+            teacherName: "金伟祖",
+            courseYear: 2019,
+            courseSemester: "春季",
+            startTime: "2019-02-24",
+            endTime: "2019-06-10"
+          },
+          courseClasses: [
+            {
+              id: 2,
+              createTime: "2019-04-02T06:54:41.000+0000",
+              updateTime: "2019-04-07T22:45:27.000+0000",
+              courseID: 2,
+              classNum: 1,
+              classCode: "200001",
+              currentExerciseChapter: -1
+            }
+          ]
         },
         {
-          courseID: 1,
-          createTime: "2019-03-28T04:53:06.000+0000",
-          updateTime: "2019-04-03T06:23:53.000+0000",
-          teacherID: 443,
-          courseName: "软件测试",
-          teacherName: "李老师",
-          courseYear: "2018",
-          courseSemester: "秋季",
-          startTime: "2019-03-28",
-          endTime: "2019-03-29",
-          successor: []
-        },
-        {
-          courseID: 1,
-          createTime: "2019-03-28T04:53:06.000+0000",
-          updateTime: "2019-04-03T06:23:53.000+0000",
-          teacherID: 443,
-          courseName: "软件测试",
-          teacherName: "王老师",
-          courseYear: "2018",
-          courseSemester: "秋季",
-          startTime: "2019-03-28",
-          endTime: "2019-03-30",
-          successor: []
+          courseInfo: {
+            courseID: 3,
+            createTime: "2019-03-29T04:41:41.000+0000",
+            updateTime: "2019-04-20T09:39:07.000+0000",
+            teacherID: 2,
+            courseName: "5",
+            teacherName: "杜庆峰",
+            courseYear: 2017,
+            courseSemester: "春季",
+            startTime: "2017-03-01",
+            endTime: "2017-06-01"
+          },
+          courseClasses: [
+            {
+              id: 5,
+              createTime: "2019-04-08T07:42:54.000+0000",
+              updateTime: "2019-04-08T07:47:56.000+0000",
+              courseID: 3,
+              classNum: 1,
+              classCode: "300001",
+              currentExerciseChapter: 17
+            }
+          ]
         }
       ],
 
@@ -336,33 +407,46 @@ export default {
       //避免清除
       relayForm: {},
       //添加
-      classNum:null,
-      ruleForm: {
-        courseName: "",
-        teacherName: "",
-        teacherID: null,
-        courseYear: "",
-        courseSemester: "",
-        startTime: null,
-        endTime: null,
-        successor: []
+      classNum: null,
+      ruleForm1: {
+        courseName: ""
+        //successor:{}
       },
       ruleForm2: {
-        courseName: "",
+        courseName: ""
+        //successor:{}
+      },
+      ruleForm3: {
         teacherName: "",
         teacherID: null,
         courseYear: "",
         courseSemester: "",
         startTime: null,
         endTime: null,
-        successor: []
+        classNum: null
       },
-      ruleForm3: {},
-      rules: {
+      ruleForm4: {
+        teacherName: "",
+        teacherID: null,
+        courseYear: "",
+        courseSemester: "",
+        startTime: null,
+        endTime: null
+      },
+      rules12: {
         courseName: [
           { required: true, message: "请输入课程名称", trigger: "blur" },
           { min: 1, max: 15, message: "长度在 1 到 15 个字符", trigger: "blur" }
         ],
+        successor: [
+          {
+            required: false,
+            message: "请选择前继课程",
+            trigger: "blur"
+          }
+        ]
+      },
+      rules34: {
         teacherName: [
           { required: true, message: "请输入教师姓名", trigger: "blur" },
           { min: 1, max: 10, message: "长度在 1 到 10 个字符", trigger: "blur" }
@@ -397,56 +481,150 @@ export default {
             trigger: "change"
           }
         ],
-        successor: [
-          {
-            required: false,
-            message: "请选择前继课程",
-            trigger: "blur"
-          }
+        classNum: [
+          { required: true, message: "请输入班级个数" },
+          { type: "number", message: "必须为数字值" }
         ]
       },
       multipleSelection: []
     };
   },
   created() {
+    //store.commit("set", "a");
     //获取课程之间的关系，data[]，links[],设置参数
-    /*  this.$axios
-      .get("/api/getAllCourse")
+    //this.getAllCourse()
+    //console.log(this.screenWidth.width);
+     axios
+      .get("/api/getAllCoursesRelation", {
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+        }
+      })
       .then(resp => {
-        console.log(resp);
-        store.commit("set", resp.data);
+        console.log(resp.data, "init.data");
+        //store.commit("set", resp.data.data);
+        
+        this.allCourse=resp.data.data
+        console.log(this.allCourse,"allcourse")
+        this.set()
       })
       .catch(err => {
         console.log(err);
-      }); */
-    console.log(this.screenWidth.width);
+      }); 
   },
-  computed:{
-    filterAllCourse:function(){
-      var filterForm = Object.assign({},this.allCourse)
-      delete filterForm[this.dataIndex-1]
-      console.log(this.allCourse)
-      console.log(filterForm)
-      return filterForm
+  computed: {
+    filterAllCourse: function() {
+      var filterForm = Object.assign({}, this.allCourse);
+      var name = this.data[this.dataIndex];
+
+      delete filterForm[this.dataIndex - 1];
+
+      var length = this.links.length;
+      for (var i = 0; i < length; i++) {
+        if (this.links[i].source == name) {
+          for (var j = 0; j < filterForm.length; j++) {
+            if (filterForm[j].courseName.courseName == this.links[i].target) {
+              delete filterForm[j];
+              break;
+            }
+          }
+        }
+      }
+      console.log(this.allCourse, "filterAllCourse");
+      console.log(filterForm, "filter");
+      return filterForm;
     }
   },
   mounted() {
     //console.log(this.data);
-    this.draw();
+    
+    //this.draw();
   },
   methods: {
+    set() {
+            //state.courseList = list
+            //var list = state.courseList
+
+            var length = this.allCourse.length
+            for (var i = 0; i < length; i++) {
+                var addData = {
+                    name: this.allCourse[i].courseName.courseName,
+                    //category: "test",
+                    x: Math.round(Math.random() * 100),
+                    y: Math.round(Math.random() * 100)+50
+                };
+                this.data.push(addData)
+                var num = this.allCourse[i].preCoursesName.length;
+                var name = this.allCourse[i].courseName.courseName
+                if (num == 0) {//无前继节点的，连接start
+                    var addLink = {
+                        target: name,
+                        source: 'start',
+                        label: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                       /*  lineStyle: {
+                            normal: { curveness: 0.2 }
+                        } */
+                    };
+                    this.links.push(addLink)
+                }
+                else {
+                    //所有前继节点
+                    for (var j = 0; j < num; j++) {
+                        var addLink = {
+                            target: name,
+                            source: this.allCourse[i].preCoursesName[j].courseName,
+                            label: {
+                                normal: {
+                                    show: false
+                                }
+                            },
+                            /* lineStyle: {
+                                normal: { curveness: 0.2 }
+                            } */
+                        };
+                        this.links.push(addLink)
+                    }
+                }
+            }
+            console.log(this.data,"this.data")
+            console.log(this.links,"this.links")
+            this.draw()
+            store.commit("set",{
+              list:this.allCourse,data:this.data,links:this.links
+            })
+        },
+    setAllCourse() {
+      axios
+        .get("/api/getAllCoursesRelation", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          }
+        })
+        .then(resp => {
+          console.log(resp.data, "init.data");
+          store.commit("setAllCourse", resp.data.data);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     initGraph() {
       var init = this.$refs.graph;
       var graph = this.$echarts.init(init);
       return graph;
     },
-    startTime() {
+    startTime(form) {
       return {
         disabledDate: time => {
-          if (this.ruleForm.endTime != null) {
+          if (form.endTime != null) {
             return (
-              time.getTime() >= this.ruleForm.endTime ||
-              time.getTime() < Date.now()
+              time.getTime() >= form.endTime || time.getTime() < Date.now()
             );
           } else {
             return time.getTime() < Date.now();
@@ -454,13 +632,12 @@ export default {
         }
       };
     },
-    endTime() {
+    endTime(form) {
       return {
         disabledDate: time => {
-          if (this.ruleForm.startTime != null) {
+          if (form.startTime != null) {
             return (
-              time.getTime() <= this.ruleForm.startTime ||
-              time.getTime() < Date.now()
+              time.getTime() <= form.startTime || time.getTime() < Date.now()
             );
           } else {
             return time.getTime() < Date.now();
@@ -488,60 +665,187 @@ export default {
       store.commit("edgeStyle", this.dataIndex);
       this.test();
     },
-    submitForm(formName) {
+    getDupCourse() {
+      axios
+        .get("/api/getAllCoursesByNameID", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            courseNameID: this.allCourse[this.dataIndex - 1].courseName
+              .courseNameID
+          }
+        })
+        .then(resp => {
+          console.log(
+            this.allCourse[this.dataIndex - 1].courseName.courseNameID,
+            "nameid"
+          );
+          console.log(resp.data, "resp.data");
+
+          this.dupCourse = resp.data.data;
+          console.log(this.dupCourse, "dup");
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    submitForm1(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           var length = this.data.length;
           for (var i = 0; i < length; i++) {
-            if (this.ruleForm.courseName == this.data[i].name) {
-              if (this.ruleForm.courseName == "start") {
+            if (this.ruleForm1.courseName == this.data[i].name) {
+              if (this.ruleForm1.courseName == "start") {
                 alert("不可添加名为“start”的课程");
               } else {
-                //直接向后端提交
-                this.$message("添加成功");
-                }
+                alert("已添加该课程");
+              }
               return 1;
             }
           }
           this.addCourse();
         } else {
           console.log("error submit!!");
+          alert("信息不完整");
           return false;
         }
       });
       this.resetForm(formName);
     },
     submitForm2(formName) {
-      this.$refs[formName].validate(valid => {
-
-        //提交后端
-        if (valid) {
-          var length = this.data.length;
-          for (var i = 0; i < length; i++) {
-            if (
-              this.ruleForm2.courseName == this.data[i].name &&
-              this.ruleForm2.courseName != this.data[this.dataIndex].name
-            ) {
-              if (this.ruleForm2.courseName == "start") {
-                alert("不可更改课程名为“start”");
-              } else {
-                //提交给后端
-                this.$message("修改成功");
-              }
-              return 1;
-            }
+      //console.log(this.dataIndex)
+      var length = this.data.length;
+      for (var i = 0; i < length; i++) {
+        if (
+          this.ruleForm2.courseName == this.data[i].name &&
+          this.ruleForm2.courseName != this.data[this.dataIndex].name
+        ) {
+          if (this.ruleForm2.courseName == "start") {
+            alert("不可更改课程名为“start”");
+          } else {
+            alert("该课程已存在");
           }
-          this.editClass();
+          return 1;
+        }
+      }
+      this.editCourse();
+    },
+    submitForm3(formName) {
+      //addClass
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          //=======================给后端
+          var form = Object.assign({}, this.ruleForm3);
+          console.log(this.ruleForm3,"ruleForm3")
+          console.log(form)
+          axios
+            .post(
+              "/api/addCourse",
+              {
+                teacherID: form.teacherID,
+                courseName: this.courseName, //id
+                teacherName: form.teacherName,
+                courseYear: form.courseYear,
+                courseSemester: form.courseSemester,
+                startTime: form.startTime,
+                endTime: form.endTime
+              },
+              {
+                headers: {
+                  Authorization:
+                    "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+                }
+              }
+            )
+            .then(resp => {
+              console.log(resp.data, "addClass");
+              var id = resp.data.data.courseID;
+              for (var i = 0; i < form.classNum; i++) {
+                axios
+                  .post(
+                    "/api/addClass",
+                    {
+                      courseID: id,
+                      classNum: i + 1
+                    },
+                    {
+                      headers: {
+                        Authorization:
+                          "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+                      }
+                    }
+                  )
+                  .then(resp => {
+                    console.log(resp.data, "addClassNum");
+                    if (resp.data.state == 1) {
+                      this.$message("添加成功");
+                      
+                    } else {
+                      this.$message("添加失败");
+                      return -1;
+                    }
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
         } else {
           console.log("error submit!!");
           return false;
-        } 
+        }
+        this.resetForm(formName);
+      });
+    },
+    submitForm4(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          var form = Object.assign({}, this.ruleForm4);
+          //==========================================后端
+          axios
+            .post("/api/alertCourseInfo",
+              {
+                courseID: form.courseID,
+                teacherID: form.teacherID,
+                courseName: this.courseName, //id
+                teacherName: form.teacherName,
+                courseYear: form.courseYear,
+                courseSemester: form.courseSemester,
+                startTime: form.startTime,
+                endTime: form.endTime
+              },
+              {
+                headers: {
+                  Authorization:
+                    "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+                }
+              }
+            )
+            .then(resp => {
+              console.log(resp.data, "editClass");
+              if (resp.message.state == 1) {
+                this.$message("修改成功");
+              } else {
+                this.$message("修改失败");
+                return -1;
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
       });
       this.resetForm(formName);
-    },
-    submitForm3(formName) {
-      //console.log(this.dataIndex)
-      this.editCourse();
+      this.isEditClass = false;
+      this.isAddCourse = true;
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
@@ -550,20 +854,20 @@ export default {
       //data
       //计算坐标
       var addData = {
-        name: this.ruleForm.courseName,
+        name: this.ruleForm1.courseName,
         category: "test",
-        x: Math.round(Math.random() * 500),
-        y: Math.round(Math.random() * 500)
+        x: Math.round(Math.random() * 100),
+        y: Math.round(Math.random() * 100)
       };
       store.commit("addData", addData);
 
       //links
-      var num = this.ruleForm.successor.length;
+      var num = this.ruleForm1.successor.length;
       //所有前继节点
       if (num == 0) {
         //无前继节点的，连接start
         var addLink = {
-          target: this.ruleForm.courseName,
+          target: this.ruleForm1.courseName,
           source: "start",
           label: {
             normal: {
@@ -578,8 +882,8 @@ export default {
       } else {
         for (var i = 0; i < num; i++) {
           var addLink = {
-            target: this.ruleForm.courseName,
-            source: this.ruleForm.successor[i],
+            target: this.ruleForm1.courseName,
+            source: this.ruleForm1.successor[i],
             label: {
               normal: {
                 show: false
@@ -592,103 +896,176 @@ export default {
           store.commit("addLinks", addLink);
         }
       }
-      var addCourse = Object.assign({}, this.ruleForm);
-      store.commit("addCourse", addCourse);
-      console.log(addCourse);
+
+      var addCourse = Object.assign({}, this.ruleForm1);
+      console.log(addCourse.successor, "successor");
+      axios
+        .post(
+          "/api/addCourseName",
+          {
+            courseName: addCourse.courseName
+          },
+          {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+            }
+          }
+        )
+        .then(
+          resp => {
+            console.log("courseName,success");
+            console.log(resp);
+            if (resp.state == 1) {
+              console.log(resp.state);
+              var id = resp.data.courseNameID;
+              for (var i = 0; i < addCourse.successor.length; i++) {
+                for (var j = 0; j < this.allCourse.length; j++) {
+                  if (
+                    addCourse.successor[i] ==
+                    this.allCourse[j].courseName.courseName
+                  ) {
+                    axios
+                      .get("/api/addCourseRelation", {
+                        headers: {
+                          Authorization:
+                            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+                        },
+                        params: {
+                          courseNameID: id,
+                          preCoursesNameID: this.allCourse[j].courseName
+                            .courseNameID
+                        }
+                      })
+                      .then(resp => {
+                        console.log("links,success");
+                        if (resp.state == 0) {
+                          alert("关系添加失败");
+                        }
+                      });
+                    break;
+                  }
+                }
+              }
+              this.$message("添加成功");
+            }
+          },
+          err => {
+            console.log("err", err);
+          }
+        );
+
+      //addCourse
+      //store.commit("addCourse", addCourse);
+      //console.log(addCourse,"addCourse");
+      this.allCourse=store.state.courseList
+      this.data=store.state.data
+      this.links=store.state.links
       this.test();
 
-      //==================向后端提交ruleForm和classNum=========================
+      //==================向后端提交ruleForm1=========================
       //message添加成功
     },
-    addVisible() {
-      if (this.isAdd == false) {
+    addCourseVisible() {
+      if (this.isAddCourse == false) {
         this.isEditCourse = false;
         this.isEditClass = false;
-        this.isAdd = true;
+        this.isAddCourse = true;
+        this.isAddClass=false;
+        this.editClassNum=false;
       }
-    },
-    rowClick(row) {
-      this.dialog2 = true;
-      console.log(row);
-      this.rowIndex = row;
-      console.log(this.rowIndex);
-      //dubCourse
-    },
-    editClassVisible() {
-      this.dialog1 = false;
-      this.dialog2 = false;
-      this.isAdd = false;
-      this.isEditClass = true;
-
-      var a = Object.assign({}, this.rowIndex);
-      //var a = this.rowIndex;
-      console.log(a);
-      if (a.length == 11) {
-        delete a["courseID"];
-        delete a["createTime"];
-        delete a["updateTime"];
-      }
-      a["courseYear"] = new Date(a["courseYear"]);
-      a["startTime"] = new Date(a["startTime"]);
-      a["endTime"] = new Date(a["endTime"]);
-      this.ruleForm2 = a;
-    },
-    editClass() {
-      var length = this.dupCourse.length;
-
-      var editClass = Object.assign({}, this.ruleForm2);
-      //提交ruleForm2
-      this.resetForm('ruleForm2')
-      this.isEditClass=false;
-      this.isAdd=true
-      this.$message('修改成功')
-      
-      //================向后端提交ruleForm2和classNum==========================
-      //提交之后返回成功后，message修改成功
     },
     editCourseVisible() {
       this.dialog1 = false;
-      this.isAdd=false;
-      this.isEditClass=false
-      this.isEditCourse = true;
-      
-      this.ruleForm3= Object.assign({}, this.allCourse[this.dataIndex - 1]);
-      console.log(this.ruleForm3)
+      this.isAddCourse = false;
+      this.isEditCourse = true; //编辑course
+      this.isAddClass = false;
+      this.isEditClass = false;
+      this.editClassNum=false;
+
+      var obj = Object.assign({}, this.allCourse[this.dataIndex - 1]);
+      this.ruleForm2.courseName = obj.courseName.courseName;
+      var length = obj.preCoursesName.length;
+      this.ruleForm2.successor = new Array();
+      for (var i = 0; i < length; i++) {
+        this.ruleForm2.successor[i] = obj.preCoursesName[i].courseName;
+      }
+      console.log(this.ruleForm2, "form2");
     },
     editCourse() {
-      var oldName = store.state.data[this.dataIndex].name;
-      var newName = this.ruleForm3.courseName;
-      var oldLinks = this.allCourse[this.dataIndex - 1].successor; //该节点原来的前继节点们
-      var newLinks = this.ruleForm3.successor; //该节点修改后的前继节点
-      console.log(oldLinks,newLinks)
+      var id = this.allCourse[this.dataIndex - 1].courseName.courseNameID;
+      var oldName = this.data[this.dataIndex].name;
+      var newName = this.ruleForm2.courseName;
+      var length = this.allCourse[this.dataIndex - 1].preCoursesName.length;
+      var oldLinks = new Array();
+      var oldLinksID = new Array();
+      for (var i = 0; i < length; i++) {
+        oldLinks[i] = this.allCourse[this.dataIndex - 1].preCoursesName[
+          i
+        ].courseName;
+        oldLinksID[i] = this.allCourse[this.dataIndex - 1].preCoursesName[
+          i
+        ].courseNameID;
+      } //该节点原来的前继节点们
+      var newLinks = this.ruleForm2.successor; //该节点修改后的前继节点
+      console.log(oldLinks, newLinks);
+
+      var editCourse = Object.assign({}, this.ruleForm2);
       //如果名字被更改，更新courseList、data和links里的名称
       if (newName != oldName) {
         store.commit("editName", { name: newName, index: this.dataIndex });
         console.log(this.data);
+        axios
+            .post("/api/alertCourseName",
+              {courseNameID:id,
+              courseName:newName
+              },
+              {
+                headers: {
+                  Authorization:
+                    "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+                }
+              }
+            )
+            .then(resp => {
+              console.log(resp.data, "editCourseName");
+              if (resp.message.state == 1) {
+                this.$message("修改成功");
+              } else {
+                this.$message("修改失败");
+                return -1;
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+       
       }
       //links
       var isEqual = oldLinks.sort().toString() === newLinks.sort().toString();
-      console.log(isEqual)
+      console.log(isEqual);
       if (isEqual == false) {
-        /*    //更改links
-        //去重
-        //获得需删除的link
-        //临时数组存放
-        var tempArray1 = [];
-        var del = []; //del
+        //更改links
+        store.commit("editLinks", { new: newLinks, index: this.dataIndex });
+        console.log(this.links,"links");
+
+        //去重-获得需删除的link
+        var tempArray1 = []; //临时数组存放
+        var del = [];
         for (var i = 0; i < newLinks.length; i++) {
           tempArray1[newLinks[i]] = true; //将newLinks中的元素值作为tempArray1 中的键，值为true；
         }
         for (var i = 0; i < oldLinks.length; i++) {
           if (!tempArray1[oldLinks[i]]) {
             del.push(oldLinks[i]); //过滤相同的元素；
+          } else {
+            oldLinksID.splice(i, 1);
           }
         }
 
         //获得需增加的link
-        //临时数组存放
-        var tempArray2 = [];
-        var add = []; //add
+        var tempArray2 = []; //临时数组存放
+        var add = [];
         for (var i = 0; i < oldLinks.length; i++) {
           tempArray2[oldLinks[i]] = true; //将oldLinks中的元素值作为tempArray1 中的键，值为true；
         }
@@ -696,24 +1073,137 @@ export default {
           if (!tempArray2[newLinks[i]]) {
             add.push(newLinks[i]); //过滤相同的元素；
           }
-        } */
+        }
 
-        store.commit("editLinks", { new: newLinks, index: this.dataIndex });
-        console.log(this.links);
+        //////////////////////////////后端改links
+        var delLength = del.length;
+        var addLength = add.length;
+        var allLength = this.allCourse.length;
+        for (var m = 0; m < addLength; m++) {
+          for (var n = 0; n < allLength; n++) {
+            if (add[m] == this.allCourse[n].courseName.courseName) {
+              add[m] = this.allCourse[n].courseName.courseNameID;
+              break;
+            }
+          }
+        }
+        for (var p = 0; p < delLength; p++) {
+          axios
+            .get("/api/deleteCourseRelation", {
+              headers: {
+                Authorization:
+                  "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              },
+              params: {
+                courseNameID: id,
+                preCoursesNameID: oldLinksID[p]
+              }
+            })
+            .then(resp => {
+              console.log("links,del,success", p);
+              if (resp.state == 0) {
+                alert("关系删除失败");
+              }
+            });
+        }
+        for (var q = 0; q < addLength; q++) {
+          axios
+            .get("/api/addCourseRelation", {
+              headers: {
+                Authorization:
+                  "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              },
+              params: {
+                courseNameID: id,
+                preCoursesNameID: add[q]
+              }
+            })
+            .then(resp => {
+              console.log("links,add,success", q);
+              if (resp.state == 0) {
+                alert("关系添加失败");
+              }
+            });
+        }
       }
-      //修改courseList
-      var editCourse = Object.assign({}, this.ruleForm3);
-      store.commit("editCourseList", {
-        form: editCourse,
-        index: this.dataIndex
-      });
-      console.log(this.allCourse)
-      //向后台提交，返回成功信息后message
-      this.isEditCourse=false;
-      this.isAdd=true;
-      this.test()
-      this.$message('修改成功'); 
+      //查看是否修改了信息
+      if (isEqual == false || newName != oldName) {
+        console.log(this.allCourse);
+        this.isEditCourse = false;
+        this.isAddCourse = true;
+        this.test();
+        this.setAllCourse();
+        this.$message("修改成功");
+        //===============================
+        //this.resetForm("ruleForm2");
+        //===============================
+      } else {
+        alert("没有要修改的信息");
+      }
     },
+    rowClick(row) {
+      this.dialog2 = true;
+      console.log(row, "row");
+      this.rowIndex = row;
+      console.log(this.rowIndex, "rowIndex");
+      //dubCourse
+    },
+    addClassVisible() {
+      this.isAddCourse = false;
+      this.isEditCourse = false;
+      this.isAddClass = true;
+      this.isEditClass = false;
+      this.editClassNum=false;
+
+      this.dialog1 = false;
+    },
+    editClassVisible() {
+      this.dialog1 = false;
+      this.dialog2 = false;
+      this.isAddCourse = false;
+      this.isEditCourse = false;
+      this.isAddClass = false;
+      this.isEditClass = true;
+      this.editClassNum=false;
+
+      var b = Object.assign({}, this.rowIndex);
+      //var a = this.rowIndex;
+      var a = b.courseInfo;
+      console.log(a);
+      a["courseYear"] = new Date(a["courseYear"]);
+      a["startTime"] = new Date(a["startTime"]);
+      a["endTime"] = new Date(a["endTime"]);
+      this.ruleForm4 = a;
+      /* 
+      var num = this.rowIndex.courseClasses.length;
+      this.ruleForm4.classNum = num; */
+      console.log(this.ruleForm4);
+    }, 
+    editClass() {
+      var length = this.dupCourse.length;
+
+      var editClass = Object.assign({}, this.ruleForm4);
+      //提交ruleForm2
+      this.resetForm("ruleForm4");
+      this.isEditClass = false;
+      this.isAddCourse = true;
+      this.$message("修改成功");
+
+      //================向后端提交ruleForm2和classNum==========================
+      //提交之后返回成功后，message修改成功
+    },
+    editClassNumVisible(){
+      this.dialog1 = false;
+      this.dialog2 = false;
+      this.isAddCourse = false;
+      this.isEditCourse = false;
+      this.isAddClass = false;
+      this.isEditClass = false;
+      this.editClassNum=true;
+      this.editClassNum=false
+
+    },
+   
     selsChange(arr) {
       this.multipleSelection = arr;
       console.log(arr);
@@ -726,20 +1216,96 @@ export default {
       //this.test();
       this.test();
     }, */
-    delClass(){
-      //splice
-      this.dialog2=false;
-      this.dupCourse.splice(this.rowIndex,1)
-      console.log(this.dupCourse)
-      //后端
+    //find
+    addClassNum(){
+      this.isAddClassNum=false
+  axios
+        .post("/api/addClass", {
+          courseID:this.rowIndex.courseInfo.courseID,
+          classNum:this.rowIndex.courseClasses.length+1
+        },
+          {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+        })
+        .then(resp => {
+          console.log("success");
+          console.log(resp,"addClassNumresp")
+          this.rowIndex.courseClasses.push(resp.data.data)
+        });
     },
-    delCourse() {//直接删除所有该名的课程
+    delClassNum(data) {
+      //splice
+      //this.dupCourse.splice(this.rowIndex, 1);
+      console.log(this.rowIndex,"rowindex1")
+      this.rowIndex.courseClasses.splice(data.$index,1)
+      console.log(this.rowIndex,"rowindex2")
+      console.log(data.$index);
+      //=================================================================后端
+       axios
+        .get("/api/deleteClass", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            courseClassID: data.row.id
+          }
+        })
+        .then(resp => {
+          console.log("success");
+          console.log(resp,"deleteClassNumresp")
+          
+        });
+     },
+    delClass(){//删除课程下的某一老师开的课程
+      this.dialog2 = false;
+      this.dupCourse.splice(this.rowIndex, 1);
+      axios
+        .get("/api/deleteCourse", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            courseID: this.rowIndex.courseInfo.courseID
+          }
+        })
+        .then(resp => {
+          console.log("success");
+          console.log(resp,"deleteClassresp")
+          /* if (resp.state == 0) {
+            alert("删除失败");
+          } */
+        });
+    },
+    delCourse() {
+      //直接删除所有该名的课程
       this.dialog1 = false;
-      this.resetForm("ruleForm2");
+      this.isDelCourse = false;
+      //this.resetForm("ruleForm2");
       store.commit("delNode2", this.dataIndex);
       this.test();
       //====================向后端提交====================
-    },
+     /*  axios
+        .get("/api/deleteCourse", {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          },
+          params: {
+            courseID: this.allCourse[this.dataIndex - 1].courseID
+          }
+        })
+        .then(resp => {
+          console.log("success");
+          if (resp.state == 0) {
+            alert("删除失败");
+          }
+        });
+     */},
     test() {
       var option = {
         series: [
@@ -799,8 +1365,8 @@ export default {
                 }
               }
             },
-            data: store.state.data,
-            links: store.state.links,
+            data: this.data,
+            links: this.links,
 
             lineStyle: {
               normal: {
@@ -815,7 +1381,7 @@ export default {
       myChart.setOption(option);
       var that = this;
       myChart.on("click", function(params) {
-        console.log(params);
+        console.log(params, "params");
         //点击高亮
 
         if (params.dataType == "edge") {
@@ -834,16 +1400,9 @@ export default {
             alert("不可对该节点进行操作");
           } else {
             //点击节点获取同名列表
-            /*  this.$axios
-      .get("/api/getDupCourse")
-      .then(resp => {
-        console.log(resp);
-        that.dupCourse=resp.data
-      })
-      .catch(err => {
-        console.log(err);
-      }); */
-
+            //that.getDupCourse();
+            that.courseName =
+              that.allCourse[that.dataIndex - 1].courseName.courseNameID;
             that.dialog1 = true;
           }
         }

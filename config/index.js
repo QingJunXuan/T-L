@@ -7,12 +7,12 @@ const path = require('path')
 module.exports = {
   dev: {
 
-    // Paths
+    // Paths http://yapi.demo.qunar.com/mock/63359
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
       '/api':{
-        target:'http://yapi.demo.qunar.com/mock/63957',
+        target:'http://localhost:8080',
         changeOrigin:true,
         pathRewrite:{
           '^/api':''

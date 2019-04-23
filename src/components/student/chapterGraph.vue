@@ -13,6 +13,7 @@ export default {
   data() {
     return {
       dataIndex: 0,
+      tree: [],
       data: [
         {
           name: "第一章",
@@ -77,19 +78,20 @@ export default {
       //loading: true,
     };
   },
-  /* created() {
+   created() {
     //获得章节目录，data[]，links[],设置参数
-     this.$axios
-      .get("/api/getAllCourse")
+    axios
+      .get("/api/getChapterRelationByCourseID",{
+        params:{courseID:id}
+      })
       .then(resp => {
-        console.log(resp);
-        store.commit("set", resp.data);
+        console.log(resp.data);
+        this.tree=resp.data.data
       })
       .catch(err => {
         console.log(err);
       });
-    //console.log(this.screenWidth.width);
-  }, */
+  }, 
   mounted() {
     //console.log(this.data);
     this.draw();
@@ -104,8 +106,8 @@ export default {
       var option = {
         series: [
           {
-            data: store.state.data,
-            links: store.state.links
+            data: this.data,
+            links: this.links
           }
         ]
       };
@@ -113,11 +115,62 @@ export default {
       this.initGraph().setOption(option);
       console.log("test2");
     },
+    handleClick(params) {},
+    init() {
+      var length = this.tree.length;
+      for (var i = 0; i < length; i++) {
+        var addData = {
+          name: this.tree.content,
+          //category: "test",
+          x: Math.round(Math.random() * 500),
+          y: Math.round(Math.random() * 500) + 50
+        };
+        this.data.push(addData);
+        //var num = this.tree[i].subCatalog.length;
+        var name = this.tree[i].content;
+        if (this.tree[i].parentID == 0) {
+          //无前继节点的，连接start
+          var addLink = {
+            target: name,
+            source: "start",
+            label: {
+              normal: {
+                show: false
+              }
+            }
+            /*  lineStyle: {
+                            normal: { curveness: 0.2 }
+                        } */
+          };
+          this.links.push(addLink);
+        } else {
+          //所有前继节点
+          for (var j = 0; j < num; j++) {
+            var addLink = {
+              target: name,
+              source: this.tree[i].subCatalog[j].courseName,
+              label: {
+                normal: {
+                  show: false
+                }
+              }
+              /* lineStyle: {
+                                normal: { curveness: 0.2 }
+                            } */
+            };
+            state.links.push(addLink);
+          }
+        }
+      }
+      console.log(state.data, "state.data");
+      console.log(state.links, "state.links");
+    },
     draw() {
       var init = this.$refs.graph;
       var myChart = this.$echarts.init(init);
+      //this.init();
       var option = {
-       /*  title: {
+        /*  title: {
           text: "章节关系图"
         }, */
         tooltip: {},
@@ -152,59 +205,8 @@ export default {
                 }
               }
             },
-            //data: this.data,
-            //links: this.links,
-            data: [
-              {
-                name: "第一章",
-                x: 200,
-                y: 0
-              },
-              {
-                name: "第二章",
-                x: 100,
-                y: 100
-              },
-              {
-                name: "第三章",
-                x: 300,
-                y: 100
-              },
-              {
-                name: "第四章",
-                x: 200,
-                y: 200
-              }
-            ],
-            links: [
-              {
-                source: "第一章",
-                target: "第二章",
-                label: {
-                  normal: {
-                    show: false
-                  }
-                }
-              },
-              {
-                source: "第一章",
-                target: "第三章",
-                label: {
-                  normal: {
-                    show: false
-                  }
-                }
-              },
-              {
-                source: "第三章",
-                target: "第四章",
-                label: {
-                  normal: {
-                    show: false
-                  }
-                }
-              }
-            ],
+            data: this.data,
+            links: this.links,
             lineStyle: {
               normal: {
                 opacity: 0.9,
@@ -222,10 +224,23 @@ export default {
         if (params.dataType == "edge") {
           //that.handleClick(params);
           that.dataIndex = params.dataIndex;
+          if (params.data.label.show == false) {
+            that.links[that.dataIndex].label.normal.show = true;
+          } else {
+            that.links[that.dataIndex].label.normal.show = false;
+          }
           //显示边
           myChart.setOption(option);
         } else if (params.dataType == "node") {
           that.dataIndex = params.dataIndex;
+          //var id = that.tree[that.dataIndex-1].id
+          that.$router.push({
+            path: "chapterDetail",
+            query: {
+              id: that.dataIndex
+              //id:id
+            }
+          });
         }
       });
       //取消右键的弹出菜单

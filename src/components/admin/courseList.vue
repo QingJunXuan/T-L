@@ -8,28 +8,28 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="7" :offset="1" v-for="(item,index) in items" :key="index">
+          <el-col :span="7" :offset="1" v-for="(item,index) in allCourse" :key="index">
             <el-card :body-style="{padding:0}" style="margin:20px 0;">
               <el-row class="top">
                 <p
                   id="name"
-                >{{item.courseInfo.courseName}}</p>
+                >{{item.courseName}}</p>
                 <el-row><el-col :span="5" :offset="18" style="margin-top:10px">
-                  <span style="font-size: 10px;color: rgb(238, 235, 235);">老师：{{item.courseInfo.teacherName}}</span>
+                  <span style="font-size: 10px;color: rgb(238, 235, 235);">老师：{{item.teacherName}}</span>
                 </el-col></el-row>
                 <el-row><el-col :span="5" :offset="18" >
-                  <span style="font-size: 10px;color: rgb(238, 235, 235);">ID：{{item.courseInfo.teacherID}}</span>
+                  <span style="font-size: 10px;color: rgb(238, 235, 235);">ID：{{item.teacherID}}</span>
                 </el-col></el-row>
               </el-row>
               <el-row class="bottom">
                 <el-row></el-row>
                 <el-row style="padding-bottom:10px">
-                    <el-col>{{item.courseInfo.courseYear+item.courseInfo.courseSemester}}</el-col>
+                    <el-col>{{item.courseYear+item.courseSemester}}</el-col>
                 </el-row>
                 <el-row style="padding-bottom:10px">
-                  <el-col>{{item.courseInfo.startTime+" - "+item.courseInfo.endTime}}</el-col>
+                  <el-col>{{item.startTime+" - "+item.endTime}}</el-col>
                 </el-row>
-                <el-row style="padding-bottom:10px;"><el-col>邀请码：{{item.courseClass.classCode}}</el-col></el-row>
+                <!-- <el-row style="padding-bottom:10px;"><el-col>邀请码：{{item.courseClass.classCode}}</el-col></el-row> -->
               </el-row>
             </el-card>
           </el-col>
@@ -39,6 +39,7 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
   name:'courseList',
   data() {
@@ -104,8 +105,24 @@ export default {
           }
         }
       ],
-      analysisMode: false
+      analysisMode: false,
+      allCourse:[]
     };
+  },
+  created(){
+    axios.get('/api/getAllCourses',{
+headers: {
+            'Authorization':
+              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+          }
+    }).then(resp=>{
+      if(resp.data.state==1){
+        this.allCourse=resp.data.data
+      }
+    }).catch(err=>{
+      console.log(err)
+    })
+
   },
   methods: {
     edit() {

@@ -9,6 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import 'font-awesome/css/font-awesome.min.css'
 import axios from 'axios'
 import echarts from 'echarts'
+import qs from 'qs'
 
 Vue.use(ElementUI);
 Vue.use(VueResource);
@@ -27,7 +28,9 @@ router.beforeEach((to, from, next) => {
     next()
   }
 });
+Vue.http.options.emulateJSON = true
 
+Vue.http.options.emulateHTTP = true
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
@@ -35,3 +38,13 @@ new Vue({
   components: { App },
   template: '<App/>'
 });
+
+axios.interceptors.request.use(function (config) {
+  if(config.method!='get'){
+      config.data=qs.stringify(config.data);
+  }
+  config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+  return config;
+},function (error) {
+  return Promise.reject(error)
+})
