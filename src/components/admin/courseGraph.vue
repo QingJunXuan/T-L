@@ -504,10 +504,12 @@ export default {
       .then(resp => {
         console.log(resp.data, "init.data");
         //store.commit("set", resp.data.data);
-        
+        if(resp.data.data.length!=0){
         this.allCourse=resp.data.data
-        console.log(this.allCourse,"allcourse")
         this.set()
+        }
+        console.log(this.allCourse,"allcourse")
+        
       })
       .catch(err => {
         console.log(err);
@@ -898,15 +900,18 @@ export default {
       }
 
       var addCourse = Object.assign({}, this.ruleForm1);
+      console.log(addCourse)
       console.log(addCourse.successor, "successor");
+      var params = new URLSearchParams()
+      params.append("courseName",addCourse.courseName)
       axios
         .post(
           "/api/addCourseName",
+         params,
           {
-            courseName: addCourse.courseName
-          },
-          {
+
             headers: {
+              'Content-Type':'application/x-www-form-urlencoded',
               Authorization:
                 "Bearer "+localStorage.getItem("token")
             }
@@ -915,9 +920,8 @@ export default {
         .then(
           resp => {
             console.log("courseName,success");
-            console.log(resp);
-            if (resp.state == 1) {
-              console.log(resp.state);
+            console.log(resp.data);
+            if (resp.data.state == 1) {
               var id = resp.data.courseNameID;
               for (var i = 0; i < addCourse.successor.length; i++) {
                 for (var j = 0; j < this.allCourse.length; j++) {
