@@ -407,6 +407,7 @@ export default {
         })
         .then(resp => {
           console.log("rev", resp.data);
+          if(resp.data.state==1){
           this.exercises = resp.data.data;
           var length = this.exercises.length;
           if (length != 0) {
@@ -414,6 +415,7 @@ export default {
           }
 
           this.test();
+          }
         })
         .catch(err => {
           console.log(err);
@@ -477,17 +479,17 @@ export default {
         alert("评分不可为0");
       } else {
         this.isRated = true;
+         var params = new URLSearchParams()
+        params.append("answers",this.answer)
+        params.append("studentId",1)
+        params.append("chapterId",this.sid)
+        params.append('type',"review")
+        params.append('comment',1)
+        params.append('rate',this.rate)
         axios
           .post(
             "/api/question/answerAll",
-            {
-              answers: this.answer,
-              studentId: 1, //存在本地
-              chapterId: this.chapterId,
-              type: "review",
-              comment:"test",
-              rate: this.rate
-            },
+           params,
             {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -499,6 +501,9 @@ export default {
           .then(resp => {
             console.log(resp.data);
             console.log("rev submit success");
+            if(resp.data.state==1){
+              this.$message("提交成功")
+            }
           })
           .catch(err => {
             console.log(err);

@@ -241,54 +241,50 @@
                 <el-button type="text" @click="addCourseVisible">取消</el-button>
               </el-form-item>
             </el-form>
-            <el-row  v-show="editClassNum">
-            <el-table
-              :data="rowIndex.courseClasses"
-              border
-              style="width: 100%"
-            >
+            <el-row v-show="editClassNum">
+              <el-table :data="rowIndex.courseClasses" border style="width: 100%">
                 <el-table-column prop="classNum" label="班级" width="100"></el-table-column>
                 <el-table-column prop="classCode" label="邀请码" width="150"></el-table-column>
                 <el-table-column fixed="right" label="操作" width="80">
                   <template slot-scope="scope">
-                    <el-button
-                      @click="delClassNum(scope)"
-                      type="text"
-                      size="small"
-                    >删除</el-button>
+                    <el-button @click="delClassNum(scope)" type="text" size="small">删除</el-button>
                   </template>
-              </el-table-column>
-              <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
-            </el-table>
-            <div style="padding-top:20px"><el-button @click="isAddClassNum=true" size="small">新增班级</el-button></div>
-            <el-dialog :visible.sync="isAddClassNum" title="提示" center width="30%">
-             <p style="text-align:center">是否确认添加班级？</p>
-             <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="addClassNum" size="small">确 认</el-button>
-            <el-button @click="isAddClassNum=false" size="small">取 消</el-button>
-          </span>
-            </el-dialog>
+                </el-table-column>
+                <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
+              </el-table>
+              <div style="padding-top:20px">
+                <el-button @click="isAddClassNum=true" size="small">新增班级</el-button>
+              </div>
+              <el-dialog :visible.sync="isAddClassNum" title="提示" center width="30%">
+                <p style="text-align:center">是否确认添加班级？</p>
+                <span slot="footer" class="dialog-footer">
+                  <el-button type="primary" @click="addClassNum" size="small">确 认</el-button>
+                  <el-button @click="isAddClassNum=false" size="small">取 消</el-button>
+                </span>
+              </el-dialog>
             </el-row>
           </el-card>
         </el-col>
         <el-dialog title="请选择要进行的操作" :visible.sync="dialog1">
-          <span style="margin-top:-20px">
+          <div style="margin-top:-20px">
             对课程进行操作：
             <el-button type="text" @click="editCourseVisible">
               <span style="font-size:12px">编辑</span>
             </el-button>
-           <!--  <el-button type="text" @click="isDelCourse=true">
+            <!--  <el-button type="text" @click="isDelCourse=true">
               <span style="font-size:12px">删除</span>
-            </el-button> -->
+            </el-button>-->
             <el-button type="text" @click="addClassVisible">
               <span style="font-size:12px">开课</span>
             </el-button>
-          </span>
+          </div>
           <el-table :data="dupCourse" border style="width: 100%" @row-click="rowClick">
             <el-table-column label="点击下表对应行，对班级进行操作">
               <el-table-column prop="courseInfo.teacherName" label="教师" width="100"></el-table-column>
               <el-table-column prop="courseInfo.startTime" label="开课时间" width="180"></el-table-column>
               <el-table-column prop="courseInfo.endTime" label="结束时间"></el-table-column>
+              <!-- <el-table-column prop="courseClasses" label="班级数"></el-table-column> -->
+
             </el-table-column>
             <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
           </el-table>
@@ -327,71 +323,22 @@ export default {
       isEditCourse: false,
       isEditClass: false,
       isDelCourse: false,
-      isAddClassNum:false,
+      isAddClassNum: false,
       dialog1: false,
       dialog2: false,
-      editClassNum:false,
+      editClassNum: false,
       dataIndex: 0,
       rowIndex: 0,
-      data:[{
-        name:"start",
-        x:250,
-        y:0
-      }],
-      links: [],
-      allCourse: [], //不重名列表用于显示左侧
-      dupCourse: [
+      data: [
         {
-          courseInfo: {
-            courseID: 2,
-            createTime: "2019-03-28T05:00:13.000+0000",
-            updateTime: "2019-04-20T09:39:07.000+0000",
-            teacherID: 2223,
-            courseName: "5",
-            teacherName: "金伟祖",
-            courseYear: 2019,
-            courseSemester: "春季",
-            startTime: "2019-02-24",
-            endTime: "2019-06-10"
-          },
-          courseClasses: [
-            {
-              id: 2,
-              createTime: "2019-04-02T06:54:41.000+0000",
-              updateTime: "2019-04-07T22:45:27.000+0000",
-              courseID: 2,
-              classNum: 1,
-              classCode: "200001",
-              currentExerciseChapter: -1
-            }
-          ]
-        },
-        {
-          courseInfo: {
-            courseID: 3,
-            createTime: "2019-03-29T04:41:41.000+0000",
-            updateTime: "2019-04-20T09:39:07.000+0000",
-            teacherID: 2,
-            courseName: "5",
-            teacherName: "杜庆峰",
-            courseYear: 2017,
-            courseSemester: "春季",
-            startTime: "2017-03-01",
-            endTime: "2017-06-01"
-          },
-          courseClasses: [
-            {
-              id: 5,
-              createTime: "2019-04-08T07:42:54.000+0000",
-              updateTime: "2019-04-08T07:47:56.000+0000",
-              courseID: 3,
-              classNum: 1,
-              classCode: "300001",
-              currentExerciseChapter: 17
-            }
-          ]
+          name: "start",
+          x: 2050,
+          y: 0
         }
       ],
+      links: [],
+      allCourse: [], //不重名列表用于显示左侧
+      dupCourse: [],
 
       loading: true,
       pickerOptions0: this.startTime(),
@@ -490,30 +437,28 @@ export default {
     };
   },
   created() {
-    //store.commit("set", "a");
-    //获取课程之间的关系，data[]，links[],设置参数
-    //this.getAllCourse()
-    //console.log(this.screenWidth.width);
-     axios
+    axios
       .get("/api/getAllCoursesRelation", {
         headers: {
-          Authorization:
-            "Bearer "+localStorage.getItem("token")
+          Authorization: "Bearer " + localStorage.getItem("token")
         }
       })
       .then(resp => {
-        console.log(resp.data, "init.data");
-        //store.commit("set", resp.data.data);
-        if(resp.data.data.length!=0){
-        this.allCourse=resp.data.data
-        this.set()
+        if (resp.data.state == 1) {
+          this.allCourse = resp.data.data;
+          var length = this.allCourse.length;
+          if (length != 0) {
+            this.set(length);
+          } else {
+            this.draw();
+          }
+        } else {
+          this.$message(resp.data.message);
         }
-        console.log(this.allCourse,"allcourse")
-        
       })
       .catch(err => {
         console.log(err);
-      }); 
+      });
   },
   computed: {
     filterAllCourse: function() {
@@ -533,84 +478,79 @@ export default {
           }
         }
       }
-      console.log(this.allCourse, "filterAllCourse");
-      console.log(filterForm, "filter");
       return filterForm;
     }
   },
   mounted() {
     //console.log(this.data);
-    
     //this.draw();
   },
   methods: {
-    set() {
-            //state.courseList = list
-            //var list = state.courseList
+    set(length) {
+      //var length = this.allCourse.length
+      for (var i = 0; i < length; i++) {
+        var addData = {
+          name: this.allCourse[i].courseName.courseName,
+          //category: "test",
+          x: Math.round(Math.random() * 2000),
+          y: Math.round(Math.random() * 2000) + 50
+        };
+        this.data.push(addData);
+        var num = this.allCourse[i].preCoursesName.length;
 
-            var length = this.allCourse.length
-            for (var i = 0; i < length; i++) {
-                var addData = {
-                    name: this.allCourse[i].courseName.courseName,
-                    //category: "test",
-                    x: Math.round(Math.random() * 100),
-                    y: Math.round(Math.random() * 100)+50
-                };
-                this.data.push(addData)
-                var num = this.allCourse[i].preCoursesName.length;
-                var name = this.allCourse[i].courseName.courseName
-                if (num == 0) {//无前继节点的，连接start
-                    var addLink = {
-                        target: name,
-                        source: 'start',
-                        label: {
-                            normal: {
-                                show: false
-                            }
-                        },
-                       /*  lineStyle: {
+        var name = this.allCourse[i].courseName.courseName;
+        if (num == 0) {
+          //无前继节点的，连接start
+          var addLink = {
+            target: name,
+            source: "start",
+            label: {
+              normal: {
+                show: false
+              }
+            }
+            /*  lineStyle: {
                             normal: { curveness: 0.2 }
                         } */
-                    };
-                    this.links.push(addLink)
+          };
+          this.links.push(addLink);
+        } else {
+          //所有前继节点
+          for (var j = 0; j < num; j++) {
+            var addLink = {
+              target: name,
+              source: this.allCourse[i].preCoursesName[j].courseName,
+              label: {
+                normal: {
+                  show: false
                 }
-                else {
-                    //所有前继节点
-                    for (var j = 0; j < num; j++) {
-                        var addLink = {
-                            target: name,
-                            source: this.allCourse[i].preCoursesName[j].courseName,
-                            label: {
-                                normal: {
-                                    show: false
-                                }
-                            },
-                            /* lineStyle: {
+              }
+              /* lineStyle: {
                                 normal: { curveness: 0.2 }
                             } */
-                        };
-                        this.links.push(addLink)
-                    }
-                }
-            }
-            console.log(this.data,"this.data")
-            console.log(this.links,"this.links")
-            this.draw()
-            store.commit("set",{
-              list:this.allCourse,data:this.data,links:this.links
-            })
-        },
+            };
+            this.links.push(addLink);
+          }
+        }
+      }
+      this.draw();
+      store.commit("set", {
+        list: this.allCourse,
+        data: this.data,
+        links: this.links
+      });
+    },
     setAllCourse() {
       axios
         .get("/api/getAllCoursesRelation", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(resp => {
-          console.log(resp.data, "init.data");
-          store.commit("setAllCourse", resp.data.data);
+          if (resp.data.state == 1) {
+            store.commit("setAllCourse", resp.data.data);
+          }
         })
         .catch(err => {
           console.log(err);
@@ -671,8 +611,7 @@ export default {
       axios
         .get("/api/getAllCoursesByNameID", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseNameID: this.allCourse[this.dataIndex - 1].courseName
@@ -685,8 +624,9 @@ export default {
             "nameid"
           );
           console.log(resp.data, "resp.data");
-
-          this.dupCourse = resp.data.data;
+          if (resp.data.state == 1) {
+            this.dupCourse = resp.data.data;
+          }
           console.log(this.dupCourse, "dup");
         })
         .catch(err => {
@@ -740,63 +680,66 @@ export default {
         if (valid) {
           //=======================给后端
           var form = Object.assign({}, this.ruleForm3);
-          console.log(this.ruleForm3,"ruleForm3")
-          console.log(form)
-          axios
-            .post(
-              "/api/addCourse",
-              {
-                teacherID: form.teacherID,
-                courseName: this.courseName, //id
-                teacherName: form.teacherName,
-                courseYear: form.courseYear,
-                courseSemester: form.courseSemester,
-                startTime: form.startTime,
-                endTime: form.endTime
-              },
-              {
+          console.log(this.ruleForm3, "ruleForm3");
+          form.startTime=this.setTime(form.startTime)
+          form.endTime=this.setTime(form.endTime)
+          form.courseYear=this.getTime(form.courseYear)
+
+          console.log(form);
+
+          var params = new URLSearchParams();
+          params.append("teacherID", form.teacherID),
+            params.append("courseName", this.courseName),
+            params.append("teacherName", form.teacherName),
+            params.append("courseYear", form.courseYear),
+            params.append("courseSemester", form.courseSemester),
+            params.append("startTime", form.startTime),
+            params.append("endTime", form.endTime),
+            axios
+              .post("/api/addCourse", params, {
                 headers: {
-                  Authorization:
-                    "Bearer "+localStorage.getItem("token")
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  Authorization: "Bearer " + localStorage.getItem("token")
                 }
-              }
-            )
-            .then(resp => {
-              console.log(resp.data, "addClass");
-              var id = resp.data.data.courseID;
-              for (var i = 0; i < form.classNum; i++) {
-                axios
-                  .post(
-                    "/api/addClass",
-                    {
-                      courseID: id,
-                      classNum: i + 1
-                    },
-                    {
-                      headers: {
-                        Authorization:
-                          "Bearer "+localStorage.getItem("token")
-                      }
-                    }
-                  )
-                  .then(resp => {
-                    console.log(resp.data, "addClassNum");
-                    if (resp.data.state == 1) {
-                      this.$message("添加成功");
-                      
-                    } else {
-                      this.$message("添加失败");
-                      return -1;
-                    }
-                  })
-                  .catch(err => {
-                    console.log(err);
-                  });
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
+              })
+              .then(resp => {
+                console.log(resp.data,"need")
+                if (resp.data.state == 1) {
+                  console.log(resp.data, "addClass");
+                  var id = resp.data.data.courseID;
+                  for (var i = 0; i < form.classNum; i++) {
+                    var params = new URLSearchParams()
+                    params.append("courseID",id)
+                    params.append("classNum",i+1)
+                    axios
+                      .post(
+                        "/api/addClass",
+                       params,
+                        {
+                          headers: {
+                            Authorization:
+                              "Bearer " + localStorage.getItem("token")
+                          }
+                        }
+                      )
+                      .then(resp => {
+                        console.log(resp.data, "addClassNum");
+                        if (resp.data.state == 1) {
+                          this.$message("添加成功");
+                        } else {
+                          this.$message("添加失败");
+                          return -1;
+                        }
+                      })
+                      .catch(err => {
+                        console.log(err);
+                      });
+                  }
+                }
+              })
+              .catch(err => {
+                console.log(err);
+              });
         } else {
           console.log("error submit!!");
           return false;
@@ -805,36 +748,44 @@ export default {
       });
     },
     submitForm4(formName) {
+      //editClass
       this.$refs[formName].validate(valid => {
         if (valid) {
           var form = Object.assign({}, this.ruleForm4);
           //==========================================后端
+          form.startTime=this.setTime(form.startTime)
+          form.endTime=this.setTime(form.endTime)
+          form.courseYear=this.getTime(form.courseYear)
+
+           var params = new URLSearchParams();
+          params.append("courseID", form.courseID),
+          params.append("teacherID", form.teacherID),
+            params.append("courseName", this.courseName),
+            params.append("teacherName", form.teacherName),
+            params.append("courseYear", form.courseYear),
+            params.append("courseSemester", form.courseSemester),
+            params.append("startTime", form.startTime),
+            params.append("endTime", form.endTime),
           axios
-            .post("/api/alertCourseInfo",
-              {
-                courseID: form.courseID,
-                teacherID: form.teacherID,
-                courseName: this.courseName, //id
-                teacherName: form.teacherName,
-                courseYear: form.courseYear,
-                courseSemester: form.courseSemester,
-                startTime: form.startTime,
-                endTime: form.endTime
-              },
+            .post(
+              "/api/alterCourseInfo",
+              params,
               {
                 headers: {
-                  Authorization:
-                    "Bearer "+localStorage.getItem("token")
+                  'Content-Type':'application/x-www-form-urlencoded',
+                  Authorization: "Bearer " + localStorage.getItem("token")
                 }
               }
             )
             .then(resp => {
-              console.log(resp.data, "editClass");
-              if (resp.message.state == 1) {
-                this.$message("修改成功");
-              } else {
-                this.$message("修改失败");
-                return -1;
+              if (resp.data.state == 1) {
+                console.log(resp.data, "editClass");
+                if (resp.data.state == 1) {
+                  this.$message("修改成功");
+                } else {
+                  this.$message("修改失败");
+                  return -1;
+                }
               }
             })
             .catch(err => {
@@ -858,8 +809,8 @@ export default {
       var addData = {
         name: this.ruleForm1.courseName,
         category: "test",
-        x: Math.round(Math.random() * 100),
-        y: Math.round(Math.random() * 100)
+        x: Math.round(Math.random() * 1000),
+        y: Math.round(Math.random() * 1000)
       };
       store.commit("addData", addData);
 
@@ -900,71 +851,62 @@ export default {
       }
 
       var addCourse = Object.assign({}, this.ruleForm1);
-      console.log(addCourse)
+      console.log(addCourse);
       console.log(addCourse.successor, "successor");
-      var params = new URLSearchParams()
-      params.append("courseName",addCourse.courseName)
+      var params = new URLSearchParams();
+      params.append("courseName", addCourse.courseName);
       axios
-        .post(
-          "/api/addCourseName",
-         params,
-          {
-
-            headers: {
-              'Content-Type':'application/x-www-form-urlencoded',
-              Authorization:
-                "Bearer "+localStorage.getItem("token")
-            }
+        .post("/api/addCourseName", params, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
-        .then(
-          resp => {
-            console.log("courseName,success");
-            console.log(resp.data);
-            if (resp.data.state == 1) {
-              var id = resp.data.courseNameID;
-              for (var i = 0; i < addCourse.successor.length; i++) {
-                for (var j = 0; j < this.allCourse.length; j++) {
-                  if (
-                    addCourse.successor[i] ==
-                    this.allCourse[j].courseName.courseName
-                  ) {
-                    axios
-                      .get("/api/addCourseRelation", {
-                        headers: {
-                          Authorization:
-                            "Bearer "+localStorage.getItem("token")
-                        },
-                        params: {
-                          courseNameID: id,
-                          preCoursesNameID: this.allCourse[j].courseName
-                            .courseNameID
-                        }
-                      })
-                      .then(resp => {
-                        console.log("links,success");
-                        if (resp.state == 0) {
-                          alert("关系添加失败");
-                        }
-                      });
-                    break;
-                  }
+        })
+        .then(resp => {
+          if (resp.data.state == 1) {
+            var id = resp.data.data.courseNameID;
+
+            for (var i = 0; i < addCourse.successor.length; i++) {
+              for (var j = 0; j < this.allCourse.length; j++) {
+                if (
+                  addCourse.successor[i] ==
+                  this.allCourse[j].courseName.courseName
+                ) {
+                  axios
+                    .get("/api/addCourseRelation", {
+                      params: {
+                        courseNameID: id,
+                        preCourseNameID: this.allCourse[j].courseName
+                          .courseNameID
+                      },
+                      headers: {
+                        Authorization: "Bearer " + localStorage.getItem("token")
+                      }
+                    })
+                    .then(resp => {
+                      console.log("links,success");
+
+                      if (resp.data.state == 0) {
+                        alert("关系添加失败");
+                      }
+                    });
+                  //break;
                 }
               }
-              this.$message("添加成功");
             }
-          })
-          .catch(err => {
-            console.log("err", err);
+            this.$message("课程添加成功");
           }
-        );
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
 
       //addCourse
       //store.commit("addCourse", addCourse);
       //console.log(addCourse,"addCourse");
-      this.allCourse=store.state.courseList
-      this.data=store.state.data
-      this.links=store.state.links
+      this.allCourse = store.state.courseList;
+      this.data = store.state.data;
+      this.links = store.state.links;
       this.test();
 
       //==================向后端提交ruleForm1=========================
@@ -975,8 +917,8 @@ export default {
         this.isEditCourse = false;
         this.isEditClass = false;
         this.isAddCourse = true;
-        this.isAddClass=false;
-        this.editClassNum=false;
+        this.isAddClass = false;
+        this.editClassNum = false;
       }
     },
     editCourseVisible() {
@@ -985,7 +927,7 @@ export default {
       this.isEditCourse = true; //编辑course
       this.isAddClass = false;
       this.isEditClass = false;
-      this.editClassNum=false;
+      this.editClassNum = false;
 
       var obj = Object.assign({}, this.allCourse[this.dataIndex - 1]);
       this.ruleForm2.courseName = obj.courseName.courseName;
@@ -1019,31 +961,31 @@ export default {
       if (newName != oldName) {
         store.commit("editName", { name: newName, index: this.dataIndex });
         console.log(this.data);
+        var params = new URLSearchParams()
+        params.append("courseNameID",id)
+        params.append("courseName",newName)
         axios
-            .post("/api/alertCourseName",
-              {courseNameID:id,
-              courseName:newName
-              },
-              {
-                headers: {
-                  Authorization:
-                    "Bearer "+localStorage.getItem("token")
-                }
+          .post(
+            "/api/alertCourseName",
+            params,
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token")
               }
-            )
-            .then(resp => {
-              console.log(resp.data, "editCourseName");
-              if (resp.message.state == 1) {
-                this.$message("修改成功");
-              } else {
-                this.$message("修改失败");
-                return -1;
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
-       
+            }
+          )
+          .then(resp => {
+            console.log(resp.data, "editCourseName");
+            if (resp.message.state == 1) {
+              this.$message("修改成功");
+            } else {
+              this.$message("修改失败");
+              return -1;
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
       }
       //links
       var isEqual = oldLinks.sort().toString() === newLinks.sort().toString();
@@ -1051,7 +993,7 @@ export default {
       if (isEqual == false) {
         //更改links
         store.commit("editLinks", { new: newLinks, index: this.dataIndex });
-        console.log(this.links,"links");
+        console.log(this.links, "links");
 
         //去重-获得需删除的link
         var tempArray1 = []; //临时数组存放
@@ -1095,17 +1037,16 @@ export default {
           axios
             .get("/api/deleteCourseRelation", {
               headers: {
-                Authorization:
-                  "Bearer "+localStorage.getItem("token")
+                Authorization: "Bearer " + localStorage.getItem("token")
               },
               params: {
                 courseNameID: id,
-                preCoursesNameID: oldLinksID[p]
+                preCourseNameID: oldLinksID[p]
               }
             })
             .then(resp => {
               console.log("links,del,success", p);
-              if (resp.state == 0) {
+              if (resp.data.state == 0) {
                 alert("关系删除失败");
               }
             });
@@ -1114,17 +1055,16 @@ export default {
           axios
             .get("/api/addCourseRelation", {
               headers: {
-                Authorization:
-                  "Bearer "+localStorage.getItem("token")
+                Authorization: "Bearer " + localStorage.getItem("token")
               },
               params: {
                 courseNameID: id,
-                preCoursesNameID: add[q]
+                preCourseNameID: add[q]
               }
             })
             .then(resp => {
-              console.log("links,add,success", q);
-              if (resp.state == 0) {
+              //console.log("links,add,success", q);
+              if (resp.data.state == 0) {
                 alert("关系添加失败");
               }
             });
@@ -1157,7 +1097,7 @@ export default {
       this.isEditCourse = false;
       this.isAddClass = true;
       this.isEditClass = false;
-      this.editClassNum=false;
+      this.editClassNum = false;
 
       this.dialog1 = false;
     },
@@ -1168,7 +1108,7 @@ export default {
       this.isEditCourse = false;
       this.isAddClass = false;
       this.isEditClass = true;
-      this.editClassNum=false;
+      this.editClassNum = false;
 
       var b = Object.assign({}, this.rowIndex);
       //var a = this.rowIndex;
@@ -1182,7 +1122,7 @@ export default {
       var num = this.rowIndex.courseClasses.length;
       this.ruleForm4.classNum = num; */
       console.log(this.ruleForm4);
-    }, 
+    },
     editClass() {
       var length = this.dupCourse.length;
 
@@ -1196,18 +1136,17 @@ export default {
       //================向后端提交ruleForm2和classNum==========================
       //提交之后返回成功后，message修改成功
     },
-    editClassNumVisible(){
+    editClassNumVisible() {
       this.dialog1 = false;
       this.dialog2 = false;
       this.isAddCourse = false;
       this.isEditCourse = false;
       this.isAddClass = false;
       this.isEditClass = false;
-      this.editClassNum=true;
-      this.editClassNum=false
-
+      this.editClassNum = true;
+      //this.editClassNum = false;
     },
-   
+
     selsChange(arr) {
       this.multipleSelection = arr;
       console.log(arr);
@@ -1221,38 +1160,39 @@ export default {
       this.test();
     }, */
     //find
-    addClassNum(){
-      this.isAddClassNum=false
-  axios
-        .post("/api/addClass", {
-          courseID:this.rowIndex.courseInfo.courseID,
-          classNum:this.rowIndex.courseClasses.length+1
-        },
+    addClassNum() {
+      this.isAddClassNum = false;
+      var params = new URLSearchParams()
+        params.append("courseID",this.rowIndex.courseInfo.courseID)
+        params.append("classNum",this.rowIndex.courseClasses.length + 1)
+      axios
+        .post(
+          "/api/addClass",
+         params,
           {
-          headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
-          },
-        })
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(resp => {
           console.log("success");
-          console.log(resp,"addClassNumresp")
-          this.rowIndex.courseClasses.push(resp.data.data)
+          console.log(resp, "addClassNumresp");
+          this.rowIndex.courseClasses.push(resp.data.data);
         });
     },
     delClassNum(data) {
       //splice
       //this.dupCourse.splice(this.rowIndex, 1);
-      console.log(this.rowIndex,"rowindex1")
-      this.rowIndex.courseClasses.splice(data.$index,1)
-      console.log(this.rowIndex,"rowindex2")
+      console.log(this.rowIndex, "rowindex1");
+      this.rowIndex.courseClasses.splice(data.$index, 1);
+      console.log(this.rowIndex, "rowindex2");
       console.log(data.$index);
       //=================================================================后端
-       axios
+      axios
         .get("/api/deleteClass", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseClassID: data.row.id
@@ -1260,18 +1200,20 @@ export default {
         })
         .then(resp => {
           console.log("success");
-          console.log(resp,"deleteClassNumresp")
-          
+          console.log(resp, "deleteClassNumresp");
+          if (resp.data.state == 1) {
+            this.$message(resp.data.message);
+          }
         });
-     },
-    delClass(){//删除课程下的某一老师开的课程
+    },
+    delClass() {
+      //删除课程下的某一老师开的课程
       this.dialog2 = false;
       this.dupCourse.splice(this.rowIndex, 1);
       axios
         .get("/api/deleteCourse", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseID: this.rowIndex.courseInfo.courseID
@@ -1279,10 +1221,10 @@ export default {
         })
         .then(resp => {
           console.log("success");
-          console.log(resp,"deleteClassresp")
-          /* if (resp.state == 0) {
+          console.log(resp, "deleteClassresp");
+          if (resp.data.state == 0) {
             alert("删除失败");
-          } */
+          }
         });
     },
     delCourse() {
@@ -1293,7 +1235,7 @@ export default {
       store.commit("delNode2", this.dataIndex);
       this.test();
       //====================向后端提交====================
-     /*  axios
+      /*  axios
         .get("/api/deleteCourse", {
           headers: {
             Authorization:
@@ -1309,7 +1251,8 @@ export default {
             alert("删除失败");
           }
         });
-     */},
+     */
+    },
     test() {
       var option = {
         series: [
@@ -1404,7 +1347,7 @@ export default {
             alert("不可对该节点进行操作");
           } else {
             //点击节点获取同名列表
-            //that.getDupCourse();
+            that.getDupCourse();
             that.courseName =
               that.allCourse[that.dataIndex - 1].courseName.courseNameID;
             that.dialog1 = true;

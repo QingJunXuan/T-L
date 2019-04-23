@@ -196,8 +196,10 @@ export default {
         })
         .then(resp => {
           console.log(resp.data);
+          if(resp.data.state==1){
           this.graphTree = resp.data.data;
           this.init();
+          }
         })
         .catch(err => {
           console.log(err);
@@ -222,20 +224,22 @@ export default {
           }
         })
         .then(resp => {
+          if(resp.data.state==1){
           this.textarea = resp.data.data.courseNotice;
+          }
         })
         .catch(err => {
           console.log(err);
         });
     },
     changeNotice() {
+       var params = new URLSearchParams()
+        params.append("courseID",this.courseID)
+        params.append("courseNotice",this.textarea)
       axios
         .post(
           "/api/addCourseNotice",
-          {
-            courseID: this.courseID,
-            courseNotice: this.textarea
-          },
+          params,
           {
             headers: {
               'Content-Type':'application/x-www-form-urlencoded',
@@ -246,9 +250,9 @@ export default {
         )
         .then(resp => {
           console.log("notice success");
-          /* if (resp.data.state == 1) {
+           if (resp.data.state == 1) {
             this.$message("修改成功");
-          } */
+          }
         })
         .catch(err => {
           console.log(err);
@@ -266,7 +270,9 @@ export default {
           }
         })
         .then(resp => {
+          if(resp.data.state==1){
           this.tree = resp.data.data;
+          }
           console.log(this.courseID);
         })
         .catch(err => {
