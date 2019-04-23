@@ -1,39 +1,44 @@
 <template>
   <el-container>
     <el-main class="background">
-      <el-row :gutter="10" style="margin: 0 auto; width: 75%; max-height: 685px" type="flex" justify="center">
-        <el-col :span="8" align="right">
-          <el-card class="infocard" :body-style="{ padding: '0' }">
+      <el-row
+        :gutter="10"
+        style="margin: 0 auto; width: 90%; max-height: 685px"
+        type="flex"
+        justify="center"
+      >
+        <el-col :span="2" align="right">
+          <div>
+            <el-button @click="goBack" circle style="box-shadow: 0 0 8px 1px #dbdbdb">
+              <i class="el-icon-back"></i>
+            </el-button>
+          </div>
+        </el-col>
+        <el-col :span="6" align="right">
+          <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <div class="header" align="start">
-                <el-button @click="goBack" type="text" class="backbutton">
-                  <i class="el-icon-arrow-left" style="margin-right: 6px"></i>返回
-                </el-button>
-              </div>
               <div class="info" align="start">
+                <div>
                 <span>{{studentID}}</span>
                 <span>{{studentName}}</span>
-                <span style="position:absolute; right: 15px">最近学到章节3</span>
+                </div>
+                <el-row style="margin-top: 3px">
+                  <el-col :span="16" style="padding-left: 15px; padding-top: 8px"><el-progress :percentage="75" stroke-width="3" color="#41abf1" :show-text="false"></el-progress></el-col>
+                  <el-col :span="8" style="padding-left: 12px;"><div style="font-size: 12px; color: #8e8e8e">已学习3/4</div></el-col>
+                </el-row>
               </div>
+              
               <div align="start">
-                <el-table size="small">
-                  <el-table-column label="课前成绩" width="80px" align="center">
-
-                  </el-table-column>
-                  <el-table-column label="课后成绩" width="80px" align="center">
-
-                  </el-table-column>
-                  <el-table-column label="总成绩" width="70px" align="center">
-
-                  </el-table-column>
-                  <el-table-column label="排名" width="70px" align="center">
-
-                  </el-table-column>
+                <el-table size="small" :data="gradeData">
+                  <el-table-column label="课前成绩" width="80px" align="center" prop="pre"></el-table-column>
+                  <el-table-column label="课后成绩" width="80px" align="center" prop="rev"></el-table-column>
+                  <el-table-column label="总成绩" width="70px" align="center" prop="avg"></el-table-column>
+                  <el-table-column label="排名" width="70px" align="center" prop="rank"></el-table-column>
                 </el-table>
               </div>
             </div>
           </el-card>
-          <el-card class="selectcard" :body-style="{ padding: '0' }">
+          <el-card class="select-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="center">
               <div style="width: 64%" align="start">
                 <el-row class="select-title">指标</el-row>
@@ -145,42 +150,70 @@
           </el-card>
         </el-col>
         <el-col :span="16">
-          <el-card class="contentcard" :body-style="{ padding: '0' }">
+          <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <div class="header" align="start"></div>
-              <el-scrollbar wrap-style="height: 630px; margin-top: 5px" :native="false">
+              <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
                 <div>
-                  <el-collapse v-model="activeNames" style="padding: 0 20px 0 20px">
+                  <el-collapse
+                    v-model="activeNames"
+                    class="collapse"
+                  >
                     <el-collapse-item title="成绩分析" name="1">
                       <el-row>
-                        <div id="myChart" style="width: 100%;height: 500px;margin-top: 40px"></div>
+                        <div id="myChart" class="my-chart"></div>
                       </el-row>
                     </el-collapse-item>
                     <el-collapse-item title="成绩与反馈" name="2">
-                      <div style="height: 150px; background-color: #fafafa; margin-top: 10px">
-                        <el-row>章节1</el-row>
-                        <el-row :gutter="10">
-                          <el-col :span="6">课前成绩：85</el-col>
-                          <el-col :span="6">课后成绩：85</el-col>
-                          <el-col :span="6">总成绩：85</el-col>
-                          <el-col :span="6">排名：15</el-col>
-                        </el-row>
-                        <el-row>评分：4.2</el-row>
+                      <div align="start" class="response">
                         <el-row>
-                          <div style="height: 100px">反馈内容</div>
+                            <div class="title">章节1 IO接口</div>
+                        </el-row>
+                        <el-row :gutter="10">
+                          <el-col :span="6"><span class="grade">课前成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">课后成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">总成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">排名：15</span></el-col>
+                        </el-row>
+                        <el-row>
+                          <div>
+                              <el-rate
+                                v-model="courseGrade"
+                                disabled
+                                show-score
+                                text-color="#ff9900"
+                                score-template="{value}"
+                                class="rate"
+                              ></el-rate>
+                            </div>
+                        </el-row>
+                        <el-row style="margin-top: 13px">
+                          <div class="text">反馈内容</div>
                         </el-row>
                       </div>
-                      <div style="height: 150px; background-color: #fafafa; margin-top: 10px">
-                        <el-row>章节2</el-row>
-                        <el-row :gutter="10">
-                          <el-col :span="6">课前成绩：85</el-col>
-                          <el-col :span="6">课后成绩：85</el-col>
-                          <el-col :span="6">总成绩：85</el-col>
-                          <el-col :span="6">排名：10</el-col>
-                        </el-row>
-                        <el-row>评分：4.2</el-row>
+                      <div style="margin-top: 20px" align="start" class="response">
                         <el-row>
-                          <div style="height: 100px">反馈内容</div>
+                            <div class="title">章节2 Spring基础</div>
+                        </el-row>
+                        <el-row :gutter="10">
+                          <el-col :span="6"><span class="grade">课前成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">课后成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">总成绩：85</span></el-col>
+                          <el-col :span="6"><span class="grade">排名：15</span></el-col>
+                        </el-row>
+                        <el-row>
+                          <div>
+                              <el-rate
+                                v-model="courseGrade"
+                                disabled
+                                show-score
+                                text-color="#ff9900"
+                                score-template="{value}"
+                                class="rate"
+                              ></el-rate>
+                            </div>
+                        </el-row>
+                        <el-row style="margin-top: 13px">
+                          <div class="text">反馈内容</div>
                         </el-row>
                       </div>
                     </el-collapse-item>
@@ -200,9 +233,18 @@ export default {
   name: "studentAnalysis",
   data() {
     return {
-      studentID: 0,
-      studentName: "",
+      courseGrade: 4.5,
+      studentID: 1612345,
+      studentName: "学生姓名",
       activeNames: ["1"],
+      gradeData: [
+        {
+          pre: 85,
+          rev: 85,
+          avg: 85,
+          rank: 10
+        }
+      ],
       xyOptions: [
         {
           value: 0,
@@ -595,46 +637,60 @@ export default {
 
 .select-button {
   width: 100%;
-  background-color: rgb(95, 158, 160, 0.8);
-  border-color: rgb(95, 158, 160, 0.8);
+  background-color: #7cc8fb;
+  border-color: #7cc8fb;
 }
 
 .background {
-  background-color: rgba(118, 162, 163, 0.26);
+  background-image: url("../../assets/background.jpg"); /*背景图片地址*/
+  background-repeat: no-repeat; /*背景图片不重复*/
+  background-size: cover; /*背景图片拉伸铺满*/
+  width: 100%; /* 宽度为100%；*/
 }
 
-.infocard {
+.info-card {
   width: 300px;
   height: 200px;
 }
 
 .info {
-  height: 20px; 
-  padding: 15px 10px 15px 10px;
+  height: 50px;
+  padding: 20px 10px 15px 10px;
   border-bottom: 1px solid #e7edf5;
 }
 
-.info span {
-  font-size: 14px;
+.info > div > span {
+  font-size: 24px;
   font-weight: bold;
-  color: rgb(95, 158, 160, 0.8);
+  color: #41ABF1;
+  padding-left: 10px;
 }
 
-.selectcard {
+.select-card {
   margin-top: 10px;
   width: 300px;
   height: 480px;
 }
 
-.contentcard {
+.content-card {
   width: 800px;
   height: 690px;
 }
 
+.content-card .collapse {
+  padding: 0 20px 0 20px; 
+  margin-top: -5px;
+}
+
+.my-chart {
+  width: 100%;
+  height: 500px;
+  margin-top: 40px;
+}
+
 .header {
   height: 42px;
-  background-color: rgb(95, 158, 160, 0.8);
-  box-shadow: 0 -1px 5px #aaaaaa;
+  border-bottom: 1px solid #eaeef3;
 }
 
 .cardbody {
@@ -642,8 +698,34 @@ export default {
   position: relative;
 }
 
-.backbutton {
-  padding-left: 10px;
-  color: #fff;
+.response {
+  border-top: 1px solid #eaeef3;
+  padding: 5px 20px 20px 20px;
+}
+
+.response .title {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #41abf1;
+  padding-top: 15px;
+  padding-bottom: 2px;
+}
+
+.response .rate {
+  zoom: 90%;
+  margin-top: 4px;
+  margin-bottom: 3px;
+}
+
+.response .grade {
+  letter-spacing: 0.6px;
+  font-size: 12px;
+}
+
+.response .text {
+  min-height: 100px;
+  background-color: #fafafa;
+  padding: 5px 10px 5px 10px;
 }
 </style>

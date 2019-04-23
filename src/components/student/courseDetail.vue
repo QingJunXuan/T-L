@@ -28,7 +28,11 @@
           </div>
         </el-col>
         <el-col :span="4">
+<<<<<<< HEAD
           <div @click="showAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
+=======
+          <div @click="toAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
+>>>>>>> 70db23d866a793b7ff90be70975716b1d0691861
             <el-button type="text" class="tab" :class="{'clickButton':isAnalysis}">学习分析</el-button>
           </div>
         </el-col>
@@ -233,6 +237,9 @@ export default {
         this.isLesson = false;
         this.isAnalysis = true;
       }
+    },
+    toAnalysis() {
+      this.$router.push({path: '/student/studentAnalysis'})
     },
     handleNodeClick(object) {
       console.log(object,"node-object");

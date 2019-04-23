@@ -236,7 +236,6 @@
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('username', this.ruleForm.account);
                 that.logining = false;
-                bus.$emit('isLogin', true);
                 that.$notify({
                   title: '登录成功',
                   message: '页面即将跳转',
@@ -245,7 +244,7 @@
                 });
                 this.loginTableVisible = false;
                 setTimeout(function () {
-                  //location.reload();
+                  location.reload();
                   //TODO: 根据身份跳转
                 }, 2000)
               }, response => {
