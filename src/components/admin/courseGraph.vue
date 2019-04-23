@@ -954,7 +954,7 @@ export default {
               this.$message("添加成功");
             }
           })
-          .catcch(err => {
+          .catch(err => {
             console.log("err", err);
           }
         );
