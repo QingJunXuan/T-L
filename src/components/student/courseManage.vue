@@ -137,7 +137,7 @@ export default {
       .get("/api/getStuCourseList", {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+            "Bearer "+localStorage.getItem("token")
         },
         params: {
           studentID: 1
@@ -155,7 +155,7 @@ export default {
             .get("/api/getChapterByID", {
               headers: {
                 Authorization:
-                  "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+                  "Bearer "+localStorage.getItem("token")
               },
               params: {
                 chapterID: chapterNode
@@ -185,7 +185,7 @@ export default {
         .get("/api/getCourseByCode", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
           params: {
             courseCode: this.code
@@ -208,7 +208,7 @@ export default {
         .get("/api/joinCourse", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
           params: {
             studentID: 1,

@@ -190,7 +190,7 @@ export default {
         .get("/api/getChapterRelationByCourseID", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
           params: { courseID: this.courseID }
         })
@@ -215,7 +215,7 @@ export default {
         .get("/api/getNoticeByCouID", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
@@ -240,7 +240,7 @@ export default {
             headers: {
               'Content-Type':'application/x-www-form-urlencoded',
               Authorization:
-                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+               "Bearer "+localStorage.getItem("token")
             }
           }
         )
@@ -259,7 +259,7 @@ export default {
         .get("/api/getCourseCatalog", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID

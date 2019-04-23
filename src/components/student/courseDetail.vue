@@ -28,11 +28,7 @@
           </div>
         </el-col>
         <el-col :span="4">
-<<<<<<< HEAD
-          <div @click="showAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
-=======
           <div @click="toAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
->>>>>>> 70db23d866a793b7ff90be70975716b1d0691861
             <el-button type="text" class="tab" :class="{'clickButton':isAnalysis}">学习分析</el-button>
           </div>
         </el-col>
@@ -165,7 +161,7 @@ export default {
       .get("/api/getChapterRelationByCourseID",{
          headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
         params:{courseID:this.courseID}
       })
@@ -183,7 +179,7 @@ export default {
         .get("/api/getNoticeByCouID", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
@@ -202,7 +198,7 @@ export default {
         .get("/api/getCourseCatalog", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6dGgiLCJleHAiOjE1NTY0NTI0MTEsImlhdCI6MTU1NTg0NzYxMX0.fv3xdxZ3z4nfVLBvFT3ruHFBCJJ5rLFSsdluahhTnekuy2VSDizqRdbstA1kgIDPJycPhi4OSD3O0fRpMQThNg"
+              "Bearer "+localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
