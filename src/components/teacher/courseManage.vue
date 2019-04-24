@@ -16,12 +16,8 @@
         <el-row>请联系<span style="color:darkcyan;font-weight:bold">学院管理员</span>为您开课吧
         </el-row>
       </el-row>
-       <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
-        <el-row style="padding:30px">还没有课？</el-row>
-        <el-row>请联系<span style="color:darkcyan;font-weight:bold">学院管理员</span>为您开课吧
-        </el-row>
-      </el-row>
       <el-row :gutter="40">
+        <el-col :span="22" :offset="1">
         <el-col :span="8" v-for="(item,index) in items" :key="index">
           <el-card :body-style="{padding:0}" style="margin:20px 0;">
             <el-row class="top">
@@ -61,6 +57,7 @@
               </el-row>
             </el-row>
           </el-card>
+        </el-col>
         </el-col>
       </el-row>
     </el-col>

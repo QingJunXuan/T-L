@@ -169,7 +169,7 @@ export default {
             if (response.status === 200) {
               let exerciseList = JSON.parse(response.bodyText);
               if (exerciseList.state === 1) {
-                let i = 1;
+                let i = 0;
                 while (i < exerciseList.data.length) {
                   this.exercises.push({
                     exerciseID: exerciseList.data[i].exercise.exerciseId,

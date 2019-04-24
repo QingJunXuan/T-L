@@ -113,16 +113,17 @@ export default {
      set() {
             var length = this.list.length
             for (var i = 0; i < length; i++) {
-                var addData = {
-                    name: this.list[i].courseName.courseName,
-                    //category: "test",
-                    x: Math.round(Math.random() * 200),
-                    y: Math.round(Math.random() * 200)+50
-                };
-                this.data.push(addData)
+                
                 var num = this.list[i].preCoursesName.length;
                 var name = this.list[i].courseName.courseName
                 if (num == 0) {//无前继节点的，连接start
+                var addData = {
+                    name: name,
+                    //category: "test",
+                    x: Math.round(Math.random() * 1000),
+                    y: Math.round(Math.random() * 500)+100
+                };
+                this.data.push(addData)
                     var addLink = {
                         target: name,
                         source: 'start',
@@ -139,6 +140,13 @@ export default {
                 }
                 else {
                     //所有前继节点
+                    var addData = {
+                    name: name,
+                    //category: "test",
+                    x: Math.round(Math.random() * 1000),
+                    y: Math.round(Math.random() * 500)+700
+                };
+                this.data.push(addData)
                     for (var j = 0; j < num; j++) {
                         var addLink = {
                             target: name,

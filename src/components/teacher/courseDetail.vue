@@ -99,6 +99,7 @@ export default {
   },
   data() {
     return {
+      number:0,//章节号
       courseID: 1,
       classID: 1,
       isNotice: false,
@@ -112,7 +113,7 @@ export default {
       data: [
         {
           name: "start",
-          x: 200,
+          x: 250,
           y: 0
         }
       ],
@@ -122,8 +123,8 @@ export default {
         label: "contentName"
       },
       graphTree: [],
-      //tree:[],
-      tree: [
+      tree:[],
+     /*  tree: [
         {
           id: 1,
           createTime: "2019-03-30T06:16:14.000+0000",
@@ -176,7 +177,7 @@ export default {
           exerciseTotal_2: 100,
           subCatalog: []
           }
-      ],
+      ], */
       items: [
         {
           id: 1,
@@ -218,6 +219,7 @@ export default {
           console.log(resp.data);
           if(resp.data.state==1){
           this.graphTree = resp.data.data;
+          console.log(this.graphTree,"graphtree-teacher")
           this.init();
           }
         })
@@ -295,6 +297,7 @@ export default {
         .then(resp => {
           if(resp.data.state==1){
           this.tree = resp.data.data;
+          console.log(this.tree,"lesson-tree")
           }
           console.log(this.courseID);
         })
@@ -367,19 +370,23 @@ export default {
    
     init() {
       //var list = state.courseList
+      
+      
       var length = this.graphTree.length;
       for (var i = 0; i < length; i++) {
-        var addData = {
-          name: this.graphTree[i].chapterNode.content,
-          //category: "test",
-          x: Math.round(Math.random() * 500),
-          y: Math.round(Math.random() * 500) + 50
-        };
-        this.data.push(addData);
+        var name = this.graphTree[i].chapterNode.contentName;
+        
         var num = this.graphTree[i].preChapterNodes.length;
-        var name = this.graphTree[i].chapterNode.content;
         if (num == 0) {
           //无前继节点的，连接start
+          var addData = 
+        {
+          name:name,
+          //category: "test",
+          x: Math.round(Math.random() * 500),
+          y: Math.round(Math.random() * 500) + 100
+        };
+        this.data.push(addData);
           var addLink = {
             target: name,
             source: "start",
@@ -395,10 +402,18 @@ export default {
           this.links.push(addLink);
         } else {
           //所有前继节点
+          var addData = 
+        {
+          name:name,
+          //category: "test",
+          x: Math.round(Math.random() * 500),
+          y: Math.round(Math.random() * 500) + 700
+        };
+        this.data.push(addData);
           for (var j = 0; j < num; j++) {
             var addLink = {
               target: name,
-              source: this.graphTree[i].preChapterNodes[j].content,
+              source: this.graphTree[i].preChapterNodes[j].contentName,
               label: {
                 normal: {
                   show: false
@@ -490,12 +505,15 @@ export default {
       that.myChart = myChart;
     },
     renderContent(h, { node, data, store }) {
+      
+      //console.log(h,"h",node,"node",data,"data",store,"store")
       if (data.parentID == 0) {
+        //this.number=this.number+1
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
               <span style="color:#000;font-size:15px">
-                {"第 " + data.content + " 章 "}&nbsp;
+                {"第 "  + this.number+ " 章 "}&nbsp;
               </span>
               <span>{node.label}</span>
             </span>
@@ -524,12 +542,13 @@ export default {
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-              <span>{data.content}&nbsp;</span>
+              <span>&nbsp;</span>
               <span>{node.label}</span>
             </span>
           </span>
         );
       }
+      //this.number=this.number+1
     },
     pre(data) {
       console.log(data, "pre");

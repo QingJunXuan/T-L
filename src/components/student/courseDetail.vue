@@ -170,6 +170,7 @@ export default {
         .then(resp => {
           console.log(resp.data);
           if (resp.data.state == 1) {
+            console.log(resp.data,"chapter-tree")
             this.graphTree = resp.data.data;
             this.init();
           }

@@ -280,8 +280,6 @@
           </div>
           <el-table :data="dupCourse" border  @row-click="rowClick">
             <el-table-column label="点击下表对应行，对班级进行操作">
-              
-              <el-table-column prop="courseInfo.courseName" label="name" width="100"></el-table-column>
               <el-table-column prop="courseInfo.teacherName" label="教师" width="100"></el-table-column>
               <el-table-column prop="courseInfo.startTime" label="开课时间" width="180"></el-table-column>
               <el-table-column prop="courseInfo.endTime" label="结束时间"></el-table-column>
@@ -503,8 +501,8 @@ export default {
         };
         this.data.push(addData); */
         if (num == 0) {
-          var nopre_x = Math.round(Math.random() * 2000)
-          var nopre_y =Math.round(Math.random() * 500)+50
+          var nopre_x = Math.round(Math.random()*200) * 10
+          var nopre_y =Math.round(Math.random()*200)* 5+100
           var addData = {
           name: name,
           //category: "test",
@@ -527,8 +525,8 @@ export default {
           };
           this.links.push(addLink);
         } else {
-          var nopre_x = Math.round(Math.random() * 2000)
-          var nopre_y =Math.round(Math.random() * 500)+600  //50+500+50
+          var nopre_x = Math.round(Math.random()*200)* 10
+          var nopre_y =Math.round(Math.random()*200) * 5+1200  //100+1000+100
           var addData = {
           name: name,
           //category: "test",
@@ -845,8 +843,8 @@ export default {
         var addData = {
         name: name,
         category: "test",
-        x: Math.round(Math.random() * 2000),
-        y: Math.round(Math.random() * 500)+50
+        x: Math.round(Math.random()*200) * 10,
+        y: Math.round(Math.random() * 200)*5+100
       };
       store.commit("addData", addData);
         //无前继节点的，连接start
@@ -867,8 +865,8 @@ export default {
          var addData = {
         name: name,
         category: "test",
-        x: Math.round(Math.random() * 2000),
-        y: Math.round(Math.random() * 500)+600 //50+500+50
+        x: Math.round(Math.random() * 200)*10,
+        y: Math.round(Math.random() * 200)*5+1200 //100+1000+100
       };
       store.commit("addData", addData);
 
