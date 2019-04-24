@@ -118,6 +118,7 @@ headers: {
     }).then(resp=>{
       if(resp.data.state==1){
         this.allCourse=resp.data.data
+        console.log(this.allCourse,"allcourse")
       }
     }).catch(err=>{
       console.log(err)

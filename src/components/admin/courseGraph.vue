@@ -4,12 +4,12 @@
       <div>
         <el-col :span="12" :offset="2">
           <div
-            style="height:520px;margin-top:0px;padding-right:10px;border:1px solid #ddd"
+            style="height:650px;margin-top:0px;padding-right:10px;border:1px solid #ddd"
             ref="graph"
           ></div>
         </el-col>
         <el-col :span="8" :offset="1">
-          <el-card id="edit" style="width:100%;height:520px;left:10%;" body-style="{padding:'0px'}">
+          <el-card id="edit" style="width:100%;height:650px;left:10%;" body-style="{padding:'0px'}">
             <el-row style="padding-bottom:10px" v-show="isAddCourse">
               <p style="text-align:center;font-size:13px">新建课程</p>
               <p style="text-align:center;font-size:12px">其他操作，请点击左侧课程关系图中对应的节点</p>
@@ -265,7 +265,7 @@
             </el-row>
           </el-card>
         </el-col>
-        <el-dialog title="请选择要进行的操作" :visible.sync="dialog1">
+        <el-dialog title="请选择要进行的操作" :visible.sync="dialog1" width="30%">
           <div style="margin-top:-20px">
             对课程进行操作：
             <el-button type="text" @click="editCourseVisible">
@@ -278,8 +278,10 @@
               <span style="font-size:12px">开课</span>
             </el-button>
           </div>
-          <el-table :data="dupCourse" border style="width: 100%" @row-click="rowClick">
+          <el-table :data="dupCourse" border  @row-click="rowClick">
             <el-table-column label="点击下表对应行，对班级进行操作">
+              
+              <el-table-column prop="courseInfo.courseName" label="name" width="100"></el-table-column>
               <el-table-column prop="courseInfo.teacherName" label="教师" width="100"></el-table-column>
               <el-table-column prop="courseInfo.startTime" label="开课时间" width="180"></el-table-column>
               <el-table-column prop="courseInfo.endTime" label="结束时间"></el-table-column>
@@ -332,7 +334,7 @@ export default {
       data: [
         {
           name: "start",
-          x: 2050,
+          x: 1000,
           y: 0
         }
       ],
@@ -489,17 +491,27 @@ export default {
     set(length) {
       //var length = this.allCourse.length
       for (var i = 0; i < length; i++) {
-        var addData = {
-          name: this.allCourse[i].courseName.courseName,
+        
+        var num = this.allCourse[i].preCoursesName.length;
+        var name = this.allCourse[i].courseName.courseName;
+
+        /* var addData = {
+          name: name,
           //category: "test",
           x: Math.round(Math.random() * 2000),
-          y: Math.round(Math.random() * 2000) + 50
+          y: Math.round(Math.random() * 2000) + Math.round(Math.random()* 100)+50
         };
-        this.data.push(addData);
-        var num = this.allCourse[i].preCoursesName.length;
-
-        var name = this.allCourse[i].courseName.courseName;
+        this.data.push(addData); */
         if (num == 0) {
+          var nopre_x = Math.round(Math.random() * 2000)
+          var nopre_y =Math.round(Math.random() * 500)+50
+          var addData = {
+          name: name,
+          //category: "test",
+          x: nopre_x,
+          y: nopre_y,
+        };
+         this.data.push(addData);
           //无前继节点的，连接start
           var addLink = {
             target: name,
@@ -515,6 +527,16 @@ export default {
           };
           this.links.push(addLink);
         } else {
+          var nopre_x = Math.round(Math.random() * 2000)
+          var nopre_y =Math.round(Math.random() * 500)+600  //50+500+50
+          var addData = {
+          name: name,
+          //category: "test",
+          x: nopre_x,
+          y: nopre_y,
+        };
+         this.data.push(addData);
+
           //所有前继节点
           for (var j = 0; j < num; j++) {
             var addLink = {
@@ -806,21 +828,30 @@ export default {
     addCourse() {
       //data
       //计算坐标
-      var addData = {
+     /*  var addData = {
         name: this.ruleForm1.courseName,
         category: "test",
         x: Math.round(Math.random() * 1000),
         y: Math.round(Math.random() * 1000)
       };
-      store.commit("addData", addData);
+      store.commit("addData", addData); */
 
-      //links
+      
+      var name = this.ruleForm1.courseName
       var num = this.ruleForm1.successor.length;
       //所有前继节点
       if (num == 0) {
+
+        var addData = {
+        name: name,
+        category: "test",
+        x: Math.round(Math.random() * 2000),
+        y: Math.round(Math.random() * 500)+50
+      };
+      store.commit("addData", addData);
         //无前继节点的，连接start
         var addLink = {
-          target: this.ruleForm1.courseName,
+          target: name,
           source: "start",
           label: {
             normal: {
@@ -833,6 +864,15 @@ export default {
         };
         store.commit("addLinks", addLink);
       } else {
+         var addData = {
+        name: name,
+        category: "test",
+        x: Math.round(Math.random() * 2000),
+        y: Math.round(Math.random() * 500)+600 //50+500+50
+      };
+      store.commit("addData", addData);
+
+
         for (var i = 0; i < num; i++) {
           var addLink = {
             target: this.ruleForm1.courseName,
@@ -1293,7 +1333,7 @@ export default {
           {
             type: "graph",
             layout: "none",
-            symbolSize: 40,
+            symbolSize: 30,
             color: "#ec7814",
             roam: true,
             label: {
