@@ -470,13 +470,13 @@ export default {
       // 章节
       chapterList: [],
       // 成绩 只能数字
-      gradeList: [[88, 93, 90], [76, 82, 85], [90, 89, 95]],
+      gradeList: [[88, 93, 90, 85], [76, 82, 85, 92], [90, 89, 95, 90]],
       // 课程评分 只能数字
       evaluateList: [[4.3, 3.8, 4.1], [4.5, 4.2, 3.7]],
       // 课前成绩 只能数字
-      gradePreList: [[88, 93, 90], [76, 82, 85], [90, 89, 95]],
+      gradePreList: [[88, 93, 90, 85], [76, 82, 85, 92], [90, 89, 95, 90]],
       // 课后成绩 只能数字
-      gradeRevList: [[88, 93, 90], [76, 82, 85], [90, 89, 95]],
+      gradeRevList: [[88, 93, 90, 85], [76, 82, 85, 92], [90, 89, 95, 90]],
       // 成绩阶段
       gradeEnumList: [60, 70, 80, 90],
       // 评分阶段
@@ -509,7 +509,7 @@ export default {
     getStudentOptions(index) {
       this.$http
         .get(
-          "http://localhost:8080/getStudentsByClassID?courseClassID=" +
+          "/api/getStudentsByClassID?courseClassID=" +
             this.studentOptions[index].value,
           {
             headers: {
@@ -547,7 +547,7 @@ export default {
       // 登录时存teacherID
       // 根据课程号和老师id
       this.$http
-        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
+        .get("/api/getCoursesByTeacherID?teacherID=443", {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
@@ -587,7 +587,7 @@ export default {
       this.semesterOptions = [];
       // 登录时存teacherID
       this.$http
-        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
+        .get("/api/getCoursesByTeacherID?teacherID=443", {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
@@ -621,7 +621,7 @@ export default {
       this.yearOptions = [];
       // 登录时存teacherID
       this.$http
-        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
+        .get("/api/getCoursesByTeacherID?teacherID=443", {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
@@ -652,26 +652,27 @@ export default {
       this.chapterOptions = [];
       // 登录时存teacherID
       this.$http
-        .get("http://localhost:8080/getCourseCatalog?courseID=" + this.courseID, {
+        .get("/api/getCourseCatalog?courseID=" + this.courseID, {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
           response => {
             if (response.status === 200) {
               let courseList = JSON.parse(response.bodyText);
-              let i = 0;
-              while (i < courseList.data.length) {
+              let i = 1;
+              while (i <= courseList.data.length) {
                 this.chapterOptions.push({
-                  value: i,
+                  value: i-1,
                   label:
                     "第" +
-                    courseList.data[i].id +
+                    i +
                     "章-" +
                     courseList.data[i].contentName
                 });
-                this.chapterList.push(courseList.data[i].contentName);
+                this.chapterList.push(courseList.data[i-1].contentName);
                 i++;
               }
+              this.xData = this.chapterList;
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -688,6 +689,7 @@ export default {
         case 0: {
           this.comparison = 0;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 6) this.cOptions[i].disabled = true;
             else this.cOptions[i].disabled = false;
@@ -695,13 +697,15 @@ export default {
           this.xData.length = 0;
           this.yData.length = 0;
           this.xData = this.chapterList;
-          this.yData = this.gradeList;
+          this.yData = [[88, 93, 90], [76, 85, 92], [89, 95, 90]];
+          // gradeList
           break;
         }
         // 分数段-人数
         case 1: {
           this.comparison = 1;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 0 || i === 6) this.cOptions[i].disabled = true;
             else this.cOptions[i].disabled = false;
@@ -709,13 +713,15 @@ export default {
           this.xData.length = 0;
           this.yData.length = 0;
           this.xData = this.gradeEnumList;
-          this.yData = this.amountList;
+          //this.yData = this.amountList;
+          this.yData = [[8, 17, 29, 18], [7, 19, 22, 24]]
           break;
         }
         // 章节-评分
         case 2: {
           this.comparison = 3;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i < 3 || i === 6) this.cOptions[i].disabled = true;
             else this.cOptions[i].disabled = false;
@@ -723,13 +729,14 @@ export default {
           this.xData.length = 0;
           this.yData.length = 0;
           this.xData = this.chapterList;
-          this.yData = this.evaluateList;
+          this.yData = [[4.3, 3.8, 4.2], [4.5, 4.2, 4.6]];
           break;
         }
         // 评分-人数
         case 3: {
           this.comparison = 6;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 6) this.cOptions[i].disabled = false;
             else this.cOptions[i].disabled = true;
@@ -744,6 +751,7 @@ export default {
         case 4: {
           this.comparison = 2;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 2 || i === 3) this.cOptions[i].disabled = false;
             else this.cOptions[i].disabled = true;
@@ -758,6 +766,7 @@ export default {
         case 5: {
           this.comparison = 2;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 2 || i === 3) this.cOptions[i].disabled = false;
             else this.cOptions[i].disabled = true;
@@ -772,6 +781,7 @@ export default {
         case 6: {
           this.comparison = 2;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 2 || i === 3) this.cOptions[i].disabled = false;
             else this.cOptions[i].disabled = true;
@@ -786,6 +796,7 @@ export default {
         case 7: {
           this.comparison = 2;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 2 || i === 3) this.cOptions[i].disabled = false;
             else this.cOptions[i].disabled = true;
@@ -800,6 +811,7 @@ export default {
         case 8: {
           this.comparison = 4;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 4 || i === 5) this.cOptions[i].disabled = false;
             else this.cOptions[i].disabled = true;
@@ -814,6 +826,7 @@ export default {
         case 9: {
           this.comparison = 4;
           this.detail = [];
+          this.detailValue = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 4 || i === 5) this.cOptions[i].disabled = false;
             else this.cOptions[i].disabled = true;
@@ -861,7 +874,12 @@ export default {
     // 按键事件
     getCharts() {
       // TODO: 发送请求获取图表数据
-      this.drawChart();
+      if (this.detailValue.length === 0) {
+        this.$message({ type: "warning", message: "请选择对比组!" })
+      }
+      else {
+        this.drawChart();
+      }
     },
     // 图表绘制
     drawChart() {
@@ -880,6 +898,7 @@ export default {
         colorOptions.push(this.colors[i]);
         legendData.push("对比组" + i);
       }
+      myChart.clear();
       // 绘制图表
       myChart.setOption({
         color: colorOptions,
@@ -918,7 +937,8 @@ export default {
         yAxis: [
           {
             name: this.xyOptions[this.xy].yName,
-            type: "value"
+            type: "value",
+            data: this.yData
           }
         ],
         series: seriesData
@@ -944,8 +964,8 @@ export default {
     this.getSemesterOptions();
     this.getYearOptions();
     this.getChapterOptions();
-    this.xData = this.chapterList;
-    this.yData = this.gradeList;
+    this.xData = ['第一章', '第二章', '第三章']
+    this.yData = [[88, 93, 90], [76, 85, 92], [89, 95, 90]];
     this.detail = new Array(4);
     this.studentMap = new Array(4);
   },

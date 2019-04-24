@@ -10,6 +10,11 @@
             <graph></graph>
           </el-card>
         </el-col>
+        </el-row>
+       <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
+        <el-row style="padding:30px">还没有课？</el-row>
+        <el-row>请联系<span style="color:darkcyan;font-weight:bold">学院管理员</span>为您开课吧
+        </el-row>
       </el-row>
        <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
         <el-row style="padding:30px">还没有课？</el-row>
@@ -135,7 +140,7 @@ export default {
             "Bearer "+localStorage.getItem("token")
         },
         params: {
-          teacherID: 1
+          teacherID: 443
         }
       })
       .then(resp => {
@@ -146,6 +151,7 @@ export default {
             this.noCourse = false;
           }
         }
+        this.items = resp.data.data;
         console.log(resp.data, "resp.data");
         console.log(this.items, "items");
       })

@@ -1,7 +1,6 @@
 <template>
   <el-container>
     <div>
-      <h4>{{pointName}}</h4>
       <el-form
         :model="pointForm"
         status-icon
@@ -20,8 +19,8 @@
           <div id="editor"></div>
         </el-form-item>
         <el-form-item align="center">
-          <el-button type="primary">保存</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" size="small" @click="save">保存</el-button>
+          <el-button size="small" @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -34,8 +33,9 @@ export default {
   name: "chapterEdit",
   data() {
     return {
-      id: "",
-      pointName: "",
+      item: 0,
+      pointName: '',
+      pointContent: '',
       editor: new WangEditor("#editor"),
       // 知识点
       pointForm: {
@@ -52,12 +52,85 @@ export default {
   },
   methods: {
     getParams() {
-      this.id = this.$route.query.id;
-      this.pointName = this.$route.query.name;
+      this.item = this.$route.query.item;
+    },
+    getContents() {
+      this.pointName = '';
+      this.pointContent = '';
+      this.pointForm = {
+        title: "",
+        content: ""
+      }
+      this.$http
+        .get(
+          "/api/getChapterByID?chapterID=" +
+            this.item.id,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let content = JSON.parse(response.bodyText);
+              if (content.state === 1) {
+                this.pointName = content.data.contentName;
+                this.pointContent = content.data.content;
+                this.pointForm.title = this.pointName;
+                this.pointForm.content = this.pointContent;
+                this.editor.txt.text(content.data.content);
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    reset() {
+      this.pointForm.title = this.pointName;
+      this.pointForm.content = this.pointContent;
+    },
+    save() {
+      this.$http
+        .post(
+          "/api/alertChapter",
+          {
+            id: this.item.id,
+            courseID: this.item.courseID,
+            contentName: this.pointForm.title,
+            parentID: this.item.parentID,
+            siblingID: this.item.siblingID,
+            content: this.pointForm.content
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              this.editor.txt.html('');
+              this.getContents();
+            } else {
+              this.$message({ type: "error", message: "更新失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "更新失败!" });
+          }
+        );
     }
   },
   created() {
     this.getParams();
+    this.getContents();
   },
   mounted() {
     this.editor.customConfig.menus = [
@@ -79,11 +152,11 @@ export default {
       "redo" // 重复
     ];
     this.editor.customConfig.onchange = () => {
-      this.pointForm.content = this.editor.txt.html();
+      this.pointForm.content = this.editor.txt.text();
     };
     this.editor.customConfig.debug =
       location.href.indexOf("wangeditor_debug_mode=1") > 0; // 开启debug模式
-    this.editor.create();;
+    this.editor.create();
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可

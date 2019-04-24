@@ -232,7 +232,8 @@
               that.$http.post('/api/auth', {
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
-              }).then(response => {
+              }, {emulateJSON:false}).then(response => {
+                alert(response.bodyText);
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('username', this.ruleForm.account);
                 that.logining = false;
@@ -268,7 +269,7 @@
                 mail: this.ruleForm1.email,
                 password: this.ruleForm1.password,
                 name: this.ruleForm1.name,
-                work_id: this.ruleForm1.number,
+                workID: this.ruleForm1.number,
                 role: this.ruleForm1.auth,
                 gender: this.ruleForm1.gender
               }).then(response => {
