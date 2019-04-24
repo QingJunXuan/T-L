@@ -28,7 +28,9 @@
           </div>
           <div class="betweenspace" style="margin-top: 10px; padding: 0 10px 0 10px">
             <div v-for="(item2, j) in item1.options" :key="j">
-              <div :class="item1.answer === j? 'answer': ''">{{String.fromCharCode(j+65)}}.{{item2.content}}</div>
+              <div
+                :class="item1.answer === j? 'answer': ''"
+              >{{String.fromCharCode(j+65)}}.{{item2.content}}</div>
             </div>
           </div>
           <div
@@ -157,7 +159,7 @@ export default {
       this.$http
         .get(
           // 传值chapterid
-          '/api/question/view?chapterId=' + this.id + '&type=preview',
+          "/api/question/view?chapterId=" + this.id + "&type=preview",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -184,22 +186,20 @@ export default {
                     edit: false,
                     new: false
                   });
+                  this.totalScore += Number(
+                    exerciseList.data[i].exercise.exercisePoint
+                  );
                   for (
                     let k = 0;
                     k < exerciseList.data[i].exerciseChoiceList.length;
                     k++
                   ) {
-                    this.exercises[i].options.push(
-                      {
-                        id: exerciseList.data[i].exerciseChoiceList[k].id,
-                        content: exerciseList.data[i].exerciseChoiceList[k].choice
-                      }
-                    );
+                    this.exercises[i].options.push({
+                      id: exerciseList.data[i].exerciseChoiceList[k].id,
+                      content: exerciseList.data[i].exerciseChoiceList[k].choice
+                    });
                   }
                   i++;
-                }
-                for (let i = 0; i < this.exercises.length; i++) {
-                  this.totalScore += Number(this.exercises[i].score);
                 }
               }
             } else {
@@ -212,13 +212,13 @@ export default {
         );
     },
     addPreOptions() {
-      this.exerciseNew.options.push({id: '', content: ''});
+      this.exerciseNew.options.push({ id: "", content: "" });
     },
     addPreview() {
       this.exercises.push({
         exerciseID: 0,
         question: "",
-        options: [{id: '', content: ''}, {id: '', content: ''}],
+        options: [{ id: "", content: "" }, { id: "", content: "" }],
         score: 0,
         answer: 0,
         detail: "",
@@ -237,36 +237,36 @@ export default {
       })
         .then(() => {
           this.$http
-              .put(
-                "/api/question/deleteExercise",
-                {
-                  params: {
-                    exerciseId: this.exercises[index].exerciseID
-                  },
-                  headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token")
-                  },
+            .put(
+              "/api/question/deleteExercise",
+              {
+                exerciseId: this.exercises[index].exerciseID
+              },
+              {
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("token")
                 }
-              )
-              .then(
-                response => {
-                  if (response.status === 200) {
-                    this.$message({
-                      type: "success",
-                      message: "习题删除成功!"
-                    });
-                    this.totalScore -= this.exercises[index].score;
-                    this.getPreExercises();
-                  } else {
-                    this.$message({ type: "error", message: "习题删除失败!" });
-                    return;
-                  }
-                },
-                response => {
+              }
+            )
+            .then(
+              response => {
+                if (response.status === 200) {
+                  this.$message({
+                    type: "success",
+                    message: "习题删除成功!"
+                  });
+                  this.totalScore -= this.exercises[index].score;
+                  this.getPreExercises();
+                } else {
                   this.$message({ type: "error", message: "习题删除失败!" });
                   return;
                 }
-              );
+              },
+              response => {
+                this.$message({ type: "error", message: "习题删除失败!" });
+                return;
+              }
+            );
         })
         .catch(() => {
           this.$message({
@@ -281,56 +281,52 @@ export default {
       this.addButton = false;
     },
     deleteOption(index) {
-      this.exerciseNew.options.splice(index, 1)
+      this.exerciseNew.options.splice(index, 1);
     },
     addOptions(eID) {
       for (let i = 0; i < this.exerciseNew.options.length; i++) {
-              let optionEntity = {
-                exerciseId: eID,
-                exerciceChoiceId: String.fromCharCode(i + 65),
-                choice: this.exerciseNew.options[i].content
-              };
-              this.$http
-                .post(
-                  "/api/question/addChoice",
-                  optionEntity,
-                  {
-                    headers: {
-                      Authorization: "Bearer " + localStorage.getItem("token")
-                    }
-                  }
-                )
-                .then(
-                  response => {
-                    if (response.status === 200) {
-                      this.$message({
-                      type: "success",
-                      message: "习题添加成功!"
-                    });
-                    this.getPreExercises();
-                    } else {
-                      this.$message({
-                        type: "error",
-                        message: "习题添加失败!"
-                      });
-                      return;
-                    }
-                  },
-                  response => {
-                    this.$message({ type: "error", message: "习题添加失败!" });
-                    return;
-                  }
-                );
+        let optionEntity = {
+          exerciseId: eID,
+          exerciceChoiceId: String.fromCharCode(i + 65),
+          choice: this.exerciseNew.options[i].content
+        };
+        this.$http
+          .post("/api/question/addChoice", optionEntity, {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
             }
+          })
+          .then(
+            response => {
+              if (response.status === 200) {
+                this.$message({
+                  type: "success",
+                  message: "习题添加成功!"
+                });
+                this.getPreExercises();
+              } else {
+                this.$message({
+                  type: "error",
+                  message: "习题添加失败!"
+                });
+                return;
+              }
+            },
+            response => {
+              this.$message({ type: "error", message: "习题添加失败!" });
+              return;
+            }
+          );
+      }
     },
     saveEdit(index) {
-      for (let i = 0;i < this.exerciseNew.options.length;i++) {
-        if (this.this.exerciseNew.options[i] === '') {
+      for (let i = 0; i < this.exerciseNew.options.length; i++) {
+        if (this.exerciseNew.options[i] === "") {
           this.$message({
-          message: "请将习题内容填写完整！",
-          type: "warning"
-        });
-        return;
+            message: "请将习题内容填写完整！",
+            type: "warning"
+          });
+          return;
         }
       }
       if (
@@ -355,31 +351,29 @@ export default {
           if (this.exerciseNew.new) {
             // 添加
             let exerciseEntity = {
-            // 传值chapterid
-            chapterId: this.id,
-            exerciseType: 1,
-            exerciseNumber: index + 1,
-            exerciseContent: this.exerciseNew.question,
-            exerciseAnswer: String.fromCharCode(this.exerciseNew.answer + 65),
-            exerciseAnalysis: this.exerciseNew.detail,
-            exercisePoint: this.exerciseNew.score
-          };
+              // 传值chapterid
+              chapterId: this.id,
+              exerciseType: 1,
+              exerciseNumber: index + 1,
+              exerciseContent: this.exerciseNew.question,
+              exerciseAnswer: String.fromCharCode(this.exerciseNew.answer + 65),
+              exerciseAnalysis: this.exerciseNew.detail,
+              exercisePoint: this.exerciseNew.score
+            };
             let eID = 0;
             this.$http
-              .post(
-                "/api/question/addExercise",
-                exerciseEntity,
-                {
-                  headers: {
-                    'Authorization': "Bearer " + localStorage.getItem("token"),
-                    'Content-Type': "application/json"
-                  }
+              .post("/api/question/addExercise", exerciseEntity, {
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("token"),
+                  "Content-Type": "application/json"
                 }
-              )
+              })
               .then(
                 response => {
                   if (response.status === 200) {
-                    this.addOptions(JSON.parse(response.bodyText).data.exerciseId);
+                    this.addOptions(
+                      JSON.parse(response.bodyText).data.exerciseId
+                    );
                   } else {
                     this.$message({ type: "error", message: "习题添加失败!" });
                     return;
@@ -390,175 +384,83 @@ export default {
                   return;
                 }
               );
-          }
-          else {
+          } else {
             // 编辑
-            alert(111)
             let exerciseEntity = {
               exerciseId: this.exercises[index].exerciseID,
-            // 传值chapterid
-            chapterId: this.id,
-            exerciseType: 1,
-            exerciseNumber: index + 1,
-            exerciseContent: this.exerciseNew.question,
-            exerciseAnswer: this.exerciseNew.answer,
-            exerciseAnalysis: this.exerciseNew.detail,
-            exercisePoint: this.exerciseNew.score
-          };
+              // 传值chapterid
+              chapterId: this.id,
+              exerciseType: 1,
+              exerciseNumber: index + 1,
+              exerciseContent: this.exerciseNew.question,
+              exerciseAnswer: String.fromCharCode(this.exerciseNew.answer + 65),
+              exerciseAnalysis: this.exerciseNew.detail,
+              exercisePoint: this.exerciseNew.score
+            };
             let i = 0;
             // 选项长度变大
-            alert(this.exerciseNew.options.length)
-            if (this.exercises[index].options.length <= this.exerciseNew.options.length) {
+            if (
+              this.exercises[index].options.length <=
+              this.exerciseNew.options.length
+            ) {
               while (i < this.exercises[index].options.length) {
-              if (
-                this.exercises[index].options[i].content !== this.exerciseNew.options[i].content
-              ) {
-                let optionEntity = {
-                  id: this.exercises[index].options[i].id,
-                  exerciseId: this.exercises[index].exerciseID,
-                  exerciceChoiceId: String.fromCharCode(i + 65),
-                  choice: this.exerciseNew.options[i].content
-                };
-                this.$http
-                  .put(
-                    "/api/question/alterChoice",
-                    optionEntity,
-                    {
+                if (
+                  this.exercises[index].options[i].content !==
+                  this.exerciseNew.options[i].content
+                ) {
+                  let optionEntity = {
+                    id: this.exercises[index].options[i].id,
+                    exerciseId: this.exercises[index].exerciseID,
+                    exerciceChoiceId: String.fromCharCode(i + 65),
+                    choice: this.exerciseNew.options[i].content
+                  };
+                  this.$http
+                    .put("/api/question/alterChoice", optionEntity, {
                       headers: {
                         Authorization: "Bearer " + localStorage.getItem("token")
                       }
-                    }
-                  )
-                  .then(
-                    response => {
-                      if (response.status === 200) {
-                        alert(
-                          "option " + String.fromCharCode(i + 65) + " success"
-                        );
-                      } else {
+                    })
+                    .then(
+                      response => {
+                        if (response.status === 200) {
+                        } else {
+                          this.$message({
+                            type: "error",
+                            message: "选项修改失败!"
+                          });
+                          return;
+                        }
+                      },
+                      response => {
                         this.$message({
                           type: "error",
                           message: "选项修改失败!"
                         });
                         return;
                       }
-                    },
-                    response => {
-                      this.$message({
-                        type: "error",
-                        message: "选项修改失败!"
-                      });
-                      return;
-                    }
-                  );
+                    );
+                }
+                i = i + 1;
               }
-              i = i + 1;
-            }
-            while (i < this.exerciseNew.options.length) {
-              let optionEntity = {
-                exerciseId: this.exercises[index].exerciseID,
-                exerciceChoiceId: String.fromCharCode(i + 65),
-                choice: this.exerciseNew.options[i].content
-              };
-              this.$http
-                .post(
-                  "/api/question/addChoice",
-                  optionEntity,
-                  {
-                    headers: {
-                      Authorization: "Bearer " + localStorage.getItem("token")
-                    }
-                  }
-                )
-                .then(
-                  response => {
-                    if (response.status === 200) {
-                      alert(
-                        "option " + String.fromCharCode(i + 65) + " success"
-                      );
-                    } else {
-                      this.$message({
-                        type: "error",
-                        message: "选项添加失败!"
-                      });
-                      return;
-                    }
-                  },
-                  response => {
-                    this.$message({ type: "error", message: "选项添加失败!" });
-                    return;
-                  }
-                );
-              i = i + 1;
-            }
-            }
-            // 选项长度变小
-            else {
-            while (i < this.exerciseNew.options.length) {
-              let optionEntity = {
-                id: this.exerciseNew.options[i].id,
-                exerciseId: this.exerciseNew.exerciseID,
-                exerciceChoiceId: String.fromCharCode(i + 65),
-                choice: this.exerciseNew.options[i].content
-              };
-              if (
-                this.exercises[index].options[i].content !== this.exerciseNew.options[i].content
-              ) {this.$http
-                .put(
-                  "/api/question/alterChoice",
-                  optionEntity,
-                  {
-                    headers: {
-                      Authorization: "Bearer " + localStorage.getItem("token")
-                    }
-                  }
-                )
-                .then(
-                  response => {
-                    if (response.status === 200) {
-                      alert(
-                        "option " + String.fromCharCode(i + 65) + " success"
-                      );
-                    } else {
-                      this.$message({
-                        type: "error",
-                        message: "选项修改失败!"
-                      });
-                      return;
-                    }
-                  },
-                  response => {
-                    this.$message({ type: "error", message: "选项修改失败!" });
-                    return;
-                  }
-                );
-              i = i + 1;
-            }
-            }
-            while (i < this.exercises[index].options.length) {
-              {
+              while (i < this.exerciseNew.options.length) {
+                let optionEntity = {
+                  exerciseId: this.exercises[index].exerciseID,
+                  exerciceChoiceId: String.fromCharCode(i + 65),
+                  choice: this.exerciseNew.options[i].content
+                };
                 this.$http
-                  .put(
-                    "/api/question/deleteChoice?",
-                    {
-                      params: {
-                        exerciseChoiceId: this.exercises[index].options[i].id
-                      },
-                      headers: {
-                        Authorization: "Bearer " + localStorage.getItem("token")
-                      }
+                  .post("/api/question/addChoice", optionEntity, {
+                    headers: {
+                      Authorization: "Bearer " + localStorage.getItem("token")
                     }
-                  )
+                  })
                   .then(
                     response => {
                       if (response.status === 200) {
-                        alert(
-                          "option " + String.fromCharCode(i + 65) + " success"
-                        );
                       } else {
                         this.$message({
                           type: "error",
-                          message: "选项删除失败!"
+                          message: "选项添加失败!"
                         });
                         return;
                       }
@@ -566,26 +468,97 @@ export default {
                     response => {
                       this.$message({
                         type: "error",
-                        message: "选项删除失败!"
+                        message: "选项添加失败!"
                       });
                       return;
                     }
                   );
+                i = i + 1;
               }
-              i = i + 1;
             }
+            // 选项长度变小
+            else {
+              while (i < this.exerciseNew.options.length) {
+                let optionEntity = {
+                  id: this.exerciseNew.options[i].id,
+                  exerciseId: this.exerciseNew.exerciseID,
+                  exerciceChoiceId: String.fromCharCode(i + 65),
+                  choice: this.exerciseNew.options[i].content
+                };
+                if (
+                  this.exercises[index].options[i].content !==
+                  this.exerciseNew.options[i].content
+                ) {
+                  this.$http
+                    .put("/api/question/alterChoice", optionEntity, {
+                      headers: {
+                        Authorization: "Bearer " + localStorage.getItem("token")
+                      }
+                    })
+                    .then(
+                      response => {
+                        if (response.status === 200) {
+                        } else {
+                          this.$message({
+                            type: "error",
+                            message: "选项修改失败!"
+                          });
+                          return;
+                        }
+                      },
+                      response => {
+                        this.$message({
+                          type: "error",
+                          message: "选项修改失败!"
+                        });
+                        return;
+                      }
+                    );
+                }
+                i = i + 1;
+              }
+              while (i < this.exercises[index].options.length) {
+                {
+                  this.$http
+                    .put("/api/question/deleteChoice", 
+                    {
+                      exerciseChoiceId: this.exercises[index].options[i].id
+                    },
+                    {
+                      headers: {
+                        Authorization: "Bearer " + localStorage.getItem("token")
+                      }
+                    })
+                    .then(
+                      response => {
+                        if (response.status === 200) {
+                        } else {
+                          this.$message({
+                            type: "error",
+                            message: "选项删除失败!"
+                          });
+                          return;
+                        }
+                      },
+                      response => {
+                        this.$message({
+                          type: "error",
+                          message: "选项删除失败!"
+                        });
+                        return;
+                      }
+                    );
+                }
+                i = i + 1;
+              }
             }
             // 修改习题信息
             this.$http
-              .put(
-                "/api/question/alterExercise",
-                exerciseEntity,
-                {
-                  headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token")
-                  }
+              .post("/api/question/alterExercise", exerciseEntity, {
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("token")
                 }
-              )
+              })
               .then(
                 response => {
                   if (response.status === 200) {
