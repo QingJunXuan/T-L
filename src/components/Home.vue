@@ -233,7 +233,6 @@
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }, {emulateJSON:false}).then(response => {
-                alert(response.bodyText);
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('username', this.ruleForm.account);
                 that.logining = false;
