@@ -106,7 +106,7 @@
           <div style="margin-top: 20px">
             <el-button size="mini" @click="saveEdit(i)">确认</el-button>
             <el-button size="mini" style="margin-left: 10px" @click="resetEdit(i)">重置</el-button>
-            <el-button size="mini" style="margin-left: 10px" @click="deletePreview(i)">移除</el-button>
+            <el-button size="mini" style="margin-left: 10px" @click="cancelEdit(i)">取消</el-button>
           </div>
         </div>
       </div>
@@ -153,10 +153,11 @@ export default {
     },
     getPreExercises() {
       this.exercises = [];
+      this.totalScore = 0;
       this.$http
         .get(
           // 传值chapterid
-          'http://localhost:8080/question/view?chapterId=' + this.id + '&type=preview',
+          '/api/question/view?chapterId=' + this.id + '&type=preview',
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -168,7 +169,7 @@ export default {
             if (response.status === 200) {
               let exerciseList = JSON.parse(response.bodyText);
               if (exerciseList.state === 1) {
-                let i = 0;
+                let i = 1;
                 while (i < exerciseList.data.length) {
                   this.exercises.push({
                     exerciseID: exerciseList.data[i].exercise.exerciseId,
@@ -211,13 +212,13 @@ export default {
         );
     },
     addPreOptions() {
-      this.exerciseNew.options.push({id: '', content: '请填写选项'});
+      this.exerciseNew.options.push({id: '', content: ''});
     },
     addPreview() {
       this.exercises.push({
         exerciseID: 0,
         question: "",
-        options: [{id: '', content: '请填写选项'}, {id: '', content: '请填写选项'}],
+        options: [{id: '', content: ''}, {id: '', content: ''}],
         score: 0,
         answer: 0,
         detail: "",
@@ -235,14 +236,16 @@ export default {
         type: "warning"
       })
         .then(() => {
-          /*
           this.$http
-              .post(
-                "http://localhost:8080/question/deleteExercise?exerciseId=" + this.exercises[index].exerciseID,
+              .put(
+                "/api/question/deleteExercise",
                 {
+                  params: {
+                    exerciseId: this.exercises[index].exerciseID
+                  },
                   headers: {
                     Authorization: "Bearer " + localStorage.getItem("token")
-                  }
+                  },
                 }
               )
               .then(
@@ -252,6 +255,8 @@ export default {
                       type: "success",
                       message: "习题删除成功!"
                     });
+                    this.totalScore -= this.exercises[index].score;
+                    this.getPreExercises();
                   } else {
                     this.$message({ type: "error", message: "习题删除失败!" });
                     return;
@@ -261,9 +266,7 @@ export default {
                   this.$message({ type: "error", message: "习题删除失败!" });
                   return;
                 }
-              );*/
-          this.totalScore -= this.exercises[index].score;
-          this.exercises.splice(index, 1);
+              );
         })
         .catch(() => {
           this.$message({
@@ -289,7 +292,7 @@ export default {
               };
               this.$http
                 .post(
-                  "http://localhost:8080/question/addChoice",
+                  "/api/question/addChoice",
                   optionEntity,
                   {
                     headers: {
@@ -299,22 +302,37 @@ export default {
                 )
                 .then(
                   response => {
-                    if (response.status === 200) {} else {
+                    if (response.status === 200) {
+                      this.$message({
+                      type: "success",
+                      message: "习题添加成功!"
+                    });
+                    this.getPreExercises();
+                    } else {
                       this.$message({
                         type: "error",
-                        message: "选项添加失败!"
+                        message: "习题添加失败!"
                       });
                       return;
                     }
                   },
                   response => {
-                    this.$message({ type: "error", message: "选项添加失败!" });
+                    this.$message({ type: "error", message: "习题添加失败!" });
                     return;
                   }
                 );
             }
     },
     saveEdit(index) {
+      for (let i = 0;i < this.exerciseNew.options.length;i++) {
+        if (this.this.exerciseNew.options[i] === '') {
+          this.$message({
+          message: "请将习题内容填写完整！",
+          type: "warning"
+        });
+        return;
+        }
+      }
       if (
         this.exerciseNew.question === "" ||
         Number(this.exerciseNew.score) === 0 ||
@@ -334,22 +352,22 @@ export default {
             type: "warning"
           });
         } else {
-          /*
           if (this.exerciseNew.new) {
+            // 添加
             let exerciseEntity = {
             // 传值chapterid
-            chapterId: '1',
+            chapterId: this.id,
             exerciseType: 1,
             exerciseNumber: index + 1,
             exerciseContent: this.exerciseNew.question,
-            exerciseAnswer: this.exerciseNew.answer,
+            exerciseAnswer: String.fromCharCode(this.exerciseNew.answer + 65),
             exerciseAnalysis: this.exerciseNew.detail,
             exercisePoint: this.exerciseNew.score
           };
             let eID = 0;
             this.$http
               .post(
-                "http://localhost:8080/question/addExercise",
+                "/api/question/addExercise",
                 exerciseEntity,
                 {
                   headers: {
@@ -361,11 +379,6 @@ export default {
               .then(
                 response => {
                   if (response.status === 200) {
-                    this.$message({
-                      type: "success",
-                      message: "习题添加成功!"
-                    });
-                    alert(response.bodyText);
                     this.addOptions(JSON.parse(response.bodyText).data.exerciseId);
                   } else {
                     this.$message({ type: "error", message: "习题添加失败!" });
@@ -379,10 +392,12 @@ export default {
               );
           }
           else {
+            // 编辑
+            alert(111)
             let exerciseEntity = {
               exerciseId: this.exercises[index].exerciseID,
             // 传值chapterid
-            chapterId: 1,
+            chapterId: this.id,
             exerciseType: 1,
             exerciseNumber: index + 1,
             exerciseContent: this.exerciseNew.question,
@@ -391,21 +406,22 @@ export default {
             exercisePoint: this.exerciseNew.score
           };
             let i = 0;
-            alert(this.exercises[index].exerciseID);
             // 选项长度变大
+            alert(this.exerciseNew.options.length)
             if (this.exercises[index].options.length <= this.exerciseNew.options.length) {
               while (i < this.exercises[index].options.length) {
               if (
                 this.exercises[index].options[i].content !== this.exerciseNew.options[i].content
               ) {
                 let optionEntity = {
+                  id: this.exercises[index].options[i].id,
                   exerciseId: this.exercises[index].exerciseID,
                   exerciceChoiceId: String.fromCharCode(i + 65),
                   choice: this.exerciseNew.options[i].content
                 };
                 this.$http
                   .put(
-                    "http://localhost:8080/question/alterChoice",
+                    "/api/question/alterChoice",
                     optionEntity,
                     {
                       headers: {
@@ -438,7 +454,6 @@ export default {
               }
               i = i + 1;
             }
-            alert(i);
             while (i < this.exerciseNew.options.length) {
               let optionEntity = {
                 exerciseId: this.exercises[index].exerciseID,
@@ -447,7 +462,7 @@ export default {
               };
               this.$http
                 .post(
-                  "http://localhost:8080/question/addChoice",
+                  "/api/question/addChoice",
                   optionEntity,
                   {
                     headers: {
@@ -481,6 +496,7 @@ export default {
             else {
             while (i < this.exerciseNew.options.length) {
               let optionEntity = {
+                id: this.exerciseNew.options[i].id,
                 exerciseId: this.exerciseNew.exerciseID,
                 exerciceChoiceId: String.fromCharCode(i + 65),
                 choice: this.exerciseNew.options[i].content
@@ -489,7 +505,7 @@ export default {
                 this.exercises[index].options[i].content !== this.exerciseNew.options[i].content
               ) {this.$http
                 .put(
-                  "http://localhost:8080/question/alterChoice",
+                  "/api/question/alterChoice",
                   optionEntity,
                   {
                     headers: {
@@ -523,8 +539,11 @@ export default {
               {
                 this.$http
                   .put(
-                    "http://localhost:8080/question/deleteChoice?exerciseChoiceId=" + this.exercises[index].options[i].id,
+                    "/api/question/deleteChoice?",
                     {
+                      params: {
+                        exerciseChoiceId: this.exercises[index].options[i].id
+                      },
                       headers: {
                         Authorization: "Bearer " + localStorage.getItem("token")
                       }
@@ -559,7 +578,7 @@ export default {
             // 修改习题信息
             this.$http
               .put(
-                "http://localhost:8080/question/alterExercise",
+                "/api/question/alterExercise",
                 exerciseEntity,
                 {
                   headers: {
@@ -574,6 +593,7 @@ export default {
                       type: "success",
                       message: "习题编辑成功!"
                     });
+                    this.getPreExercises();
                   } else {
                     this.$message({ type: "error", message: "习题编辑失败!" });
                     return;
@@ -584,18 +604,24 @@ export default {
                   return;
                 }
               );
-          }*/
-          this.totalScore = sum;
+          }
+          //this.totalScore = sum;
           this.exerciseNew.edit = false;
           this.exerciseNew.new = false;
-          this.exercises.splice(index, 1, this.exerciseNew);
-          //this.getPreExercises();
+          //this.exercises.splice(index, 1, this.exerciseNew);
           this.addButton = true;
         }
       }
     },
     resetEdit(index) {
       this.exerciseNew = this.objDeepCopy(this.exercises[index]);
+    },
+    cancelEdit(index) {
+      this.exercises[index].edit = false;
+      this.exerciseNew = {};
+      if (this.exercises[index].new) {
+        this.exercises.splice(index, 1);
+      }
     },
     objDeepCopy(source) {
       let sourceCopy = source instanceof Array ? [] : {};

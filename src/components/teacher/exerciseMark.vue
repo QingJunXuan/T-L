@@ -228,7 +228,7 @@ export default {
       this.$http
         .get(
           // 传值chapterid
-          "http://localhost:8080/question/view?chapterId=" +
+          "/api/question/view?chapterId=" +
             this.chapterID +
             "&type=preview",
           {
@@ -242,7 +242,7 @@ export default {
             if (response.status === 200) {
               let exerciseList = JSON.parse(response.bodyText);
               if (exerciseList.state === 1) {
-                let i = 0;
+                let i = 1;
                 while (i < exerciseList.data.length) {
                   if (exerciseList.data[i].exercise.exerciseType === 3) {
                     this.question.push({
@@ -269,7 +269,7 @@ export default {
       this.$http
         .get(
           // 传值班级号
-          "http://localhost:8080/getStudentsByClassID?courseClassID=" + this.classID,
+          "/api/getStudentsByClassID?courseClassID=" + this.classID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -322,7 +322,7 @@ export default {
     getAnswers(index, exerciseId, studentId) {
       this.$http
         .get(
-          "http://localhost:8080/question/findOneAnswer?exerciseId=" +
+          "/api/question/findOneAnswer?exerciseId=" +
             exerciseId +
             "&studentId=1",
           // + studentId

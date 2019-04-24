@@ -81,7 +81,7 @@ export default {
       this.$http
         .get(
           // 传值班级号
-          "http://localhost:8080/getStudentsByClassID?courseClassID=" + this.classID,
+          "/api/getStudentsByClassID?courseClassID=" + this.classID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")

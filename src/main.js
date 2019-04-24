@@ -28,7 +28,7 @@ router.beforeEach((to, from, next) => {
     next()
   }
 });
-//Vue.http.options.emulateJSON = true
+Vue.http.options.emulateJSON = true
 
 //Vue.http.options.emulateHTTP = true
 /* eslint-disable no-new */

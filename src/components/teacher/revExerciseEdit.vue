@@ -272,7 +272,7 @@ export default {
       this.$http
         .get(
           // 传值chapterid
-          'http://localhost:8080/question/view?chapterId=' + this.id + '&type=review',
+          '/api/question/view?chapterId=' + this.id + '&type=review',
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
