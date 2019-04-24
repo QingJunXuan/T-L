@@ -229,7 +229,7 @@
             let that = this;
             if (valid) {
               that.logining = true;
-              that.$http.post('http://localhost:8080/auth', {
+              that.$http.post('/api/auth', {
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }).then(response => {

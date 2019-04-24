@@ -1,10 +1,18 @@
 <template>
-  <div style="height:550px">
+  <div style="height:700px">
     <el-col :span="20" :offset="2">
       <el-row :gutter="40">
         <el-col :span="3" style="margin-top:10px">
           <el-button type="primary" size="mini" @click="isPlus=true">添加课程</el-button>
         </el-col>
+      </el-row>
+      <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
+        <el-row style="padding:30px">还没有课？</el-row>
+        <el-row>
+          点击上方的
+          <span style="color:darkcyan;font-weight:bold">添加课程</span>，输入专属
+          <span style="color:darkcyan;font-weight:bold">邀请码</span>加入课程吧！
+        </el-row>
       </el-row>
       <el-row :gutter="40">
         <el-col :span="8" v-for="(item,index) in items" :key="index">
@@ -12,7 +20,7 @@
             <el-row class="top">
               <p
                 id="name"
-                @click="courseDetail(item.courseInfo.courseID)"
+                @click="courseDetail(item.courseInfo.courseID,item.courseClass.id)"
               >{{item.courseInfo.courseName}}</p>
               <el-col :span="5" :offset="18" style="margin-top:10px">
                 <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
@@ -68,6 +76,7 @@ export default {
   name: "sCourseManage",
   data() {
     return {
+      noCourse: true,
       code: "",
       isPlus: false,
       isConfirm: false,
@@ -85,7 +94,7 @@ export default {
           currentExerciseChapter: -1
         }
       },
-      chapterNameList:[],
+      chapterNameList: [],
       items: [
         {
           courseInfo: {
@@ -132,20 +141,7 @@ export default {
       ]
     };
   },
-  created() {
-    axios
-      .get("/api/getStuCourseList", {
-        headers: {
-          Authorization:
-            "Bearer "+localStorage.getItem("token")
-        },
-        params: {
-          studentID: 1
-        }
-      })
-      .then(resp => {
-        this.items = resp.data.data;
-       /*  var length = this.items.length;
+  /*  var length = this.items.length;
         var test=new Array()
         for (var i = 0; i < length; i++) {
           console.log(i, "in for");
@@ -170,7 +166,25 @@ export default {
               console.log(err);
             });
         } */
-        
+  created() {
+    axios
+      .get("/api/getStuCourseList", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token")
+        },
+        params: {
+          studentID: 1
+        }
+      })
+      .then(resp => {
+        if (resp.data.state == 1) {
+          this.items = resp.data.data;
+          var length = this.items.length;
+          if (length != 0) {
+            this.noCourse = false;
+          }
+        }
+
         console.log(resp, "resp");
         console.log(resp.data, "resp.data");
         console.log(this.items, "items");
@@ -181,11 +195,11 @@ export default {
   },
   methods: {
     submit: function() {
+      //获取课程信息，进行确认
       axios
         .get("/api/getCourseByCode", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseCode: this.code
@@ -202,13 +216,13 @@ export default {
       this.isConfirm = true;
     },
     confirm() {
+      //确认添加课程
       this.isPlus = false;
       this.isConfirm = false;
       axios
         .get("/api/joinCourse", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             studentID: 1,
@@ -226,11 +240,12 @@ export default {
         });
       this.code = "";
     },
-    courseDetail: function(courseID) {
+    courseDetail: function(courseID, classID) {
       this.$router.push({
         path: "/student/courseDetail",
         query: {
-          courseID: courseID
+          courseID: courseID,
+          classID: classID
         }
       });
     },

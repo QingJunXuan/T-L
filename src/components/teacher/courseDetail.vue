@@ -74,12 +74,15 @@
           </el-row>
         </div>
         <div v-show="isGrade" class="gradeBack">
-          <el-col :span="10" :offset="7" v-for="(item,index) in items" :key="index">
+          <el-col :span="10" :offset="7" v-for="(item,index) in tree" :key="index">
+            <div v-if="gradeItem(index)">
             <el-row style="padding-bottom:20px">
-              <el-card shadow="never" class="grade">
-                <el-button type="text" @click="grade(item.id)">{{item.content}}</el-button>
+              <el-card shadow="hover" class="grade">
+                <p style="margin-bottom:0px">{{item.contentName+"（"+item.exerciseDeadline_2+"）"}}</p>
+                <el-button type="text" @click="grade(item.id)">点击进入评分</el-button>
               </el-card>
             </el-row>
+            </div>
           </el-col>
         </div>
       </div>
@@ -155,7 +158,24 @@ export default {
               subCatalog: []
             }
           ]
-        }
+        },
+        {
+          id: 2,
+          createTime: "2019-03-30T06:16:14.000+0000",
+          updateTime: "2019-03-31T00:36:54.000+0000",
+          courseID: 1,
+          contentName: "Java I/O",
+          parentID: 0,
+          siblingID: 0,
+          content: "一",
+          exerciseVisible_1: false,
+          exerciseVisible_2: false,
+          exerciseDeadline_1: "2019-04-27",
+          exerciseDeadline_2: "2019-04-27",
+          exerciseTotal_1: 100,
+          exerciseTotal_2: 100,
+          subCatalog: []
+          }
       ],
       items: [
         {
@@ -249,9 +269,12 @@ export default {
           }
         )
         .then(resp => {
-          console.log("notice success");
+          console.log("notice success",resp.data);
+          
            if (resp.data.state == 1) {
             this.$message("修改成功");
+          }else{
+            this.$message(resp.data.message)
           }
         })
         .catch(err => {
@@ -298,6 +321,15 @@ export default {
         this.isNotice = false;
         this.isLesson = true;
         this.isGrade = false;
+      }
+    },
+    gradeItem(index){
+      var currentDate = new Date()
+      var stringDate=this.tree[index].exerciseDeadline_2
+      var deadDate=new Date(stringDate)
+      //console.log(stringDate,deadDate,currentDate)
+      if(deadDate<currentDate){
+        return true
       }
     },
     grade(id) {
@@ -597,7 +629,7 @@ body {
   padding-top: 50px;
 }
 .grade {
-  height: 80px;
+  height: 100px;
 }
 
 .el-tree {

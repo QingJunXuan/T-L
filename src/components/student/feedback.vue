@@ -29,10 +29,12 @@
   </el-row>
 </template>
 <script>
+import axios from 'axios';
 export default {
   name:'feedback',
   data() {
     return {
+      courseClassID:0,
       rate: null,
       textarea: "",
       half:true,
@@ -45,6 +47,27 @@ export default {
       });
     },
     submit(){
+       const routerParams = this.$route.query.courseClassID
+       this.courseClassID=routerParams
+       var params = new URLSearchParams()
+        params.append("courseClassID",this.courseClassID)
+        params.append("studentId",1)
+        params.append("comment",this.textarea)
+        params.append('rate',this.rate)
+      axios.post('/api/addClassComment',params, {
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization:
+                  "Bearer "+localStorage.getItem("token")
+              }
+            }).then(resp=>{
+console.log(resp.data,"feedback");
+            if(resp.data.state==1){
+              this.$message("提交成功")
+            }
+            }).catch(err=>{
+              console.log(err)
+            })
 
     }
   }

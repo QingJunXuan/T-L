@@ -79,6 +79,7 @@ export default {
   data() {
     return {
       courseID: 1,
+      classID: 1,
       isNotice: false,
       isLesson: true,
       isAnalysis: false,
@@ -88,7 +89,7 @@ export default {
       showButton: true,
 
       dataIndex: 0,
-      graphTree:[],
+      graphTree: [],
       data: [
         {
           name: "start",
@@ -144,10 +145,12 @@ export default {
   created() {
     //获得课程目录
     console.log(this.courseID);
-    const routerParams = this.$route.query.courseID;
-    this.courseID = routerParams;
+    const routerParams1 = this.$route.query.courseID;
+    this.courseID = routerParams1;
+    const routerParams2 = this.$route.query.classID;
+    this.classID = routerParams2;
     console.log(this.courseID);
-    this.getChapterGraph()
+    this.getChapterGraph();
     this.getNotice();
     this.getLesson();
   },
@@ -156,30 +159,30 @@ export default {
     this.draw();
   },
   methods: {
-    getChapterGraph(){
-       axios
-      .get("/api/getChapterRelationByCourseID",{
-         headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+    getChapterGraph() {
+      axios
+        .get("/api/getChapterRelationByCourseID", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
-        params:{courseID:this.courseID}
-      })
-      .then(resp => {
-        console.log(resp.data);
-        this.graphTree=resp.data.data
-        this.init()
-      })
-      .catch(err => {
-        console.log(err);
-      });
+          params: { courseID: this.courseID }
+        })
+        .then(resp => {
+          console.log(resp.data);
+          if (resp.data.state == 1) {
+            this.graphTree = resp.data.data;
+            this.init();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     getNotice() {
       axios
         .get("/api/getNoticeByCouID", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
@@ -187,7 +190,9 @@ export default {
         })
         .then(resp => {
           console.log(resp.data, "notice data");
-          this.notice = resp.data.data.courseNotice;
+          if (resp.data.state == 1) {
+            this.notice = resp.data.data.courseNotice;
+          }
         })
         .catch(err => {
           console.log(err);
@@ -197,15 +202,16 @@ export default {
       axios
         .get("/api/getCourseCatalog", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
           }
         })
         .then(resp => {
-          this.tree = resp.data.data;
+          if (resp.data.state == 1) {
+            this.tree = resp.data.data;
+          }
           console.log(resp.data, "resp.data");
           console.log(this.courseID, "courseID");
         })
@@ -235,10 +241,10 @@ export default {
       }
     },
     toAnalysis() {
-      this.$router.push({path: '/student/studentAnalysis'})
+      this.$router.push({ path: "/student/studentAnalysis" });
     },
     handleNodeClick(object) {
-      console.log(object,"node-object");
+      console.log(object, "node-object");
       if (object.subCatalog.length == 0) {
         this.$router.push({
           path: "chapterDetail/point",
@@ -316,7 +322,10 @@ export default {
     },
     feedback() {
       this.$router.push({
-        path: "/student/feedback"
+        path: "/student/feedback",
+        query: {
+          courseClassID: this.classID
+        }
       });
     },
     init() {
@@ -368,10 +377,10 @@ export default {
       }
       console.log(this.data, "this.data");
       console.log(this.links, "this.links");
-      this.draw()
+      this.draw();
     },
     draw() {
-      console.log("draw")
+      console.log("draw");
       var init = this.$refs.graph;
       var myChart = this.$echarts.init(init);
       var option = {
