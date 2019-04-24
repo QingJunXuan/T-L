@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin:0 auto;width:700px" v-if="haveRev">
-      <h4 align="start">
+      <h3 align="start">
         作业题（
         <span>{{totalPoint}}</span>分）
         <span v-show="isRated" style="font-size:14px">
@@ -12,7 +12,8 @@
           总得分:
           <span style="color:red;">{{totalScore}}</span> 分
         </span>
-      </h4>
+      </h3>
+      <h4 align="start" style="color:rgb(150,150,150)">截止时间：{{time}}</h4>
       <el-form ref="answer" :model="answer" v-show="before">
         <div
           style="margin-top:15px;font-size:14px"
@@ -173,6 +174,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      time:"2019-01-01",
       haveRev: false,
       half: true,
       before: true,
@@ -385,6 +387,28 @@ export default {
     //this.test();
   },
   methods: {
+      getTime(){
+      axios
+        .get("/api/getChapterByID", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          },
+          params: {
+            chapterId: this.sid
+          }
+        })
+        .then(resp => {
+          console.log("pre", resp.data);
+          if (resp.data.state == 1) {
+            console.log(resp.data.data,"time")
+            //this.time = resp.data.data.exerciseDeadline_2
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+
+    },
     test() {
       for (var i = 0; i < this.exercises.length; i++) {
         this.totalPoint += this.exercises[i].exercise.exercisePoint;
@@ -394,6 +418,7 @@ export default {
     getRev() {
       const sid = this.$route.query.srevid;
       this.sid = sid;
+      this.getTime()
       axios
         .get("/api/question/view", {
           headers: {

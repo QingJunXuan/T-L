@@ -40,7 +40,8 @@ export default {
           //this.tree = resp.data.data;
           console.log(this.chapterID, "chapterid");
           console.log(resp.data, "chapter content");
-          this.point = resp.data.data;
+          if(resp.data.state==1){
+          this.point = resp.data.data;}
           //console.log(this.courseID,"courseID");
         })
         .catch(err => {

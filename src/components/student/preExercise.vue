@@ -1,11 +1,11 @@
 <template>
   <div>
     <div style="margin:0 auto;width:700px" v-if="havePre">
-      <h4 align="start">
+      <h3 align="start">
         客观题（
         <span>{{totalPoint}}</span>分）
         <span v-show="after">得分：{{totalScore}} 分</span>
-      </h4>
+      </h3>
       <el-form ref="answer" :model="answer" v-show="before">
         <div
           style="margin-top:15px;font-size:14px"
@@ -148,7 +148,7 @@ export default {
   data() {
     return {
       isScored: false,
-      havePre: false,
+      havePre: true,
       before: true,
       after: false,
       beforeRate: true,
@@ -344,6 +344,7 @@ export default {
     }
   },
   methods: {
+  
     getPre() {
       const sid = this.$route.query.spreid;
       this.sid = sid;
