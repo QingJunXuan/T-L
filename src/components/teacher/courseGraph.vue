@@ -1,15 +1,12 @@
 <template>
   <el-container>
-        <el-col :span="20" :offset="2">
-          <div
-            style="height:280px"
-            ref="graph"
-          ></div>
-        </el-col>
+    <el-col :span="20" :offset="2">
+      <div style="height:480px" ref="graph"></div>
+    </el-col>
   </el-container>
 </template>
 <script>
-import axios from 'axios'
+import axios from "axios";
 export default {
   name: "tCourseGraph",
   data() {
@@ -18,87 +15,29 @@ export default {
         width: window.screen.width
       },
       dataIndex: 0,
-      list:[],
-      data:[{
-        name:"start",
-        x:200,
-        y:0
-      }],
-      links:[]
-     /*  data: [
+      list: [],
+      data: [
         {
           name: "start",
           x: 200,
           y: 0
-        },
-        {
-          name: "软件工程",
-          x: 100,
-          y: 100
-        },
-        {
-          name: "web",
-          x: 300,
-          y: 100
-        },
-        {
-          name: "软件项目与过程管理",
-          x: 220,
-          y: 270
         }
-      ],  *///node：name+坐标信息
-    
-    /* links: [
-        {
-          source: "start",
-          target: "软件工程",
-          label: {
-            normal: {
-              show: false
-            }
-          }
-          
-        },
-        {
-          source: "start",
-          target: "web",
-          label: {
-            normal: {
-              show: false
-            }
-          }
-        },
-        {
-          source: "软件工程",
-          target: "软件项目与过程管理",
-          label: {
-            normal: {
-              show: false
-            }
-          },
-          lineStyle: {
-            normal: { curveness: 0 }
-          }
-        }
-      ], //连线信息
-
-      allCourse: [],
-      loading: true
-    */ };
+      ],
+      links: []
+    };
   },
   created() {
     //获取课程之间的关系，data[]，links[],设置参数
     axios
-      .get("/api/getAllCoursesRelation",{
-         headers: {
-          Authorization:
-            "Bearer "+localStorage.getItem("token")
+      .get("/api/getAllCoursesRelation", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token")
         }
       })
       .then(resp => {
         console.log(resp.data);
-        this.list=resp.data.data
-        this.set()
+        this.list = resp.data.data;
+        this.set();
       })
       .catch(err => {
         console.log(err);
@@ -110,64 +49,92 @@ export default {
     this.draw();
   },
   methods: {
-     set() {
-            var length = this.list.length
-            for (var i = 0; i < length; i++) {
-                
-                var num = this.list[i].preCoursesName.length;
-                var name = this.list[i].courseName.courseName
-                if (num == 0) {//无前继节点的，连接start
-                var addData = {
-                    name: name,
-                    //category: "test",
-                    x: Math.round(Math.random() * 1000),
-                    y: Math.round(Math.random() * 500)+100
-                };
-                this.data.push(addData)
-                    var addLink = {
-                        target: name,
-                        source: 'start',
-                        label: {
-                            normal: {
-                                show: false
-                            }
-                        },
-                       /*  lineStyle: {
-                            normal: { curveness: 0.2 }
-                        } */
-                    };
-                    this.links.push(addLink)
-                }
-                else {
-                    //所有前继节点
-                    var addData = {
-                    name: name,
-                    //category: "test",
-                    x: Math.round(Math.random() * 1000),
-                    y: Math.round(Math.random() * 500)+700
-                };
-                this.data.push(addData)
-                    for (var j = 0; j < num; j++) {
-                        var addLink = {
-                            target: name,
-                            source: this.list[i].preCoursesName[j].courseName,
-                            label: {
-                                normal: {
-                                    show: false
-                                }
-                            },
-                            /* lineStyle: {
-                                normal: { curveness: 0.2 }
-                            } */
-                        };
-                        this.links.push(addLink)
-                    }
-                }
+    set() {
+      // 计算data
+      let nodes = this.list.map(i => [i.courseName.courseName, {level: 0, preCourses: i.preCoursesName.map(k => k.courseName)}]);
+      for (let j = nodes.length - 1; j >= 0 ; j-- ) {
+        let curr = nodes[j][1]
+        if (curr.preCourses.length) {
+          curr.preCourses.forEach((p) => {
+            let findIndex = nodes.findIndex(node => node[0] === p)
+            nodes[findIndex] = [nodes[findIndex][0], Object.assign({}, nodes[findIndex][1], {level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1})]
+          })
+        }
+      }
+
+
+      let tempData = new Map()
+      nodes.forEach((n) => {
+        tempData.set(n[1].level, [])
+      })
+      nodes.forEach((n) => {
+        tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]))
+      })
+
+      let data = []
+      for (let item of tempData.entries()) {
+				console.log("TCL: set -> item", item[0])
+        item[1].forEach((value, index) => {
+          let addData = {
+            name: value,
+            x: Math.round((1000 / item[1].length) * index ),
+            y: (parseInt(item[0]) + 1) * -300
+          };
+          data.push(addData)
+        })
+      }
+      this.data = data
+			console.log("TCL: set -> data", data)
+
+      var length = this.list.length;
+      for (var i = 0; i < length; i++) {
+        var num = this.list[i].preCoursesName.length;
+        var name = this.list[i].courseName.courseName;
+        if (num == 0) {
+          //无前继节点的，连接start
+          // var addData = {
+          //   name: name,
+          //   //category: "test",
+          //   x: Math.round(Math.random() * 1000),
+          //   y: Math.round(Math.random() * 500) + 100
+          // };
+          // this.data.push(addData);
+          var addLink = {
+            target: name,
+            source: "start",
+            label: {
+              normal: {
+                show: false
+              }
             }
-            console.log(this.data,"this.data")
-            console.log(this.links,"this.links")
-            this.draw()
-        },
+          };
+          this.links.push(addLink);
+        } else {
+          //所有前继节点
+          // var addData = {
+          //   name: name,
+          //   x: Math.round(Math.random() * 1000),
+          //   y: Math.round(Math.random() * 500) + 700
+          // };
+          // this.data.push(addData);
+          for (var j = 0; j < num; j++) {
+            var addLink = {
+              target: name,
+              source: this.list[i].preCoursesName[j].courseName,
+              label: {
+                normal: {
+                  show: false
+                }
+              }
+            };
+            this.links.push(addLink);
+          }
+        }
+      }
+      console.log(this.data, "this.data");
+      console.log(this.links, "this.links");
+      this.draw();
+    },
     initGraph() {
       var init = this.$refs.graph;
       var graph = this.$echarts.init(init);
@@ -183,7 +150,7 @@ export default {
         ]
       };
       console.log("test");
-      //this.initGraph().setOption(option);
+      // this.initGraph().setOption(option);
       console.log("test2");
     },
     draw() {
