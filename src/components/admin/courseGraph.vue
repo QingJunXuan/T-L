@@ -278,13 +278,12 @@
               <span style="font-size:12px">开课</span>
             </el-button>
           </div>
-          <el-table :data="dupCourse" border  @row-click="rowClick">
+          <el-table :data="dupCourse" border @row-click="rowClick">
             <el-table-column label="点击下表对应行，对班级进行操作">
               <el-table-column prop="courseInfo.teacherName" label="教师" width="100"></el-table-column>
               <el-table-column prop="courseInfo.startTime" label="开课时间" width="180"></el-table-column>
               <el-table-column prop="courseInfo.endTime" label="结束时间"></el-table-column>
               <!-- <el-table-column prop="courseClasses" label="班级数"></el-table-column> -->
-
             </el-table-column>
             <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
           </el-table>
@@ -488,8 +487,58 @@ export default {
   methods: {
     set(length) {
       //var length = this.allCourse.length
+
+      // 计算节点位置
+      let nodes = this.allCourse.map(i => [
+        i.courseName.courseName,
+        { level: 0, subCourses: i.subCoursesName.map(k => k.courseName) }
+      ]);
+      for (let j = 0; j < nodes.length; j++) {
+        let curr = nodes[j][1];
+        if (curr.subCourses.length) {
+          curr.subCourses.forEach(p => {
+            let findIndex = nodes.findIndex(node => node[0] === p);
+            nodes[findIndex] = [
+              nodes[findIndex][0],
+              Object.assign({}, nodes[findIndex][1], { level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1 })
+            ];
+          });
+        }
+      }
+
+      let tempData = new Map();
+      nodes.forEach(n => {
+        tempData.set(n[1].level, []);
+      });
+      nodes.forEach(n => {
+        tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]));
+      });
+
+      let data = [];
+      for (let item of tempData.entries()) {
+        console.log("TCL: set -> item", item[0]);
+        item[1].forEach((value, index) => {
+          let addData = {
+            name: value,
+            x: Math.round((1000 / item[1].length) * index),
+            y: (parseInt(item[0]) + 1) * 300
+          };
+          data.push(addData);
+        });
+      }
+
+      data.push({
+        name: "start",
+        x: 0,
+        y: 0
+      });
+
+      this.data = data;
+      console.log("TCL: set -> data", data);
+
+      // 计算结束
+
       for (var i = 0; i < length; i++) {
-        
         var num = this.allCourse[i].preCoursesName.length;
         var name = this.allCourse[i].courseName.courseName;
 
@@ -501,15 +550,15 @@ export default {
         };
         this.data.push(addData); */
         if (num == 0) {
-          var nopre_x = Math.round(Math.random()*200) * 10
-          var nopre_y =Math.round(Math.random()*200)* 5+100
-          var addData = {
-          name: name,
-          //category: "test",
-          x: nopre_x,
-          y: nopre_y,
-        };
-         this.data.push(addData);
+        //   var nopre_x = Math.round(Math.random() * 200) * 10;
+        //   var nopre_y = Math.round(Math.random() * 200) * 5 + 100;
+        //   var addData = {
+        //     name: name,
+        //     //category: "test",
+        //     x: nopre_x,
+        //     y: nopre_y
+        //   };
+        //   this.data.push(addData);
           //无前继节点的，连接start
           var addLink = {
             target: name,
@@ -525,15 +574,15 @@ export default {
           };
           this.links.push(addLink);
         } else {
-          var nopre_x = Math.round(Math.random()*200)* 10
-          var nopre_y =Math.round(Math.random()*200) * 5+1200  //100+1000+100
-          var addData = {
-          name: name,
-          //category: "test",
-          x: nopre_x,
-          y: nopre_y,
-        };
-         this.data.push(addData);
+          // var nopre_x = Math.round(Math.random() * 200) * 10;
+          // var nopre_y = Math.round(Math.random() * 200) * 5 + 1200; //100+1000+100
+          // var addData = {
+          //   name: name,
+          //   //category: "test",
+          //   x: nopre_x,
+          //   y: nopre_y
+          // };
+          // this.data.push(addData);
 
           //所有前继节点
           for (var j = 0; j < num; j++) {
@@ -701,9 +750,9 @@ export default {
           //=======================给后端
           var form = Object.assign({}, this.ruleForm3);
           console.log(this.ruleForm3, "ruleForm3");
-          form.startTime=this.setTime(form.startTime)
-          form.endTime=this.setTime(form.endTime)
-          form.courseYear=this.getTime(form.courseYear)
+          form.startTime = this.setTime(form.startTime);
+          form.endTime = this.setTime(form.endTime);
+          form.courseYear = this.getTime(form.courseYear);
 
           console.log(form);
 
@@ -723,25 +772,21 @@ export default {
                 }
               })
               .then(resp => {
-                console.log(resp.data,"need")
+                console.log(resp.data, "need");
                 if (resp.data.state == 1) {
                   console.log(resp.data, "addClass");
                   var id = resp.data.data.courseID;
                   for (var i = 0; i < form.classNum; i++) {
-                    var params = new URLSearchParams()
-                    params.append("courseID",id)
-                    params.append("classNum",i+1)
+                    var params = new URLSearchParams();
+                    params.append("courseID", id);
+                    params.append("classNum", i + 1);
                     axios
-                      .post(
-                        "/api/addClass",
-                       params,
-                        {
-                          headers: {
-                            Authorization:
-                              "Bearer " + localStorage.getItem("token")
-                          }
+                      .post("/api/addClass", params, {
+                        headers: {
+                          Authorization:
+                            "Bearer " + localStorage.getItem("token")
                         }
-                      )
+                      })
                       .then(resp => {
                         console.log(resp.data, "addClassNum");
                         if (resp.data.state == 1) {
@@ -773,44 +818,40 @@ export default {
         if (valid) {
           var form = Object.assign({}, this.ruleForm4);
           //==========================================后端
-          form.startTime=this.setTime(form.startTime)
-          form.endTime=this.setTime(form.endTime)
-          form.courseYear=this.getTime(form.courseYear)
+          form.startTime = this.setTime(form.startTime);
+          form.endTime = this.setTime(form.endTime);
+          form.courseYear = this.getTime(form.courseYear);
 
-           var params = new URLSearchParams();
+          var params = new URLSearchParams();
           params.append("courseID", form.courseID),
-          params.append("teacherID", form.teacherID),
+            params.append("teacherID", form.teacherID),
             params.append("courseName", this.courseName),
             params.append("teacherName", form.teacherName),
             params.append("courseYear", form.courseYear),
             params.append("courseSemester", form.courseSemester),
             params.append("startTime", form.startTime),
             params.append("endTime", form.endTime),
-          axios
-            .post(
-              "/api/alterCourseInfo",
-              params,
-              {
+            axios
+              .post("/api/alterCourseInfo", params, {
                 headers: {
-                  'Content-Type':'application/x-www-form-urlencoded',
+                  "Content-Type": "application/x-www-form-urlencoded",
                   Authorization: "Bearer " + localStorage.getItem("token")
                 }
-              }
-            )
-            .then(resp => {
-              if (resp.data.state == 1) {
-                console.log(resp.data, "editClass");
+              })
+              .then(resp => {
                 if (resp.data.state == 1) {
-                  this.$message("修改成功");
-                } else {
-                  this.$message("修改失败");
-                  return -1;
+                  console.log(resp.data, "editClass");
+                  if (resp.data.state == 1) {
+                    this.$message("修改成功");
+                  } else {
+                    this.$message("修改失败");
+                    return -1;
+                  }
                 }
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
+              })
+              .catch(err => {
+                console.log(err);
+              });
         } else {
           console.log("error submit!!");
           return false;
@@ -826,7 +867,7 @@ export default {
     addCourse() {
       //data
       //计算坐标
-     /*  var addData = {
+      /*  var addData = {
         name: this.ruleForm1.courseName,
         category: "test",
         x: Math.round(Math.random() * 1000),
@@ -834,19 +875,57 @@ export default {
       };
       store.commit("addData", addData); */
 
-      
-      var name = this.ruleForm1.courseName
-      var num = this.ruleForm1.successor.length;
-      //所有前继节点
-      if (num == 0) {
+      let nodes = this.allCourse.map(i => [i.courseName.courseName, {level: 0, subCourses: i.subCoursesName.map(k => k.courseName)}]);
+      for (let j = 0; j < nodes.length ; j++ ) {
+        let curr = nodes[j][1]
+        if (curr.subCourses.length) {
+          curr.subCourses.forEach((p) => {
+            let findIndex = nodes.findIndex(node => node[0] === p)
+            nodes[findIndex] = [nodes[findIndex][0], Object.assign({}, nodes[findIndex][1], {level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1})]
+          })
+        }
+      }
 
-        var addData = {
-        name: name,
-        category: "test",
-        x: Math.round(Math.random()*200) * 10,
-        y: Math.round(Math.random() * 200)*5+100
-      };
-      store.commit("addData", addData);
+      let tempData = new Map()
+      nodes.forEach((n) => {
+        tempData.set(n[1].level, [])
+      })
+      nodes.forEach((n) => {
+        tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]))
+      })
+
+      let data = []
+      for (let item of tempData.entries()) {
+				console.log("TCL: set -> item", item[0])
+        item[1].forEach((value, index) => {
+          let addData = {
+            name: value,
+            x: Math.round((1000 / item[1].length) * index ),
+            y: (parseInt(item[0]) + 1) * 300
+          };
+          store.commit("addData", addData);
+        })
+      }
+
+      store.commit("addData", {
+        name: 'start',
+        x: 0,
+        y: 0
+      });
+
+      // this.data = data
+      // console.log("TCL: set -> data", data)
+      // var name = this.ruleForm1.courseName;
+      // var num = this.ruleForm1.successor.length;
+      // //所有前继节点
+      if (num == 0) {
+      //   var addData = {
+      //     name: name,
+      //     category: "test",
+      //     x: Math.round(Math.random() * 200) * 10,
+      //     y: Math.round(Math.random() * 200) * 5 + 100
+      //   };
+          // store.commit("addData", addData);
         //无前继节点的，连接start
         var addLink = {
           target: name,
@@ -862,14 +941,13 @@ export default {
         };
         store.commit("addLinks", addLink);
       } else {
-         var addData = {
-        name: name,
-        category: "test",
-        x: Math.round(Math.random() * 200)*10,
-        y: Math.round(Math.random() * 200)*5+1200 //100+1000+100
-      };
-      store.commit("addData", addData);
-
+        // var addData = {
+        //   name: name,
+        //   category: "test",
+        //   x: Math.round(Math.random() * 200) * 10,
+        //   y: Math.round(Math.random() * 200) * 5 + 1200 //100+1000+100
+        // };
+        // store.commit("addData", addData);
 
         for (var i = 0; i < num; i++) {
           var addLink = {
@@ -999,19 +1077,15 @@ export default {
       if (newName != oldName) {
         store.commit("editName", { name: newName, index: this.dataIndex });
         console.log(this.data);
-        var params = new URLSearchParams()
-        params.append("courseNameID",id)
-        params.append("courseName",newName)
+        var params = new URLSearchParams();
+        params.append("courseNameID", id);
+        params.append("courseName", newName);
         axios
-          .post(
-            "/api/alertCourseName",
-            params,
-            {
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("token")
-              }
+          .post("/api/alertCourseName", params, {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
             }
-          )
+          })
           .then(resp => {
             console.log(resp.data, "editCourseName");
             if (resp.message.state == 1) {
@@ -1200,19 +1274,15 @@ export default {
     //find
     addClassNum() {
       this.isAddClassNum = false;
-      var params = new URLSearchParams()
-        params.append("courseID",this.rowIndex.courseInfo.courseID)
-        params.append("classNum",this.rowIndex.courseClasses.length + 1)
+      var params = new URLSearchParams();
+      params.append("courseID", this.rowIndex.courseInfo.courseID);
+      params.append("classNum", this.rowIndex.courseClasses.length + 1);
       axios
-        .post(
-          "/api/addClass",
-         params,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token")
-            }
+        .post("/api/addClass", params, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
+        })
         .then(resp => {
           console.log("success");
           console.log(resp, "addClassNumresp");

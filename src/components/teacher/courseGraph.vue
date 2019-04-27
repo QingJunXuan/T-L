@@ -50,18 +50,17 @@ export default {
   },
   methods: {
     set() {
-      // 计算data
-      let nodes = this.list.map(i => [i.courseName.courseName, {level: 0, preCourses: i.preCoursesName.map(k => k.courseName)}]);
-      for (let j = nodes.length - 1; j >= 0 ; j-- ) {
+      // 计算节点位置
+      let nodes = this.list.map(i => [i.courseName.courseName, {level: 0, subCourses: i.subCoursesName.map(k => k.courseName)}]);
+      for (let j = 0; j < nodes.length ; j++ ) {
         let curr = nodes[j][1]
-        if (curr.preCourses.length) {
-          curr.preCourses.forEach((p) => {
+        if (curr.subCourses.length) {
+          curr.subCourses.forEach((p) => {
             let findIndex = nodes.findIndex(node => node[0] === p)
             nodes[findIndex] = [nodes[findIndex][0], Object.assign({}, nodes[findIndex][1], {level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1})]
           })
         }
       }
-
 
       let tempData = new Map()
       nodes.forEach((n) => {
@@ -78,13 +77,22 @@ export default {
           let addData = {
             name: value,
             x: Math.round((1000 / item[1].length) * index ),
-            y: (parseInt(item[0]) + 1) * -300
+            y: (parseInt(item[0]) + 1) * 300
           };
           data.push(addData)
         })
       }
+
+      data.push({
+        name: 'start',
+        x: 0,
+        y: 0
+      })
+
       this.data = data
-			console.log("TCL: set -> data", data)
+      console.log("TCL: set -> data", data)
+      
+      // 计算结束
 
       var length = this.list.length;
       for (var i = 0; i < length; i++) {
