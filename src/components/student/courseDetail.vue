@@ -17,7 +17,7 @@
     </el-row>
     <el-row>
       <div class="tabs">
-        <el-col :span="4" :offset="6">
+        <el-col :span="4" :offset="8">
           <div @click="showNotice" class="tabBack" :class="{'clickDiv':isNotice}">
             <el-button type="text" class="tab" :class="{'clickButton':isNotice}">公告</el-button>
           </div>
@@ -27,16 +27,10 @@
             <el-button type="text" class="tab" :class="{'clickButton':isLesson}">课程及练习</el-button>
           </div>
         </el-col>
-        <el-col :span="4">
-          <div @click="toAnalysis" class="tabBack" :class="{'clickDiv':isAnalysis}">
-            <el-button type="text" class="tab" :class="{'clickButton':isAnalysis}">学习分析</el-button>
-          </div>
-        </el-col>
       </div>
     </el-row>
     <el-row>
       <div>
-        <!-- style="background-color:rgba(118, 162, 163, 0.26);" -->
         <div v-show="isNotice" class="noticeBack">
           <el-col :span="10" :offset="7">
             <div class="notice">{{notice}}</div>
@@ -54,15 +48,6 @@
               :render-content="renderContent"
             ></el-tree>
           </el-col>
-        </div>
-        <div v-show="isAnalysis" class="analysisBack">
-          <el-row>
-            <el-col :span="12" :offset="6">
-              <p style="text-align:left">学习进度：</p>
-              <el-progress :text-inside="true" :stroke-width="18" :percentage="rate"></el-progress>
-            </el-col>
-          </el-row>
-          <el-row></el-row>
         </div>
       </div>
     </el-row>
@@ -82,7 +67,6 @@ export default {
       classID: 1,
       isNotice: false,
       isLesson: true,
-      isAnalysis: false,
       notice: "Java是一门面向对象编程语言.",
       rate: 20,
       lesson: null,
@@ -224,25 +208,13 @@ export default {
       if (this.isNotice == false) {
         this.isNotice = true;
         this.isLesson = false;
-        this.isAnalysis = false;
       }
     },
     showLesson() {
       if (this.isLesson == false) {
         this.isNotice = false;
         this.isLesson = true;
-        this.isAnalysis = false;
       }
-    },
-    showAnalysis() {
-      if (this.isAnalysis == false) {
-        this.isNotice = false;
-        this.isLesson = false;
-        this.isAnalysis = true;
-      }
-    },
-    toAnalysis() {
-      this.$router.push({ path: "/student/studentAnalysis" });
     },
     handleNodeClick(object) {
       console.log(object, "node-object");
@@ -508,10 +480,6 @@ body {
 }
 .lessonBack {
   padding: 20px 0;
-}
-.analysisBack {
-  padding: 20px 0;
-  height: 500px;
 }
 .el-tree {
   background-color: #fff;

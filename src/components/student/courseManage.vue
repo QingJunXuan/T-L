@@ -2,8 +2,11 @@
   <div style="height:700px">
     <el-col :span="20" :offset="2">
       <el-row :gutter="40">
-        <el-col :span="3" style="margin-top:10px">
+        <el-col :span="2" style="margin-top:10px">
           <el-button type="primary" size="mini" @click="isPlus=true">添加课程</el-button>
+        </el-col>
+        <el-col :span="2" style="margin-top:10px">
+          <el-button type="success" size="mini" @click="toAnalysis">课程分析</el-button>
         </el-col>
       </el-row>
       <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
@@ -196,6 +199,10 @@ export default {
       });
   },
   methods: {
+    
+    toAnalysis() {
+      this.$router.push({ path: "/student/studentAnalysis" ,query:{studentID:1}});
+    },
     submit: function() {
       //获取课程信息，进行确认
       axios

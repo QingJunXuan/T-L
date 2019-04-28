@@ -13,9 +13,6 @@
         <el-col :span="1" :offset="21">
           <el-button type="text" @click="stuDetail">学生</el-button>
         </el-col>
-        <el-col :span="2">
-          <el-button type="text" @click="couAnalysis">课程分析</el-button>
-        </el-col>
       </el-row>
     </el-row>
     <el-row>
@@ -577,15 +574,7 @@ export default {
         }
       });
     },
-    couAnalysis(){
-      this.$router.push({
-        path: '/teacher/courseAnalysis', 
-        query: {
-          courseID: this.courseID
-        }
-      });
-    }
-    }
+  }
 };
 </script>
 <style>

@@ -446,6 +446,7 @@ export default {
       .then(resp => {
         if (resp.data.state == 1) {
           this.allCourse = resp.data.data;
+          console.log(this.allCourse,"allcourse")
           var length = this.allCourse.length;
           if (length != 0) {
             this.set(length);

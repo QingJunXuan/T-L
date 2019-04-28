@@ -1,8 +1,8 @@
 <template>
   <el-container>
-        <el-col :span="20" :offset="2">
+        <el-col :span="24">
           <div
-            style="height:280px"
+            style="height:300px"
             ref="graph"
           ></div>
         </el-col>
@@ -21,7 +21,7 @@ export default {
       list:[],
       data:[{
         name:"start",
-        x:200,
+        x:500,
         y:0
       }],
       links:[]
@@ -120,8 +120,8 @@ export default {
                 var addData = {
                     name: name,
                     //category: "test",
-                    x: Math.round(Math.random() * 1000),
-                    y: Math.round(Math.random() * 500)+100
+                    x: Math.round(Math.random() * 100)*10,
+                    y: Math.round(Math.random() * 100)*5+100
                 };
                 this.data.push(addData)
                     var addLink = {
@@ -143,8 +143,8 @@ export default {
                     var addData = {
                     name: name,
                     //category: "test",
-                    x: Math.round(Math.random() * 1000),
-                    y: Math.round(Math.random() * 500)+700
+                    x: Math.round(Math.random() * 200)*10,
+                    y: Math.round(Math.random() * 100)*5+500
                 };
                 this.data.push(addData)
                     for (var j = 0; j < num; j++) {
@@ -206,8 +206,9 @@ export default {
           {
             type: "graph",
             layout: "none",
-            symbolSize: 40,
+            symbolSize: 30,
             color: "#ec7814",
+            //fontSize:30,
             roam: true,
             label: {
               normal: {

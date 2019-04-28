@@ -2,10 +2,13 @@
   <div style="height:700px">
     <el-col :span="20" :offset="2">
       <el-row>
-        <el-col :span="16" :offset="4">
+        <el-col :span="2" :offset="2" style="margin-top:30px;">
+          <el-button size="mini" type="success" @click="couAnalysis">课程分析</el-button>
+        </el-col>
+        <el-col :span="16">
           <el-card
-            style="margin-top:10px;height:300px;text-align:center"
-            body-style="{padding:'0px'}"
+            style="margin-top:10px;height:340px;text-align:center"
+            body-style="{padding:'0px'}" shadow="never"
           >
             <graph></graph>
           </el-card>
@@ -157,6 +160,14 @@ export default {
       });
   },
   methods: {
+    couAnalysis(){
+      this.$router.push({
+        path: '/teacher/courseAnalysis', 
+        query: {
+          teacherID: 1
+        }
+      });
+    },
     courseDetail: function(courseID, classID) {
       this.$router.push({
         path: "/teacher/courseDetail",

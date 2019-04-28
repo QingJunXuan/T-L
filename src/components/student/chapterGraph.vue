@@ -14,7 +14,13 @@ export default {
     return {
       dataIndex: 0,
       tree: [],
-      data: [
+      data:[{
+        name:'start',
+        x:500,
+        y:0
+      }],
+      links:[]
+    /*   data: [
         {
           name: "第一章",
           x: 200,
@@ -45,9 +51,6 @@ export default {
               show: false
             }
           }
-          /* lineStyle: {
-                    normal: { curveness: 0.1 }
-                } */
         },
         {
           source: "第一章",
@@ -57,9 +60,6 @@ export default {
               show: false
             }
           }
-          /* lineStyle: {
-                    normal: { curveness: 0.1 }
-                } */
         },
         {
           source: "第三章",
@@ -73,7 +73,7 @@ export default {
             normal: { curveness: 0 }
           }
         }
-      ] //连线信息
+      ] //连线信息 */
 
       //loading: true,
     };
@@ -85,7 +85,7 @@ export default {
         params:{courseID:id}
       })
       .then(resp => {
-        console.log(resp.data);
+        console.log(resp.data,"tree");
         this.tree=resp.data.data
       })
       .catch(err => {
@@ -113,22 +113,22 @@ export default {
       };
       console.log("test");
       this.initGraph().setOption(option);
-      console.log("test2");
     },
     handleClick(params) {},
     init() {
       var length = this.tree.length;
       for (var i = 0; i < length; i++) {
-        var addData = {
-          name: this.tree.content,
+        
+        //var num = this.tree[i].subCatalog.length;
+        var name = this.tree[i].contentName;
+        if (this.tree[i].parentID == 0) {
+          var addData = {
+          name: name,
           //category: "test",
-          x: Math.round(Math.random() * 500),
-          y: Math.round(Math.random() * 500) + 50
+          x: Math.round(Math.random() * 100)*10,
+          y: Math.round(Math.random() * 100)*5 + 50
         };
         this.data.push(addData);
-        //var num = this.tree[i].subCatalog.length;
-        var name = this.tree[i].content;
-        if (this.tree[i].parentID == 0) {
           //无前继节点的，连接start
           var addLink = {
             target: name,
@@ -145,6 +145,13 @@ export default {
           this.links.push(addLink);
         } else {
           //所有前继节点
+          var addData = {
+          name: name,
+          //category: "test",
+          x: Math.round(Math.random() * 100)*10,
+          y: Math.round(Math.random() * 100)*5 + 50
+        };
+        this.data.push(addData);
           for (var j = 0; j < num; j++) {
             var addLink = {
               target: name,
