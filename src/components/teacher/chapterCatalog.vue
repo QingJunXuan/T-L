@@ -157,6 +157,7 @@
 </template>
 
 <script>
+import bus from '../../bus.js'
 export default {
   name: "chapterCatalog",
   data() {
@@ -189,7 +190,8 @@ export default {
       chapterRules: {
         name: [{ required: true, message: "请输入章节名", trigger: "blur" }]
       },
-      newPoint: {}
+      newPoint: {},
+      reloadCatalog: false,
     };
   },
   methods: {
@@ -254,6 +256,7 @@ export default {
                   });
                   i++;
                 }
+                this.reloadCatalog = false;
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -684,11 +687,22 @@ export default {
         }
       }
       return sourceCopy;
-    }
+    },
+    getData(val) {
+          this.reloadCatalog = val;
+        }
   },
   created() {
     this.courseID = this.$route.query.id;
     this.getCatalog();
+    bus.$on('reloadCatalog', (val) => this.getData(val));
+  },
+  watch: {
+    reloadCatalog(val) {
+      if (val === true) {
+        this.getCatalog();
+      }
+    }
   }
 };
 </script>

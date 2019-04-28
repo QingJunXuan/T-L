@@ -303,17 +303,69 @@ export default {
     },
     init() {
       //var list = state.courseList
+      // 计算节点位置
+      let nodes = this.graphTree.map(i => [
+        i.chapterNode.contentName,
+        { level: 0, subCourses: i.subChapterNodes.map(k => k.contentName) }
+      ]);
+			console.log("TCL: init -> nodes", nodes)
+      for (let j = 0; j < nodes.length; j++) {
+        let curr = nodes[j][1];
+        if (curr.subCourses.length) {
+          curr.subCourses.forEach(p => {
+            let findIndex = nodes.findIndex(node => node[0] === p);
+            nodes[findIndex] = [
+              nodes[findIndex][0],
+              Object.assign({}, nodes[findIndex][1], { level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1 })
+            ];
+          });
+        }
+      }
+
+      let tempData = new Map();
+      nodes.forEach(n => {
+        tempData.set(n[1].level, []);
+      });
+      nodes.forEach(n => {
+        tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]));
+      });
+
+      let data = [];
+      for (let item of tempData.entries()) {
+        console.log("TCL: set -> item", item[0]);
+        item[1].forEach((value, index) => {
+          let addData = {
+            name: value,
+            x: Math.round((1000 / item[1].length) * index),
+            y: (parseInt(item[0]) + 1) * 300
+          };
+          data.push(addData);
+        });
+      }
+
+      data.push({
+        name: "start",
+        x: 0,
+        y: 0
+      });
+
+      this.data = data;
+      console.log("TCL: set -> data", data);
+
+      // 计算结束
+
+      
       var length = this.graphTree.length;
       for (var i = 0; i < length; i++) {
-        var addData = {
-          name: this.graphTree[i].chapterNode.content,
-          //category: "test",
-          x: Math.round(Math.random() * 500),
-          y: Math.round(Math.random() * 500) + 50
-        };
-        this.data.push(addData);
+        // var addData = {
+        //   name: this.graphTree[i].chapterNode.content,
+        //   //category: "test",
+        //   x: Math.round(Math.random() * 500),
+        //   y: Math.round(Math.random() * 500) + 50
+        // };
+        // this.data.push(addData);
         var num = this.graphTree[i].preChapterNodes.length;
-        var name = this.graphTree[i].chapterNode.content;
+        var name = this.graphTree[i].chapterNode.contentName;
         if (num == 0) {
           //无前继节点的，连接start
           var addLink = {
@@ -334,7 +386,7 @@ export default {
           for (var j = 0; j < num; j++) {
             var addLink = {
               target: name,
-              source: this.graphTree[i].preChapterNodes[j].content,
+              source: this.graphTree[i].preChapterNodes[j].contentName,
               label: {
                 normal: {
                   show: false

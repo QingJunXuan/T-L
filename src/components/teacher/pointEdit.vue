@@ -19,7 +19,7 @@
           <div id="editor"></div>
         </el-form-item>
         <el-form-item align="center">
-          <el-button type="primary" size="small" @click="save">保存</el-button>
+          <el-button type="primary" size="small" @click="save" :loading="loading">保存</el-button>
           <el-button size="small" @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import bus from '../../bus.js'
 import WangEditor from "wangeditor";
 export default {
   name: "chapterEdit",
@@ -47,7 +48,8 @@ export default {
         content: [
           { required: true, message: "请输入知识点内容", trigger: "blur" }
         ]
-      }
+      },
+      loading: false
     };
   },
   methods: {
@@ -80,7 +82,7 @@ export default {
                 this.pointContent = content.data.content;
                 this.pointForm.title = this.pointName;
                 this.pointForm.content = this.pointContent;
-                this.editor.txt.text(content.data.content);
+                this.editor.txt.html(content.data.content);
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -96,6 +98,7 @@ export default {
       this.pointForm.content = this.pointContent;
     },
     save() {
+      this.loading = true;
       this.$http
         .post(
           "/api/alertChapter",
@@ -118,11 +121,16 @@ export default {
             if (response.status === 200) {
               this.editor.txt.html('');
               this.getContents();
+              bus.$emit('reloadCatalog', true);
+              this.loading = false;
+              this.$message({ type: "success", message: "更新成功!" });
             } else {
+              this.loading = false;
               this.$message({ type: "error", message: "更新失败!" });
             }
           },
           response => {
+            this.loading = false;
             this.$message({ type: "error", message: "更新失败!" });
           }
         );
@@ -152,7 +160,7 @@ export default {
       "redo" // 重复
     ];
     this.editor.customConfig.onchange = () => {
-      this.pointForm.content = this.editor.txt.text();
+      this.pointForm.content = this.editor.txt.html();
     };
     this.editor.customConfig.debug =
       location.href.indexOf("wangeditor_debug_mode=1") > 0; // 开启debug模式
