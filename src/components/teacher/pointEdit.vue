@@ -28,15 +28,15 @@
 </template>
 
 <script>
-import bus from '../../bus.js'
+import bus from "../../bus.js";
 import WangEditor from "wangeditor";
 export default {
   name: "chapterEdit",
   data() {
     return {
       item: 0,
-      pointName: '',
-      pointContent: '',
+      pointName: "",
+      pointContent: "",
       editor: new WangEditor("#editor"),
       // 知识点
       pointForm: {
@@ -57,22 +57,18 @@ export default {
       this.item = this.$route.query.item;
     },
     getContents() {
-      this.pointName = '';
-      this.pointContent = '';
+      this.pointName = "";
+      this.pointContent = "";
       this.pointForm = {
         title: "",
         content: ""
-      }
+      };
       this.$http
-        .get(
-          "/api/getChapterByID?chapterID=" +
-            this.item.id,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token")
-            }
+        .get("/api/getChapterByID?chapterID=" + this.item.id, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
+        })
         .then(
           response => {
             if (response.status === 200) {
@@ -82,7 +78,11 @@ export default {
                 this.pointContent = content.data.content;
                 this.pointForm.title = this.pointName;
                 this.pointForm.content = this.pointContent;
-                this.editor.txt.html(content.data.content);
+                if (content.data.content !== null) {
+                  this.editor.txt.html(content.data.content);
+                } else {
+                  this.editor.txt.html("");
+                }
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -119,9 +119,9 @@ export default {
         .then(
           response => {
             if (response.status === 200) {
-              this.editor.txt.html('');
+              this.editor.txt.html("");
               this.getContents();
-              bus.$emit('reloadCatalog', true);
+              bus.$emit("reloadCatalog", true);
               this.loading = false;
               this.$message({ type: "success", message: "更新成功!" });
             } else {
@@ -164,11 +164,47 @@ export default {
     };
     this.editor.customConfig.debug =
       location.href.indexOf("wangeditor_debug_mode=1") > 0; // 开启debug模式
+      this.editor.customConfig.zIndex = 10;
     this.editor.create();
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
-    $route: "getParams"
+    $route(val) {
+      this.getParams();
+      this.getContents();
+    }
+  },
+  beforeRouteUpdate(to, from, next) {
+    if (
+      this.item.name !== this.pointForm.title ||
+      this.item.content !== this.pointForm.content
+    ) {
+      const answer = window.confirm("更改尚未保存，确认离开吗？");
+      if (answer) {
+        next();
+        return;
+      } else {
+        next(false);
+        return;
+      }
+    }
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    if (
+      this.item.name !== this.pointForm.title ||
+      this.item.content !== this.pointForm.content
+    ) {
+      const answer = window.confirm("更改尚未保存，确认离开吗？");
+      if (answer) {
+        next();
+        return;
+      } else {
+        next(false);
+        return;
+      }
+    }
+    next();
   }
 };
 </script>

@@ -506,6 +506,7 @@ export default {
       this.$router.push("/teacher/studentAnalysis");
     },
     // 获取列表
+    // 学生
     getStudentOptions(index) {
       this.$http
         .get(
@@ -541,6 +542,7 @@ export default {
           }
         );
     },
+    // 班级
     getClassOptions() {
       this.classOptions = [];
       this.studentOptions = [];
@@ -580,9 +582,11 @@ export default {
           }
         );
     },
+    // 教师
     getTeacherOptions() {
       // TODO: 获取教师列表
     },
+    // 学期
     getSemesterOptions() {
       this.semesterOptions = [];
       // 登录时存teacherID
@@ -617,6 +621,7 @@ export default {
           }
         );
     },
+    // 年份
     getYearOptions() {
       this.yearOptions = [];
       // 登录时存teacherID
@@ -648,7 +653,9 @@ export default {
           }
         );
     },
-    getChapterOptions() {
+    // 章节
+    getChapters() {
+      this.chapterList = [];
       this.chapterOptions = [];
       // 登录时存teacherID
       this.$http
@@ -658,7 +665,7 @@ export default {
         .then(
           response => {
             if (response.status === 200) {
-              let courseList = JSON.parse(response.bodyText);
+              let courseList = JSON.parse(response.bodyText)
               let i = 1;
               while (i <= courseList.data.length) {
                 this.chapterOptions.push({
@@ -667,7 +674,73 @@ export default {
                     "第" +
                     i +
                     "章-" +
-                    courseList.data[i].contentName
+                    courseList.data[i - 1].contentName
+                });
+                this.chapterList.push(courseList.data[i-1].contentName);
+                i++;
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    // 课前成绩
+    getPreGrades() {
+      this.gradeList = [];
+      // 登录时存teacherID
+      // TODO: studentID
+      this.$http
+        .get("/api/getCourseCatalog?courseID=" + this.courseID + "&studentID=1", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let scoreList = JSON.parse(response.bodyText)
+              let i = 0;
+              this.gradeList.push([]);
+              let last = this.gradeList.length - 1;
+              while (i <= scoreList.data.length) {
+                this.gradeList[last].push();
+                this.chapterList.push(courseList.data[i-1].contentName);
+                i++;
+              }
+              this.xData = this.chapterList;
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    // 课后成绩
+    getChapters() {
+      this.chapterList = [];
+      this.chapterOptions = [];
+      // 登录时存teacherID
+      this.$http
+        .get("/api/getCourseCatalog?courseID=" + this.courseID, {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let courseList = JSON.parse(response.bodyText)
+              let i = 1;
+              while (i <= courseList.data.length) {
+                this.chapterOptions.push({
+                  value: i-1,
+                  label:
+                    "第" +
+                    i +
+                    "章-" +
+                    courseList.data[i - 1].contentName
                 });
                 this.chapterList.push(courseList.data[i-1].contentName);
                 i++;
@@ -959,18 +1032,19 @@ export default {
     }
   },
   created() {
+    var that = this;
     this.courseID = this.$route.query.courseID;
+    this.getChapters();
     this.getClassOptions();
     this.getSemesterOptions();
     this.getYearOptions();
-    this.getChapterOptions();
-    this.xData = ['第一章', '第二章', '第三章']
     this.yData = [[88, 93, 90], [76, 85, 92], [89, 95, 90]];
     this.detail = new Array(4);
     this.studentMap = new Array(4);
-  },
-  mounted() {
-    this.drawChart();
+    setTimeout(function() {
+      alert(that.xData.length)
+      that.drawChart();    
+      }, 5000);
   },
   computed: {
     detailOptions() {

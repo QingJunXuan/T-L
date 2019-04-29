@@ -4,7 +4,13 @@
       <el-dialog title="请选择截止时间" :visible.sync="dialogTableVisible">
         <div align="center">
           <el-date-picker v-model="time" type="date" size="small"></el-date-picker>
-          <el-button @click="publish" :loading="publishLoading" type="primary" size="small" class="confirm-button">确认</el-button>
+          <el-button
+            @click="publish"
+            :loading="publishLoading"
+            type="primary"
+            size="small"
+            class="confirm-button"
+          >确认</el-button>
         </div>
       </el-dialog>
       <!-- 客观题 -->
@@ -170,24 +176,33 @@
         </div>
       </div>
       <div v-show="objectButton">
-        <el-button size="small" round style="margin-top: 20px" type="warning" plain @click="addReviewO">
+        <el-button
+          size="small"
+          round
+          style="margin-top: 20px"
+          type="warning"
+          plain
+          @click="addReviewO"
+        >
           <i class="el-icon-circle-plus-outline" style="margin-right: 6px"></i>添加客观题
         </el-button>
       </div>
       <!-- 主观题 -->
       <h4>主观题({{totalSubject}}分)</h4>
       <!-- 正常显示 -->
-      <div v-for="(item, i) in exercisesSub" :key="i+600" align="start" style="font-size: 14px" class="exercises">
+      <div
+        v-for="(item, i) in exercisesSub"
+        :key="i+600"
+        align="start"
+        style="font-size: 14px"
+        class="exercises"
+      >
         <div v-if="item.edit === false" :class="item.delete? 'is-deleted' : ''">
           <div>
             <span style="font-size: 15px">{{item.order}}.{{item.question}}（{{item.score}}分）</span>
           </div>
-          <div
-            class="answer-text"
-          >{{item.answer}}</div>
-          <div
-            class="detail"
-          >{{item.detail}}</div>
+          <div class="answer-text">{{item.answer}}</div>
+          <div class="detail">{{item.detail}}</div>
           <div style="margin-top: 15px;" v-if="!item.delete">
             <span>
               <!-- 进入编辑模式 -->
@@ -283,12 +298,24 @@
         </div>
       </div>
       <div v-show="subjectButton">
-        <el-button type="warning" plain round size="small" style="margin-top: 20px" @click="addReviewS">
+        <el-button
+          type="warning"
+          plain
+          round
+          size="small"
+          style="margin-top: 20px"
+          @click="addReviewS"
+        >
           <i class="el-icon-circle-plus-outline" style="margin-right: 6px"></i>添加主观题
         </el-button>
       </div>
       <div align="center" style="margin-top: 20px">
-        <el-button type="primary" @click="submitReview" :loading="submitLoading" :disabled="funcButton">保存</el-button>
+        <el-button
+          type="primary"
+          @click="submitReview"
+          :loading="submitLoading"
+          :disabled="funcButton"
+        >保存</el-button>
         <el-button type="success" @click="dialogTableVisible = true" :disabled="funcButton">发布</el-button>
         <el-button type="info" @click="getRevExercises" :disabled="funcButton">重置</el-button>
       </div>
@@ -370,7 +397,10 @@ export default {
               let content = JSON.parse(response.bodyText);
               if (content.state === 1) {
                 this.chapterInfo = content.data;
-                if(this.chapterInfo.exerciseDeadline_2 !== undefined || this.chapterInfo.exerciseDeadline_2 !== '') {
+                if (
+                  this.chapterInfo.exerciseDeadline_2 !== undefined ||
+                  this.chapterInfo.exerciseDeadline_2 !== ""
+                ) {
                   this.time = this.chapterInfo.exerciseDeadline_2;
                 }
               }
@@ -828,8 +858,8 @@ export default {
           this.exercisesSub[index] = this.objDeepCopy(this.subjectNew);
           this.exercisesSub[index].edit = false;
           if (!this.exercisesSub[index].new) {
-        this.exercisesSub[index].edited = true;
-      }
+            this.exercisesSub[index].edited = true;
+          }
           this.subjectNew = {};
           this.totalSubject += Number(this.exercisesSub[index].score);
           this.subjectButton = true;
@@ -1244,13 +1274,12 @@ export default {
         }
       }
       this.publishLoading = true;
-      var deadline = '';
-       if (typeof(this.time) !== 'string') {
-         deadline = this.time.Format("yyyy-MM-dd").toString();
-       }
-       else {
-         deadline = this.time;
-       }
+      var deadline = "";
+      if (typeof this.time !== "string") {
+        deadline = this.time.Format("yyyy-MM-dd").toString();
+      } else {
+        deadline = this.time;
+      }
       this.$http
         .post(
           "/api/alertChapter",
@@ -1261,9 +1290,12 @@ export default {
             parentID: this.chapterInfo.parentID,
             siblingID: this.chapterInfo.siblingID,
             content: this.chapterInfo.content,
-            exerciseTitle: this.chapterInfo.contentName + '练习题',
+            exerciseTitle: this.chapterInfo.contentName + "练习题",
+            exerciseVisible_1: this.chapterInfo.exerciseVisible_1,
             exerciseVisible_2: true,
+            exerciseDeadline_1: this.chapterInfo.exerciseDeadline_1,
             exerciseDeadline_2: deadline,
+            exerciseTotal_1: this.chapterInfo.exerciseTotal_1,
             exerciseTotal_2:
               Number(this.totalObject) + Number(this.totalSubject)
           },
@@ -1293,11 +1325,10 @@ export default {
           response => {
             this.$message({ type: "error", message: "习题发布失败!" });
             his.publishLoading = false;
-              this.dialogTableVisible = false;
+            this.dialogTableVisible = false;
             return;
           }
         );
-
     },
     objDeepCopy(source) {
       let sourceCopy = source instanceof Array ? [] : {};
@@ -1333,7 +1364,48 @@ export default {
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
-    $route: "getParams"
+    $route(val) {
+      this.getParams();
+      this.getChapterInfo();
+      this.getRevExercises();
+    }
+  },
+  beforeRouteUpdate(to, from, next) {
+    for (let i = 0; i < this.exercisesObj.length; i++) {
+      if (
+        this.exercisesObj[i].new ||
+        this.exercisesObj[i].edited ||
+        this.exercisesObj[i].edit ||
+        this.exercisesObj[i].delete
+      ) {
+        const answer = window.confirm("更改尚未保存，确认离开吗？");
+        if (answer) {
+          next();
+          return;
+        } else {
+          next(false);
+          return;
+        }
+      }
+    }
+    for (let j = 0; j < this.exercisesSub.length; j++) {
+      if (
+        this.exercisesSub[j].new ||
+        this.exercisesSub[j].edited ||
+        this.exercisesSub[j].edit ||
+        this.exercisesSub[j].delete
+      ) {
+        const answer = window.confirm("更改尚未保存，确认离开吗？");
+        if (answer) {
+          next();
+          return;
+        } else {
+          next(false);
+          return;
+        }
+      }
+    }
+    next();
   },
   beforeRouteLeave(to, from, next) {
     for (let i = 0; i < this.exercisesObj.length; i++) {
@@ -1387,9 +1459,9 @@ export default {
 }
 
 .exercises .answer-text {
-  border: 1px solid #dcdcdc; 
-  min-height: 80px; 
-  padding: 10px 15px 10px 15px; 
+  border: 1px solid #dcdcdc;
+  min-height: 80px;
+  padding: 10px 15px 10px 15px;
   margin-top: 15px;
   font-size: 14px;
 }

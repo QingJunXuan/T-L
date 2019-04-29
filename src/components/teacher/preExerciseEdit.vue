@@ -4,7 +4,13 @@
       <el-dialog title="请选择截止时间" :visible.sync="dialogTableVisible">
         <div align="center">
           <el-date-picker v-model="time" type="date" size="small"></el-date-picker>
-          <el-button @click="publish" :loading="publishLoading" type="primary" size="small" class="confirm-button">确认</el-button>
+          <el-button
+            @click="publish"
+            :loading="publishLoading"
+            type="primary"
+            size="small"
+            class="confirm-button"
+          >确认</el-button>
         </div>
       </el-dialog>
       <h4>客观题({{totalScore}}分)</h4>
@@ -12,9 +18,7 @@
         <!-- 正常显示 -->
         <div v-if="item1.edit === false" :class="item1.delete? 'is-deleted' : ''">
           <div style="margin-top: 8px">
-            <span
-              style="font-size: 15px"
-            >{{item1.order}}. {{item1.question}}（{{item1.score}}分）</span>
+            <span style="font-size: 15px">{{item1.order}}. {{item1.question}}（{{item1.score}}分）</span>
           </div>
           <div
             class="betweenspace"
@@ -246,7 +250,7 @@ export default {
       submitLoading: false,
       publishLoading: false,
       dialogTableVisible: false,
-      time: '',
+      time: ""
     };
   },
   methods: {
@@ -266,7 +270,10 @@ export default {
               let content = JSON.parse(response.bodyText);
               if (content.state === 1) {
                 this.chapterInfo = content.data;
-                if(this.chapterInfo.exerciseDeadline_1 !== undefined || this.chapterInfo.exerciseDeadline_1 !== '') {
+                if (
+                  this.chapterInfo.exerciseDeadline_1 !== undefined ||
+                  this.chapterInfo.exerciseDeadline_1 !== ""
+                ) {
                   this.time = this.chapterInfo.exerciseDeadline_1;
                 }
               }
@@ -836,14 +843,13 @@ export default {
           return;
         }
       }
-       this.publishLoading = true;
-       var deadline = '';
-       if (typeof(this.time) !== 'string') {
-         deadline = this.time.Format("yyyy-MM-dd").toString();
-       }
-       else {
-         deadline = this.time;
-       }
+      this.publishLoading = true;
+      var deadline = "";
+      if (typeof this.time !== "string") {
+        deadline = this.time.Format("yyyy-MM-dd").toString();
+      } else {
+        deadline = this.time;
+      }
       this.$http
         .post(
           "/api/alertChapter",
@@ -854,10 +860,13 @@ export default {
             parentID: this.chapterInfo.parentID,
             siblingID: this.chapterInfo.siblingID,
             content: this.chapterInfo.content,
-            exerciseTitle: this.chapterInfo.contentName + '练习题',
+            exerciseTitle: this.chapterInfo.contentName + "练习题",
             exerciseVisible_1: true,
+            exerciseVisible_2: this.chapterInfo.exerciseVisible_2,
             exerciseDeadline_1: deadline,
-            exerciseTotal_1: Number(this.totalScore)
+            exerciseDeadline_2: this.chapterInfo.exerciseDeadline_2,
+            exerciseTotal_1: Number(this.totalScore),
+            exerciseTotal_2: this.chapterInfo.exerciseTotal_2
           },
           {
             headers: {
@@ -923,7 +932,31 @@ export default {
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
-    $route: "getParams"
+    $route(val) {
+      this.getParams();
+      this.getPreExercises();
+      this.getChapterInfo();
+    }
+  },
+  beforeRouteUpdate(to, from, next) {
+    for (let i = 0; i < this.exercises.length; i++) {
+      if (
+        this.exercises[i].new ||
+        this.exercises[i].edited ||
+        this.exercises[i].edit ||
+        this.exercises[i].delete
+      ) {
+        const answer = window.confirm("更改尚未保存，确认离开吗？");
+        if (answer) {
+          next();
+          return;
+        } else {
+          next(false);
+          return;
+        }
+      }
+    }
+    next();
   },
   beforeRouteLeave(to, from, next) {
     for (let i = 0; i < this.exercises.length; i++) {
@@ -1001,5 +1034,4 @@ export default {
   margin-left: 10px;
   margin-bottom: 20px;
 }
-
 </style>

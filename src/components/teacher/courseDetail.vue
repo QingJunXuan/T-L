@@ -570,7 +570,8 @@ export default {
       this.$router.push({
         path: '/teacher/studentList',
         query: {
-          classID: this.classID
+          classID: this.classID,
+          courseID: this.courseID
         }
       });
     },
