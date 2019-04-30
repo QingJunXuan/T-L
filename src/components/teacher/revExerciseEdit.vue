@@ -1280,6 +1280,27 @@ export default {
       } else {
         deadline = this.time;
       }
+      let entity = {
+            id: this.chapterInfo.id,
+            courseID: this.chapterInfo.courseID,
+            contentName: this.chapterInfo.contentName,
+            parentID: this.chapterInfo.parentID,
+            siblingID: this.chapterInfo.siblingID,
+            content: this.chapterInfo.content === null? new String():this.chapterInfo.content,
+            exerciseTitle: this.chapterInfo.contentName + "练习题",
+            exerciseVisible_1: this.chapterInfo.exerciseVisible_1,
+            exerciseVisible_2: 1,
+            exerciseDeadline_1: this.chapterInfo.exerciseDeadline_1,
+            exerciseDeadline_2: deadline,
+            exerciseTotal_1: this.chapterInfo.exerciseTotal_1,
+            exerciseTotal_2:
+              Number(this.totalObject + this.totalSubject)
+          }
+          let str = ''
+      for (var key in entity) {
+        str += key + ':' + entity[key] + '\n'
+      }
+      alert(str)
       this.$http
         .post(
           "/api/alertChapter",
@@ -1292,12 +1313,12 @@ export default {
             content: this.chapterInfo.content,
             exerciseTitle: this.chapterInfo.contentName + "练习题",
             exerciseVisible_1: this.chapterInfo.exerciseVisible_1,
-            exerciseVisible_2: true,
+            exerciseVisible_2: 1,
             exerciseDeadline_1: this.chapterInfo.exerciseDeadline_1,
             exerciseDeadline_2: deadline,
             exerciseTotal_1: this.chapterInfo.exerciseTotal_1,
             exerciseTotal_2:
-              Number(this.totalObject) + Number(this.totalSubject)
+              Number(this.totalObject + this.totalSubject)
           },
           {
             headers: {
@@ -1317,14 +1338,14 @@ export default {
               this.dialogTableVisible = false;
             } else {
               this.$message({ type: "error", message: "习题发布失败!" });
-              his.publishLoading = false;
+              this.publishLoading = false;
               this.dialogTableVisible = false;
               return;
             }
           },
           response => {
             this.$message({ type: "error", message: "习题发布失败!" });
-            his.publishLoading = false;
+            this.publishLoading = false;
             this.dialogTableVisible = false;
             return;
           }
