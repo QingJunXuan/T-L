@@ -8,14 +8,19 @@
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
+        v-loading="menuLoading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
       >
         <el-menu-item index="101">
           <span>
             <el-button type="text" @click="handleAddChapter" style="color: #fff">添加章节</el-button>
           </span>
         </el-menu-item>
+        <el-scrollbar wrap-style="height: calc(100vh - 200px)" :native="false">
         <el-submenu v-for="(item1,index1) in catalog" :index="index1.toString()" :key="index1">
+          
           <template slot="title">
+            
             <span>{{item1.chapterName}}</span>
             <span>
               <el-button
@@ -43,7 +48,7 @@
                     circle
                     icon="el-icon-remove-outline"
                     style="color: #fff;"
-                    @click="deletePoint(item2)"
+                    @click="deletePoint(item1, index2)"
                   ></el-button>
                 </el-col>
                 <el-col :span="16">
@@ -66,20 +71,23 @@
                 </el-col>
               </el-row>
               <el-row v-else class="vertical-middle" style="height: 50px">
-                <el-col :span="4">
+                <el-col :span="3" align="start">
                   <el-button
                     type="text"
                     size="mini"
                     circle
                     icon="el-icon-circle-close-outline"
-                    style="color: #fff;"
+                    style="color: #fff; margin-left: 3px"
                     @click="cancelEdit(item1, index2, item2)"
                   ></el-button>
                 </el-col>
-                <el-col :span="16">
-                  <el-input v-model="newPoint.name" size="small" style="width: 75%"></el-input>
+                <el-col :span="5">
+                  <el-input v-model="newPoint.order" size="small" style="width: 100%" type="number"></el-input>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="13">
+                  <el-input v-model="newPoint.name" size="small" style="width: 90%"></el-input>
+                </el-col>
+                <el-col :span="3" align="start">
                   <el-button
                     type="text"
                     size="mini"
@@ -104,14 +112,16 @@
             </router-link>
             <el-menu-item :index="index1.toString() + '100'">
               <span>
-                <el-button type="text" @click="deleteChapter(item1.id)" style="color: #fff">删除本章</el-button>
+                <el-button type="text" @click="deleteChapter(index1)" style="color: #fff">删除本章</el-button>
               </span>
             </el-menu-item>
           </div>
+          
         </el-submenu>
+        </el-scrollbar>
         <div class="exit">
           <span>
-            <el-button type="text" style="color: #fff" @click="goBack">
+            <el-button type="primary" style="background-color: #545c64;border-color: #545c64;width: 100%" @click="goBack">
               <i class="el-icon-arrow-left" style="margin-right: 6px"></i>退出编辑
             </el-button>
           </span>
@@ -136,6 +146,9 @@
           label-position="top"
           align="start"
         >
+        <el-form-item label="章节号" prop="order">
+            <el-input style="width: 100px" v-model="chapterForm.order" size="small" type="number"></el-input>
+          </el-form-item>
           <el-form-item label="章节名" prop="name">
             <el-input style="width: 200px" v-model="chapterForm.name" size="small"></el-input>
           </el-form-item>
@@ -147,7 +160,12 @@
             ></el-transfer>
           </el-form-item>
           <el-form-item align="center">
-            <el-button type="primary" size="small" @click="confirmEdit()">提交</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              @click="confirmEdit()"
+              :loading="submitLoading"
+            >提交</el-button>
             <el-button size="small">重置</el-button>
           </el-form-item>
         </el-form>
@@ -157,7 +175,7 @@
 </template>
 
 <script>
-import bus from '../../bus.js'
+import bus from "../../bus.js";
 export default {
   name: "chapterCatalog",
   data() {
@@ -188,10 +206,13 @@ export default {
       updateChapterVisible: false,
       chapterForm: {},
       chapterRules: {
+        order: [{ required: true, message: "请输入章节号", trigger: "blur" }],
         name: [{ required: true, message: "请输入章节名", trigger: "blur" }]
       },
       newPoint: {},
       reloadCatalog: false,
+      submitLoading: false,
+      menuLoading: false
     };
   },
   methods: {
@@ -211,6 +232,7 @@ export default {
     getCatalog() {
       this.catalog = [];
       this.chapterData = [];
+      this.menuLoading = true;
       this.$http
         .get(
           // 传值课程号
@@ -228,23 +250,29 @@ export default {
               if (catalogList.state === 1) {
                 let i = 0;
                 while (i < catalogList.data.length) {
+                  let end = catalogList.data[i].contentName.indexOf('章');
                   this.catalog.push({
                     id: catalogList.data[i].id,
                     chapterName: catalogList.data[i].contentName,
                     predecessor: [],
-                    points: []
+                    points: [],
+                    order: catalogList.data[i].contentName.substring(1, end)
                   });
                   for (
                     let k = 0;
                     k < catalogList.data[i].subCatalog.length;
                     k++
                   ) {
+                    let start = catalogList.data[i].subCatalog[k].contentName.indexOf('.');
+                    let end = catalogList.data[i].subCatalog[k].contentName.indexOf(' ');
                     this.catalog[i].points.push({
                       id: catalogList.data[i].subCatalog[k].id,
                       name: catalogList.data[i].subCatalog[k].contentName,
                       courseID: catalogList.data[i].subCatalog[k].courseID,
                       parentID: catalogList.data[i].subCatalog[k].parentID,
                       siblingID: catalogList.data[i].subCatalog[k].siblingID,
+                      content: catalogList.data[i].subCatalog[k].content,
+                      order: catalogList.data[i].subCatalog[k].contentName.substring(start + 1, end),
                       edit: false,
                       new: false
                     });
@@ -257,20 +285,22 @@ export default {
                   i++;
                 }
                 this.reloadCatalog = false;
+                this.menuLoading = false;
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
+              this.menuLoading = false;
             }
           },
           response => {
             this.$message({ type: "error", message: "加载失败!" });
+            this.menuLoading = false;
           }
         );
       this.$http
         .get(
           // 传值课程号
-          "/api/getChapterRelationByCourseID?courseID=" +
-            this.courseID,
+          "/api/getChapterRelationByCourseID?courseID=" + this.courseID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -317,6 +347,7 @@ export default {
       this.updateChapterVisible = true;
       this.chapterForm = {
         index: this.catalog.length,
+        order: this.catalog.length + 1,
         name: "",
         predecessor: [],
         new: true
@@ -325,19 +356,30 @@ export default {
     handleAddPoint(index) {
       this.catalog[index].points.push({
         name: "",
+        order: 0,
         edit: true,
         new: true
       });
+      this.newPoint = {
+        name: "",
+        order: 0,
+        edit: true,
+        new: true
+      };
     },
     handleEditPoint(item) {
       item.edit = true;
       this.newPoint = this.objDeepCopy(item);
+      let start = this.newPoint.name.indexOf(" ") + 1;
+      this.newPoint.name = this.newPoint.name.substring(start)
     },
     handleEditChapter(index) {
       this.updateChapterVisible = true;
+      let end = this.catalog[index].chapterName.indexOf('章');
       this.chapterForm = {
         index: index,
-        name: this.catalog[index].chapterName,
+        order: this.catalog[index].chapterName.substring(1, end),
+        name: this.catalog[index].chapterName.substring(end + 2),
         predecessor: this.catalog[index].predecessor,
         new: false
       };
@@ -351,6 +393,7 @@ export default {
     // chapter
     confirmEdit() {
       let sibID = 0;
+      this.submitLoading = true;
       if (this.chapterForm.new) {
         if (this.catalog.length > 0) {
           let last = this.catalog.length - 1;
@@ -361,7 +404,7 @@ export default {
             "/api/addChapter",
             {
               courseID: this.courseID,
-              contentName: this.chapterForm.name,
+              contentName: '第' + this.chapterForm.order.toString() + '章 ' + this.chapterForm.name,
               parentID: 0,
               siblingID: sibID,
               content: ""
@@ -376,26 +419,36 @@ export default {
             response => {
               if (response.status === 200) {
                 let responseData = JSON.parse(response.bodyText);
+                this.catalog.push({
+                  id: responseData.data.id,
+                  chapterName: responseData.data.contentName,
+                  predecessor: [],
+                  points: []
+                });
                 this.editPredecessor(this.chapterForm.index);
               } else {
                 this.$message({ type: "error", message: "章节添加失败!" });
+                this.submitLoading = false;
                 return;
               }
             },
             response => {
               this.$message({ type: "error", message: "章节添加失败!" });
+              this.submitLoading = false;
               return;
             }
           );
       } else {
-        sibID = this.catalog[this.chapterForm.index - 1].id;
+        if (this.chapterForm.index > 0) {
+          sibID = this.catalog[this.chapterForm.index - 1].id;
+        }
         this.$http
           .post(
             "/api/alertChapter",
             {
               id: this.catalog[this.chapterForm.index].id,
               courseID: this.courseID,
-              contentName: this.chapterForm.name,
+              contentName: '第' + this.chapterForm.order.toString() + '章 ' + this.chapterForm.name,
               parentID: 0,
               siblingID: sibID,
               content: ""
@@ -413,23 +466,27 @@ export default {
                 this.editPredecessor(this.chapterForm.index);
               } else {
                 this.$message({ type: "error", message: "章节编辑失败!" });
+                this.submitLoading = false;
                 return;
               }
             },
             response => {
               this.$message({ type: "error", message: "章节编辑失败!" });
+              this.submitLoading = false;
               return;
             }
           );
       }
     },
     editPredecessor(index) {
+      let notEdited = true;
       for (let i = 0; i < this.catalog[index].predecessor.length; i++) {
         if (
           this.chapterForm.predecessor.indexOf(
             this.catalog[index].predecessor[i]
           ) < 0
         ) {
+          nontEdited = false;
           // 删除
           this.$http
             .get("/api/deleteChapterRelation", {
@@ -444,14 +501,17 @@ export default {
             .then(
               response => {
                 if (response.status === 200) {
+                  this.submitLoading = false;
                   this.getCatalog();
                 } else {
                   this.$message({ type: "error", message: "章节更新失败!" });
+                  this.submitLoading = false;
                   return;
                 }
               },
               response => {
                 this.$message({ type: "error", message: "章节更新失败!" });
+                this.submitLoading = false;
                 return;
               }
             );
@@ -463,6 +523,7 @@ export default {
             this.chapterForm.predecessor[i]
           ) < 0
         ) {
+          nontEdited = false;
           // 添加
           this.$http
             .get("/api/addChapterRelation", {
@@ -478,17 +539,24 @@ export default {
               response => {
                 if (response.status === 200) {
                   this.getCatalog();
+                  this.submitLoading = false;
                 } else {
                   this.$message({ type: "error", message: "章节更新失败!" });
+                  this.submitLoading = false;
                   return;
                 }
               },
               response => {
                 this.$message({ type: "error", message: "章节更新失败!" });
+                this.submitLoading = false;
                 return;
               }
             );
         }
+      }
+      if (notEdited) {
+        this.submitLoading = false;
+        this.getCatalog();
       }
       this.updateChapterVisible = false;
       this.chapterForm = {};
@@ -497,17 +565,87 @@ export default {
         message: "章节更新成功!"
       });
     },
-    deleteChapter(id) {
+    deleteChapter(index) {
       this.$confirm("确认删除此章节吗?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
+          this.menuLoading = true;
+          if (index === 0 && index !== this.catalog.length - 1) {
+            this.$http
+              .post(
+                "/api/alertChapter",
+                {
+                  id: this.catalog[index + 1].id,
+                  courseID: this.courseID,
+                  contentName: this.catalog[index + 1].chapterName,
+                  parentID: 0,
+                  siblingID: 0,
+                  content: ""
+                },
+                {
+                  headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token")
+                  }
+                }
+              )
+              .then(
+                response => {
+                  if (response.status === 200) {
+                    this.getCatalog();
+                  } else {
+                    this.$message({ type: "error", message: "章节删除失败!" });
+                    this.submitLoading = false;
+                    return;
+                  }
+                },
+                response => {
+                  this.$message({ type: "error", message: "章节删除失败!" });
+                  this.submitLoading = false;
+                  return;
+                }
+              );
+          } else if (index < this.catalog.length - 1) {
+            this.$http
+              .post(
+                "/api/alertChapter",
+                {
+                  id: this.catalog[index + 1].id,
+                  courseID: this.courseID,
+                  contentName: this.catalog[index + 1].chapterName,
+                  parentID: 0,
+                  siblingID: this.catalog[index - 1].id,
+                  content: ""
+                },
+                {
+                  headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token")
+                  }
+                }
+              )
+              .then(
+                response => {
+                  if (response.status === 200) {
+                    this.getCatalog();
+                  } else {
+                    this.$message({ type: "error", message: "章节删除失败!" });
+                    this.submitLoading = false;
+                    return;
+                  }
+                },
+                response => {
+                  this.$message({ type: "error", message: "章节删除失败!" });
+                  this.submitLoading = false;
+                  return;
+                }
+              );
+          }
           this.$http
             .get("/api/deleteChapter", {
               params: {
-                chapterID: id
+                chapterID: this.catalog[index].id
               },
               headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
@@ -520,14 +658,15 @@ export default {
                     type: "success",
                     message: "已删除章节!"
                   });
-                  this.getCatalog();
                 } else {
                   this.$message({ type: "error", message: "删除失败!" });
+                  this.menuLoading = false;
                   return;
                 }
               },
               response => {
                 this.$message({ type: "error", message: "删除失败!" });
+                this.menuLoading = false;
                 return;
               }
             );
@@ -540,17 +679,85 @@ export default {
         });
     },
     // point
-    deletePoint(item) {
+    deletePoint(item, index) {
       this.$confirm("确认删除此知识点吗?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
+          this.menuLoading = true;
+          if (index === 0 && index !== item.points.length - 1) {
+            this.$http
+              .post(
+                "/api/alertChapter",
+                {
+                  id: item.points[index + 1].id,
+                  courseID: this.courseID,
+                  contentName: item.points[index + 1].name,
+                  parentID: item.id,
+                  siblingID: 0,
+                  content: item.points[index + 1].content
+                },
+                {
+                  headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token")
+                  }
+                }
+              )
+              .then(
+                response => {
+                  if (response.status === 200) {
+                  } else {
+                    this.$message({ type: "error", message: "知识点删除失败!" });
+                    this.submitLoading = false;
+                    return;
+                  }
+                },
+                response => {
+                  this.$message({ type: "error", message: "知识点删除失败!" });
+                  this.submitLoading = false;
+                  return;
+                }
+              );
+          } else if (index < item.points.length - 1) {
+            this.$http
+              .post(
+                "/api/alertChapter",
+                {
+                  id: item.points[index + 1].id,
+                  courseID: this.courseID,
+                  contentName: item.points[index + 1].name,
+                  parentID: item.id,
+                  siblingID: item.points[index - 1].id,
+                  content: item.points[index + 1].content
+                },
+                {
+                  headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token")
+                  }
+                }
+              )
+              .then(
+                response => {
+                  if (response.status === 200) {
+                  } else {
+                    this.$message({ type: "error", message: "知识点删除失败!" });
+                    this.submitLoading = false;
+                    return;
+                  }
+                },
+                response => {
+                  this.$message({ type: "error", message: "知识点删除失败!" });
+                  this.submitLoading = false;
+                  return;
+                }
+              );
+          }
           this.$http
             .get("/api/deleteChapter", {
               params: {
-                chapterID: item.id
+                chapterID: item.points[index].id
               },
               headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
@@ -566,11 +773,13 @@ export default {
                   this.getCatalog();
                 } else {
                   this.$message({ type: "error", message: "删除失败!" });
+                  this.menuLoading = false;
                   return;
                 }
               },
               response => {
                 this.$message({ type: "error", message: "删除失败!" });
+                this.menuLoading = false;
                 return;
               }
             );
@@ -591,7 +800,11 @@ export default {
       this.newPoint = {};
     },
     submitEdit(item1, item2, index) {
-      if (this.newPoint.name == undefined || this.newPoint.name === '') {
+      if ( this.newPoint.order <= 0 || this.newPoint.order === '') {
+        this.$message({ type: "warning", message: "请正确知识点序号!" });
+        return;
+      }
+      if (this.newPoint.name == undefined || this.newPoint.name === "") {
         this.$message({ type: "warning", message: "请填写知识点名称!" });
         return;
       }
@@ -599,13 +812,14 @@ export default {
       if (index > 0) {
         sibID = item1.points[index - 1].id;
       }
+      this.menuLoading = true;
       if (item2.new) {
         this.$http
           .post(
             "/api/addChapter",
             {
               courseID: this.courseID,
-              contentName: this.newPoint.name,
+              contentName: item1.order + '.' + this.newPoint.order + ' ' + this.newPoint.name,
               parentID: item1.id,
               siblingID: sibID,
               content: ""
@@ -628,25 +842,29 @@ export default {
                 this.newPoint = {};
               } else {
                 this.$message({ type: "error", message: "知识点添加失败!" });
+                this.menuLoading = false;
                 return;
               }
             },
             response => {
               this.$message({ type: "error", message: "知识点添加失败!" });
+              this.menuLoading = false;
               return;
             }
           );
       } else {
+        alert(item1.order);
+        alert(this.newPoint.order)
         this.$http
           .post(
             "/api/alertChapter",
             {
               id: item2.id,
               courseID: this.courseID,
-              contentName: this.newPoint.name,
+              contentName: item1.order + '.' + this.newPoint.order + ' ' + this.newPoint.name,
               parentID: item1.id,
               siblingID: sibID,
-              content: ""
+              content: item2.content
             },
             {
               headers: {
@@ -666,11 +884,13 @@ export default {
                 this.newPoint = {};
               } else {
                 this.$message({ type: "error", message: "知识点编辑失败!" });
+                this.menuLoading = false;
                 return;
               }
             },
             response => {
               this.$message({ type: "error", message: "知识点编辑失败!" });
+              this.menuLoading = false;
               return;
             }
           );
@@ -689,13 +909,13 @@ export default {
       return sourceCopy;
     },
     getData(val) {
-          this.reloadCatalog = val;
-        }
+      this.reloadCatalog = val;
+    }
   },
   created() {
     this.courseID = this.$route.query.id;
     this.getCatalog();
-    bus.$on('reloadCatalog', (val) => this.getData(val));
+    bus.$on("reloadCatalog", val => this.getData(val));
   },
   watch: {
     reloadCatalog(val) {
@@ -718,8 +938,9 @@ a {
 
 .exit {
   position: absolute;
-  bottom: 10px;
-  left: 100px;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
 }
 
 .vertical-middle {

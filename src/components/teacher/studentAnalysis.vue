@@ -19,22 +19,19 @@
             <div class="cardbody">
               <div class="info" align="start">
                 <div>
-                <span>{{studentID}}</span>
-                <span>{{studentName}}</span>
+                  <span>{{studentID}}</span>
+                  <span>{{studentName}}</span>
                 </div>
                 <el-row style="margin-top: 3px">
-                  <el-col :span="16" style="padding-left: 15px; padding-top: 8px"><el-progress :percentage="75" stroke-width="3" color="#41abf1" :show-text="false"></el-progress></el-col>
-                  <el-col :span="8" style="padding-left: 12px;"><div style="font-size: 12px; color: #8e8e8e">已学习3/4</div></el-col>
+                  <div style="padding-left: 11px; font-size: 12px; color: #8e8e8e">最近学习到</div>
                 </el-row>
               </div>
-              
-              <div align="start">
-                <el-table size="small" :data="gradeData">
-                  <el-table-column label="课前成绩" width="80px" align="center" prop="pre"></el-table-column>
-                  <el-table-column label="课后成绩" width="80px" align="center" prop="rev"></el-table-column>
-                  <el-table-column label="总成绩" width="70px" align="center" prop="avg"></el-table-column>
-                  <el-table-column label="排名" width="70px" align="center" prop="rank"></el-table-column>
-                </el-table>
+
+              <div style="padding: 10px 20px 10px 20px" align="start">
+                <el-tag type="danger" size="small" style="margin-top: 5px">学科</el-tag>
+                <el-tag type="warning" size="small" style="margin-top: 5px">语言</el-tag>
+                <el-tag type="success" size="small" style="margin-top: 5px">专业</el-tag>
+                <el-tag type="info" size="small" style="margin-top: 5px">薄弱</el-tag>
               </div>
             </div>
           </el-card>
@@ -53,13 +50,7 @@
                   </el-select>
                 </el-row>
                 <el-row>
-                  <el-select
-                    v-model="gradeAttribute"
-                    @change="handleGrade"
-                    size="small"
-                    v-if="xy === 0"
-                    class="select"
-                  >
+                  <el-select v-model="gradeAttribute" size="small" v-if="xy === 0" class="select">
                     <el-option
                       v-for="item in gradeOptions"
                       :key="item.value"
@@ -70,7 +61,7 @@
                 </el-row>
                 <el-row class="select-title" v-if="gradeAttribute !== 3">对比组</el-row>
                 <el-row v-if="gradeAttribute !== 3">
-                  <el-select v-model="comparison" @change="handleDetail" size="small">
+                  <el-select v-model="comparison" size="small">
                     <el-option
                       :disabled="item.disabled"
                       v-for="item in cOptions"
@@ -84,62 +75,57 @@
                   class="select-title"
                   v-if="comparison !== 2 && gradeAttribute !== 3"
                 >选择{{cOptions[comparison].label}}</el-row>
-                <el-row v-if="!(comparison === 0 || comparison === 2 || gradeAttribute === 3)">
-                  <el-select
-                    multiple
-                    size="small"
-                    v-model="detail"
-                    :multiple-limit="cOptions[comparison].limit"
-                    :filterable="cOptions[comparison].filterable"
-                  >
-                    <el-option
-                      v-for="item in detailOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    ></el-option>
-                  </el-select>
-                </el-row>
                 <el-row v-if="comparison === 0 && gradeAttribute !== 3">
                   <el-row>
-                    <el-cascader
-                      :options="studentOptions"
+                    <el-select
                       v-model="studentMap[0]"
-                      @change="handleChange(0)"
-                      filterable
                       size="small"
+                      filterable
                       clearable
-                    ></el-cascader>
+                      @change="handleStudent(0)"
+                    >
+                      <el-option
+                        v-for="item in studentOptions"
+                        :disabled="item.disabled"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      ></el-option>
+                    </el-select>
                   </el-row>
                   <el-row class="select">
-                    <el-cascader
-                      :options="studentOptions"
+                    <el-select
                       v-model="studentMap[1]"
-                      @change="handleChange(1)"
-                      filterable
                       size="small"
+                      filterable
                       clearable
-                    ></el-cascader>
+                      @change="handleStudent(1)"
+                    >
+                      <el-option
+                        v-for="item in studentOptions"
+                        :disabled="item.disabled"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      ></el-option>
+                    </el-select>
                   </el-row>
                   <el-row class="select">
-                    <el-cascader
-                      :options="studentOptions"
+                    <el-select
                       v-model="studentMap[2]"
-                      @change="handleChange(2)"
-                      filterable
                       size="small"
-                      clearable
-                    ></el-cascader>
-                  </el-row>
-                  <el-row class="select">
-                    <el-cascader
-                      :options="studentOptions"
-                      v-model="studentMap[3]"
-                      @change="handleChange(3)"
                       filterable
-                      size="small"
                       clearable
-                    ></el-cascader>
+                      @change="handleStudent(2)"
+                    >
+                      <el-option
+                        v-for="item in studentOptions"
+                        :disabled="item.disabled"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      ></el-option>
+                    </el-select>
                   </el-row>
                 </el-row>
                 <el-row class="select">
@@ -154,66 +140,47 @@
             <div class="cardbody">
               <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
                 <div>
-                  <el-collapse
-                    v-model="activeNames"
-                    class="collapse"
-                  >
+                  <el-collapse v-model="activeNames" class="collapse">
                     <el-collapse-item title="成绩分析" name="1">
                       <el-row>
                         <div id="myChart" class="my-chart"></div>
                       </el-row>
                     </el-collapse-item>
                     <el-collapse-item title="成绩与反馈" name="2">
-                      <div align="start" class="response">
+                      <div
+                        align="start"
+                        class="response"
+                        v-for="item in studentInfo"
+                        :key="item.id"
+                      >
                         <el-row>
-                            <div class="title">章节1 IO接口</div>
+                          <div class="title">{{item.chapter}}</div>
                         </el-row>
                         <el-row :gutter="10">
-                          <el-col :span="6"><span class="grade">课前成绩：85</span></el-col>
-                          <el-col :span="6"><span class="grade">课后成绩：85</span></el-col>
-                          <el-col :span="6"><span class="grade">总成绩：85</span></el-col>
-                          <el-col :span="6"><span class="grade">排名：15</span></el-col>
+                          <el-col :span="6">
+                            <span class="grade">课前成绩：{{item.scorePre}}</span>
+                          </el-col>
+                          <el-col :span="6">
+                            <span class="grade">课后成绩：{{item.scoreRev}}</span>
+                          </el-col>
+                          <el-col :span="6">
+                            <span class="grade">平均成绩：{{item.scoreAvg}}</span>
+                          </el-col>
                         </el-row>
                         <el-row>
                           <div>
-                              <el-rate
-                                v-model="courseGrade"
-                                disabled
-                                show-score
-                                text-color="#ff9900"
-                                score-template="{value}"
-                                class="rate"
-                              ></el-rate>
-                            </div>
+                            <el-rate
+                              v-model="item.rate"
+                              disabled
+                              show-score
+                              text-color="#ff9900"
+                              score-template="{value}"
+                              class="rate"
+                            ></el-rate>
+                          </div>
                         </el-row>
                         <el-row style="margin-top: 13px">
-                          <div class="text">反馈内容</div>
-                        </el-row>
-                      </div>
-                      <div style="margin-top: 20px" align="start" class="response">
-                        <el-row>
-                            <div class="title">章节2 Spring基础</div>
-                        </el-row>
-                        <el-row :gutter="10">
-                          <el-col :span="6"><span class="grade">课前成绩：85</span></el-col>
-                          <el-col :span="6"><span class="grade">课后成绩：85</span></el-col>
-                          <el-col :span="6"><span class="grade">总成绩：85</span></el-col>
-                          <el-col :span="6"><span class="grade">排名：15</span></el-col>
-                        </el-row>
-                        <el-row>
-                          <div>
-                              <el-rate
-                                v-model="courseGrade"
-                                disabled
-                                show-score
-                                text-color="#ff9900"
-                                score-template="{value}"
-                                class="rate"
-                              ></el-rate>
-                            </div>
-                        </el-row>
-                        <el-row style="margin-top: 13px">
-                          <div class="text">反馈内容</div>
+                          <div class="text">{{item.comments}}</div>
                         </el-row>
                       </div>
                     </el-collapse-item>
@@ -233,18 +200,14 @@ export default {
   name: "studentAnalysis",
   data() {
     return {
-      courseGrade: 4.5,
+      // 传值
       studentID: 1612345,
       studentName: "学生姓名",
+      userID: 0,
+      courseID: 0,
+      classID: 0,
+      //
       activeNames: ["1"],
-      gradeData: [
-        {
-          pre: 85,
-          rev: 85,
-          avg: 85,
-          rank: 10
-        }
-      ],
       xyOptions: [
         {
           value: 0,
@@ -297,43 +260,24 @@ export default {
           label: "课前-课后平均成绩"
         }
       ],
-      genderOptions: [
-        {
-          value: 0,
-          label: "全部"
-        },
-        {
-          value: 1,
-          label: "只看男生"
-        },
-        {
-          value: 2,
-          label: "只看女生"
-        }
-      ],
       gradeAttribute: 0,
-      detail: [],
       xy: 0,
       comparison: 0,
       xData: [],
-      yData: [],
+      // 学生和成绩
       studentOptions: [],
-      students: [],
-      chapterList: [],
       studentMap: [],
-      // 成绩 只能数字
-      gradeList: [[88, 93, 90], [76, 82, 85]],
-      // 课前成绩 只能数字
-      gradePreList: [[88, 93, 90], [76, 82, 85]],
-      // 课后成绩 只能数字
-      gradeRevList: [[88, 93, 90], [76, 82, 85]],
+      studentInfo: [],
       // 班级平均分
       gradeClass: [83, 84, 85],
       // 成绩阶段
       gradeEnumList: [60, 70, 80, 90],
       // 人数 只能数字
       amountList: [[8, 17, 29, 18], [7, 19, 22, 24], [12, 16, 31, 13]],
-      colors: ["#003366", "#4cabce", "#e5323e"]
+      colors: ["#0997F7", "#92DD22", "#FFFF33", "#FFAAEE"],
+      seriesData: [],
+      colorOptions: [],
+      legendData: []
     };
   },
   methods: {
@@ -346,11 +290,13 @@ export default {
       }
     },
     // 获取列表
-    getStudentOptions(index) {
+    getProcess() {
       this.$http
         .get(
-          "http://localhost:8080/getStudentsByClassID?courseClassID=" +
-            this.studentOptions[index].value,
+          "/api/getCurrentProgress?courseClassID=" +
+            this.classID +
+            "studentID" +
+            this.userID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -364,9 +310,10 @@ export default {
               if (studentList.state === 1) {
                 let i = 0;
                 while (i < studentList.data.length) {
-                  this.studentOptions[index].children.push({
+                  this.studentOptions.push({
+                    id: studentList.data[i].userID,
                     value: i,
-                    label: studentList.data[i].name,
+                    label: studentList.data[i].workID,
                     disabled: false
                   });
                   i++;
@@ -381,26 +328,71 @@ export default {
           }
         );
     },
-    getClassOptions() {
-      this.studentOptions = [];
-      // 登录时存teacherID
-      // 根据课程号和老师id
+    getStudentOptions() {
       this.$http
-        .get("http://localhost:8080/getCoursesByTeacherID?teacherID=443", {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        .get("/api/getStudentsByClassID?courseClassID=" + this.classID, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
         })
         .then(
           response => {
             if (response.status === 200) {
-              let classList = JSON.parse(response.bodyText);
+              let studentList = JSON.parse(response.bodyText);
+              if (studentList.state === 1) {
+                let i = 0;
+                while (i < studentList.data.length) {
+                  this.studentOptions.push({
+                    id: studentList.data[i].userID,
+                    value: i,
+                    label: studentList.data[i].workID,
+                    disabled: false
+                  });
+                  i++;
+                }
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getStudentInfo(studentID) {
+      this.studentInfo = [];
+      this.$http
+        .get(
+          "/api/getCourseScoreAndComment?courseID=" +
+            this.courseID +
+            "&studentID=" +
+            studentID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let res = JSON.parse(response.bodyText);
               let i = 0;
-              while (i < classList.data.length) {
-                this.studentOptions.push({
-                  value: classList.data[i].courseClass.id,
-                  label: classList.data[i].courseClass.classNum + "班",
-                  children: []
+              while (i < res.data.length) {
+                let avg =
+                  (Number(res.data[i].studentChapter.totalScore_1) +
+                    Number(res.data[i].studentChapter.totalScore_2)) /
+                  2;
+                this.studentInfo.push({
+                  id: res.data[i].studentChapter.id,
+                  scorePre: res.data[i].studentChapter.totalScore_1,
+                  scoreRev: res.data[i].studentChapter.totalScore_2,
+                  scoreAvg: avg,
+                  comments: res.data[i].studentChapter.comment,
+                  rate: Number(res.data[i].studentChapter.rate),
+                  chapter: res.data[i].chapterName
                 });
-                this.getStudentOptions(i);
                 i++;
               }
             } else {
@@ -412,30 +404,74 @@ export default {
           }
         );
     },
-    getChapterOptions() {
-      this.chapterOptions = [];
-      // 登录时存teacherID
+    getStudentData(studentID, index) {
+      this.xData.length = 0;
       this.$http
-        .get("http://localhost:8080/getCourseCatalog?courseID=1", {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "/api/getCourseScoreAndComment?courseID=" +
+            this.courseID +
+            "&studentID=" +
+            studentID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
-              let courseList = JSON.parse(response.bodyText);
+              let res = JSON.parse(response.bodyText);
               let i = 0;
-              while (i < courseList.data.length) {
-                this.chapterOptions.push({
-                  value: i,
-                  label:
-                    "第" +
-                    courseList.data[i].id +
-                    "章-" +
-                    courseList.data[i].contentName
-                });
-                this.chapterList.push(courseList.data[i].contentName);
+              while (i < res.data.length) {
+                let avg =
+                  (Number(res.data[i].studentChapter.totalScore_1) +
+                    Number(res.data[i].studentChapter.totalScore_2)) /
+                  2;
+                if (this.xy === 0 && this.gradeAttribute !== 3) {
+                  switch (this.gradeAttribute) {
+                    case 0: {
+                      // 总
+                      this.seriesData[index].data.push(avg);
+                      break;
+                    }
+                    case 1: {
+                      // 课前
+                      this.seriesData[index].data.push(
+                        res.data[i].studentChapter.totalScore_1
+                      );
+                      break;
+                    }
+                    case 2: {
+                      // 课后
+                      this.seriesData[index].data.push(
+                        res.data[i].studentChapter.totalScore_2
+                      );
+                      break;
+                    }
+                    default: {
+                      break;
+                    }
+                  }
+                }
+                if (this.xy === 0 && this.gradeAttribute === 3) {
+                  // 课前对比课后
+                  this.seriesData[0].data.push(
+                    res.data[i].studentChapter.totalScore_1
+                  );
+                  this.seriesData[1].data.push(
+                    res.data[i].studentChapter.totalScore_2
+                  );
+                }
+                if (this.seriesData[0].data.length > this.xData.length) {
+                  let end = res.data[i].chapterName.toString().indexOf("章");
+                  this.xData.push(
+                    res.data[i].chapterName.toString().substring(0, end + 1)
+                  );
+                }
                 i++;
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -451,82 +487,137 @@ export default {
         // 章节-平均成绩
         case 0: {
           this.comparison = 0;
-          this.detail = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 6) this.cOptions[i].disabled = true;
             else this.cOptions[i].disabled = false;
           }
-          this.xData.length = 0;
-          this.yData.length = 0;
-          this.xData = this.chapterList;
-          this.yData = this.gradeList;
           break;
         }
         // 分数段-人数
         case 1: {
           this.comparison = 1;
-          this.detail = [];
           for (let i = 0; i < this.cOptions.length; i++) {
             if (i === 0 || i === 6) this.cOptions[i].disabled = true;
             else this.cOptions[i].disabled = false;
           }
-          this.xData.length = 0;
-          this.yData.length = 0;
-          this.xData = this.gradeEnumList;
-          this.yData = this.amountList;
           break;
         }
         default:
           break;
       }
     },
-    handleChange(index) {
-      let val = this.studentMap[index];
-      if (Object.keys(val).length === 0) {
-        this.detail[index] = undefined;
-      } else {
-        if (this.detail[index] !== undefined) {
-          let lOld = this.detail[index][0];
-          let rOld = this.detail[index][1];
-          this.studentOptions[lOld - 1].children[rOld].disabled = false;
-        }
-        let lNew = val[0];
-        let rNew = val[1];
-        this.studentOptions[lNew - 1].children[rNew].disabled = true;
-        this.detail[index] = this.objDeepCopy(
-          this.studentOptions[lNew - 1].children[rNew]
-        );
-      }
+    handleStudent(index) {
+      // TODO: 禁用
     },
-    handleGrade() {},
-    handleDetail() {
-      this.detail = [];
-    },
-    // 按键事件
+    // 确认
     getCharts() {
       // TODO: 发送请求获取图表数据
-      this.drawChart();
+      this.xData = new Array();
+      this.seriesData = new Array();
+      this.colorOptions = new Array();
+      this.legendData = new Array();
+      switch (this.xy) {
+        // 章节-平均成绩
+        case 0: {
+          switch (this.comparison) {
+            // 学生
+            case 0: {
+              if (this.gradeAttribute !== 3) {
+                // 获取自己的
+                this.seriesData.push({
+                  name: this.studentName,
+                  type: "bar",
+                  barGap: 0,
+                  data: new Array()
+                });
+                this.colorOptions.push(this.colors[0]);
+                this.legendData.push(this.studentName.toString());
+                this.getStudentData(this.userID, 0);
+                let opIndex = 1;
+                for (let i = 0; i < this.studentMap.length; i++) {
+                  if (
+                    this.studentMap[i] !== undefined &&
+                    this.studentMap[i] !== ""
+                  ) {
+                    let index = this.studentMap[i];
+                    this.seriesData.push({
+                      name: this.studentOptions[index].label,
+                      type: "bar",
+                      barGap: 0,
+                      data: new Array()
+                    });
+                    this.colorOptions.push(this.colors[opIndex]);
+                    this.legendData.push(
+                      this.studentOptions[index].label.toString()
+                    );
+                    this.getStudentData(this.studentOptions[index].id, opIndex);
+                    opIndex += 1;
+                  }
+                }
+              } else {
+                this.seriesData = new Array(2);
+                this.seriesData[0] = {
+                  name: "课前成绩",
+                  type: "bar",
+                  barGap: 0,
+                  data: []
+                };
+                this.seriesData[1] = {
+                  name: "课后成绩",
+                  type: "bar",
+                  barGap: 0,
+                  data: []
+                };
+                this.colorOptions.push(this.colors[0]);
+                this.colorOptions.push(this.colors[1]);
+                this.legendData.push("课前成绩");
+                this.legendData.push("课后成绩");
+                this.getStudentData(this.userID, 0);
+              }
+              break;
+            }
+            // 性别
+            case 1: {
+              break;
+            }
+            // 班级平均分
+            case 2: {
+              break;
+            }
+            default:
+              break;
+          }
+          break;
+        }
+        // 分数段-人数
+        case 1: {
+          switch (this.comparison) {
+            // 性别
+            case 1: {
+              break;
+            }
+            // 班级平均分
+            case 2: {
+              break;
+            }
+            default:
+              break;
+          }
+          break;
+        }
+        default:
+          break;
+      }
     },
     // 图表绘制
     drawChart() {
       // 基于准备好的dom，初始化echarts实例
       let myChart = this.$echarts.init(document.getElementById("myChart"));
-      let seriesData = [];
-      let colorOptions = [];
-      let legendData = [];
-      for (let i = 0; i < this.yData.length; i++) {
-        seriesData.push({
-          name: "对比组" + i,
-          type: "bar",
-          barGap: 0,
-          data: this.yData[i]
-        });
-        colorOptions.push(this.colors[i]);
-        legendData.push("对比组" + i);
-      }
+      myChart.clear();
+      console.log(this.xData.length);
       // 绘制图表
       myChart.setOption({
-        color: colorOptions,
+        color: this.colorOptions,
         tooltip: {
           trigger: "axis",
           axisPointer: {
@@ -534,8 +625,19 @@ export default {
           }
         },
         legend: {
-          data: legendData
+          data: this.legendData
         },
+        dataZoom: [
+          {
+            type: "inside",
+            filterMode: "filter",
+            xAxisIndex: [0],
+            startValue: 0,
+            endValue: 7,
+            orient: "horizontal",
+            minValueSpan: 5
+          }
+        ],
         toolbox: {
           show: true,
           orient: "vertical",
@@ -565,7 +667,7 @@ export default {
             type: "value"
           }
         ],
-        series: seriesData
+        series: this.seriesData
       });
     },
     // 深拷贝
@@ -583,38 +685,29 @@ export default {
     },
     getParams() {
       this.studentID = this.$route.query.studentID;
-      this.studentName = this.$route.query.studentName;
+      //this.studentName = this.$route.query.studentName;
+      this.courseID = this.$route.query.courseID;
+      this.classID = this.$route.query.classID;
+      this.userID = this.$route.query.userID;
     }
   },
   created() {
-    this.getChapterOptions();
-    this.getClassOptions();
-    this.xData = this.chapterList;
-    this.yData = this.gradeList;
-    this.detail = new Array(4);
     this.getParams();
+    this.seriesData.push({
+      name: this.studentName,
+      type: "bar",
+      barGap: 0,
+      data: new Array()
+    });
+    this.colorOptions.push(this.colors[0]);
+    this.legendData.push(this.studentName);
+    this.getStudentData(this.userID, 0);
+    this.getStudentInfo(1);
+    this.getStudentOptions();
   },
   mounted() {
     this.drawChart();
   },
-  computed: {
-    detailOptions() {
-      let result = [];
-      switch (this.comparison) {
-        case 0: {
-          result = this.studentOptions;
-          break;
-        }
-        case 1: {
-          result = this.genderOptions;
-          break;
-        }
-        default:
-          break;
-      }
-      return result;
-    }
-  }
 };
 </script>
 
@@ -662,7 +755,7 @@ export default {
 .info > div > span {
   font-size: 24px;
   font-weight: bold;
-  color: #41ABF1;
+  color: #41abf1;
   padding-left: 10px;
 }
 
@@ -678,14 +771,14 @@ export default {
 }
 
 .content-card .collapse {
-  padding: 0 20px 0 20px; 
+  padding: 0 20px 0 20px;
   margin-top: -5px;
 }
 
 .my-chart {
   width: 100%;
   height: 500px;
-  margin-top: 40px;
+  margin-top: 10px;
 }
 
 .header {

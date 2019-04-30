@@ -6,8 +6,8 @@
           <div class="header">
             <div style="float: left; padding-top: 5px">
               <el-button @click="goBack" type="text" class="button">
-              <i class="el-icon-back" style="margin-right: 6px"></i>
-            </el-button>
+                <i class="el-icon-back" style="margin-right: 6px"></i>
+              </el-button>
             </div>
             <div class="title">学生列表</div>
           </div>
@@ -17,27 +17,52 @@
                 <el-input placeholder="按学号查找" v-model="searchId" size="small"></el-input>
               </el-col>
               <el-col :span="3">
-                <el-button type="primary" size="small" class="searchbutton">
+                <el-button type="primary" size="small" class="searchbutton" @click="getStudentByID">
                   <i class="el-icon-search" style="margin-right: 10px"></i>搜索
                 </el-button>
               </el-col>
             </el-row>
             <el-row class="margin">
-              <el-table :data="studentInfo" @row-click="goAnalysis" size="small" class="table">
+              <el-table
+                :data="studentCurrent"
+                @row-click="goAnalysis"
+                size="small"
+                class="table"
+                v-loading="listLoading"
+              >
                 <el-table-column label="学号" align="center">
-                  <template slot-scope="scope"><p class="text">{{scope.row.id}}</p></template>
+                  <template slot-scope="scope">
+                    <div class="table-row">
+                      <p class="text">{{scope.row.id}}</p>
+                    </div>
+                  </template>
                 </el-table-column>
                 <el-table-column label="姓名" align="center">
-                  <template slot-scope="scope"><p class="text">{{scope.row.name}}</p></template>
+                  <template slot-scope="scope">
+                    <div class="table-row">
+                      <p class="text">{{scope.row.name}}</p>
+                    </div>
+                  </template>
                 </el-table-column>
                 <el-table-column label="联系方式" align="center">
-                  <template slot-scope="scope"><p class="text">{{scope.row.email}}</p></template>
+                  <template slot-scope="scope">
+                    <div class="table-row">
+                      <p class="text">{{scope.row.email}}</p>
+                    </div>
+                  </template>
                 </el-table-column>
               </el-table>
             </el-row>
           </div>
           <div class="bottom page">
-            <el-pagination :page-size="20" layout="prev, pager, next" small :total="studentCount"></el-pagination>
+            <el-pagination
+              :page-size="9"
+              layout="prev, pager, next"
+              small
+              :total="studentCount"
+              :current-page.sync="currentPage"
+              @current-change="getStudentCurrent(currentPage)"
+            ></el-pagination>
           </div>
         </div>
       </el-card>
@@ -51,12 +76,11 @@ export default {
   data() {
     return {
       classID: 0,
+      courseID: 0,
       // 学生信息
-      studentInfo: [{
-        id: '1612345',
-        name: '学生名字',
-        email: '96234164@qq.com'
-      }],
+      studentInfo: [],
+      studentCurrent: [],
+      currentPage: 1,
       listLoading: false,
       searchId: "",
       studentCount: 0
@@ -73,11 +97,15 @@ export default {
     },
     goAnalysis(row, column, cell, event) {
       // 传值
-      this.$router.push({path: '/teacher/studentAnalysis', query: {studentID: row.id, studentName: row.name}});
+      this.$router.push({
+        path: "/teacher/studentAnalysis",
+        query: { studentID: row.id, studentName: row.name, classID: this.classID, courseID: this.courseID, userID: row.userID }
+      });
     },
     // 获取列表
     getStudentInfo(index) {
       this.studentInfo = [];
+      this.listLoading = true;
       this.$http
         .get(
           // 传值班级号
@@ -96,6 +124,7 @@ export default {
                 let i = 0;
                 while (i < studentList.data.length) {
                   this.studentInfo.push({
+                    userID: studentList.data[i].userID,
                     id: studentList.data[i].workID,
                     name: studentList.data[i].name,
                     email: studentList.data[i].mail
@@ -103,12 +132,84 @@ export default {
                   i++;
                   this.studentCount++;
                 }
+                this.getStudentCurrent(1);
               }
             } else {
+              this.listLoading = false;
               this.$message({ type: "error", message: "加载失败!" });
             }
           },
           response => {
+            this.listLoading = false;
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getStudentCurrent(page) {
+      this.studentCurrent = [];
+      for (let i = 0; i < 9; i++) {
+        let pos = (page - 1) * 9 + i;
+        if (pos >= this.studentInfo.length) break;
+        this.studentCurrent.push(this.studentInfo[pos]);
+      }
+      this.currentPage = page;
+      this.listLoading = false;
+    },
+    getStudentByID() {
+      if (this.searchId === "") {
+        this.getStudentInfo();
+        return;
+      }
+      this.listLoading = true;
+      this.studentInfo = [];
+      this.$http
+        .get(
+          // 传值班级号
+          "/api/getStudentsByClassID?courseClassID=" + this.classID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let studentList = JSON.parse(response.bodyText);
+              if (studentList.state === 1) {
+                const keyArr = this.searchId.split(" ");
+                var result = [];
+                for (let i = 0; i < studentList.data.length; i++) {
+                  let match = true;
+                  for (let j = 0; j < keyArr.length; j++) {
+                    if (
+                      studentList.data[i].workID
+                        .toString()
+                        .search(keyArr[j]) === -1
+                    ) {
+                      match = false;
+                      break;
+                    }
+                  }
+                  if (match) {
+                    result.push({
+                      id: studentList.data[i].workID,
+                      name: studentList.data[i].name,
+                      email: studentList.data[i].mail
+                    });
+                  }
+                }
+                this.studentInfo = result;
+                this.studentCount = this.studentInfo.length;
+                this.getStudentCurrent(1);
+              }
+            } else {
+              this.listLoading = false;
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.listLoading = false;
             this.$message({ type: "error", message: "加载失败!" });
           }
         );
@@ -116,6 +217,7 @@ export default {
   },
   created() {
     this.classID = this.$route.query.classID;
+    this.courseID = this.$route.query.courseID;
     this.getStudentInfo();
   }
 };
@@ -123,10 +225,10 @@ export default {
 
 <style scoped>
 .background {
-  background-image: url('../../assets/background.jpg'); /*背景图片地址*/
-  background-repeat: no-repeat;/*背景图片不重复*/
-  background-size: cover;/*背景图片拉伸铺满*/
-  width:100%; /* 宽度为100%；*/
+  background-image: url("../../assets/background.jpg"); /*背景图片地址*/
+  background-repeat: no-repeat; /*背景图片不重复*/
+  background-size: cover; /*背景图片拉伸铺满*/
+  width: 100%; /* 宽度为100%；*/
 }
 
 .card {
@@ -141,7 +243,7 @@ export default {
 }
 
 .cardbody {
-  height: 680px; 
+  height: 680px;
   position: relative;
 }
 
@@ -163,15 +265,20 @@ export default {
 }
 
 .searchbutton {
-  background-color: #7CC8FB;
-  border-color: #7CC8FB;
+  background-color: #7cc8fb;
+  border-color: #7cc8fb;
 }
 
 .table {
   border-top: 1px solid #eaeef3;
 }
 
-.text {
+.table .table-row {
+  cursor: pointer;
+  width: 100%;
+}
+
+.table .table-row .text {
   font-weight: 430;
   font-size: 13px;
   letter-spacing: 0.5px;
@@ -185,7 +292,7 @@ export default {
 
 .bottom {
   position: absolute;
-  bottom: 10px;
+  bottom: 15px;
   left: 0;
   right: 0;
   margin: auto;
