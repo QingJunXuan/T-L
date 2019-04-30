@@ -1,7 +1,8 @@
 <template>
   <div style="margin-top；-40px">
     <h3>{{point.contentName}}</h3>
-    <div>{{point.content}}</div>
+    <div v-html="point.content"></div>
+    <!-- <div>{{point.content}}</div> -->
   </div>
 </template>
 <script>
@@ -42,7 +43,6 @@ export default {
           console.log(resp.data, "chapter content");
           if(resp.data.state==1){
           this.point = resp.data.data;}
-          //console.log(this.courseID,"courseID");
         })
         .catch(err => {
           console.log(err);
@@ -52,7 +52,7 @@ export default {
   watch: {
     $route(to, from) {
       //对路由变化做出响应
-      console.log("有变化了"); //测试点击路由的反应
+      console.log("有变化了");
       //页面需要重新加载的地方
       this.getContent();
     }

@@ -143,60 +143,7 @@ export default new Vuex.Store({
               y:50,
           }],
           links:[],
-       /*  data: [{
-            name: "start",
-            x: 200,
-            y: 0
-        }, {
-            name: '软件工程',
-            x: 100,
-            y: 100,
-        }, {
-            name: "web",
-            x: 300,
-            y: 100
-        }, {
-            name: "软件项目与过程管理",
-            x: 220,
-            y: 270
-        },],//node：name+坐标信息
-        links: [
-            {
-                source: 'start',
-                target: '软件工程',
-                label: {
-                    normal: {
-                        show: false
-                    }
-                },
-                 lineStyle: {
-                    normal: { curveness: 0.1 }
-                }
-            }, {
-                source: 'start',
-                target: 'web',
-                label: {
-                    normal: {
-                        show: false
-                    }
-                },
-                lineStyle: {
-                    normal: { curveness: 0.1 }
-                } 
-            },{
-                source: '软件工程',
-                target: '软件项目与过程管理',
-                label: {
-                    normal: {
-                        show: false
-                    }
-                },
-                lineStyle: {
-                    normal: { curveness: 0 }
-                }
-            }
-        ],//连线信息
-     */
+          catalog:[],
     },
     mutations: {
         set(state,resp){
@@ -204,57 +151,10 @@ export default new Vuex.Store({
             state.data=resp.data
             state.links=resp.links
         },
-       /*  set(state, list) {
-            state.courseList = list
-            //var list = state.courseList
-            var length = list.length
-            for (var i = 0; i < length; i++) {
-                var addData = {
-                    name: list[i].courseName.courseName,
-                    //category: "test",
-                    x: Math.round(Math.random() * 500),
-                    y: Math.round(Math.random() * 500)+50
-                };
-                state.data.push(addData)
-                var num = list[i].preCoursesName.length;
-                var name = list[i].courseName.courseName
-                if (num == 0) {//无前继节点的，连接start
-                    var addLink = {
-                        target: name,
-                        source: 'start',
-                        label: {
-                            normal: {
-                                show: false
-                            }
-                        },
-                         lineStyle: {
-                            normal: { curveness: 0.2 }
-                        } 
-                    };
-                    state.links.push(addLink)
-                }
-                else {
-                    //所有前继节点
-                    for (var j = 0; j < num; j++) {
-                        var addLink = {
-                            target: name,
-                            source: list[i].preCoursesName[j].courseName,
-                            label: {
-                                normal: {
-                                    show: false
-                                }
-                            },
-                             lineStyle: {
-                                normal: { curveness: 0.2 }
-                            } 
-                        };
-                        state.links.push(addLink)
-                    }
-                }
-            }
-            console.log(state.data,"state.data")
-            console.log(state.links,"state.links")
-        }, */
+        setCatalog(state,catalog){
+            state.catalog=catalog
+            console.log(state.catalog,"state catalog")
+        },
         setAllCourse(state,data){
             state.courseList=data
         },

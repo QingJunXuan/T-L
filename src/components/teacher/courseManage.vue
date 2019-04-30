@@ -27,7 +27,7 @@
               <p
                 id="name"
                 @click="courseDetail(item.courseInfo.courseID, item.courseClass.id)"
-              >{{item.courseInfo.courseName}}</p>
+              >{{item.courseInfo.courseName+'('+item.courseClass.classNum+')'}}</p>
               <el-row>
                 <el-col :span="5" :offset="18" style="margin-top:0px">
                   <span
@@ -80,56 +80,7 @@ export default {
       code: "",
       isPlus: false,
       isConfirm: false,
-      items: [
-        {
-          courseInfo: {
-            courseID: 1,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            teacherID: 123,
-            
-          },
-          courseClass: {
-            id: 1,
-            courseID: 1,
-            classNum: 1,
-            classCode: "100001",
-            currentExerciseChapter: "JAVA I/O 课后作业"
-          }
-        },
-        {
-          courseInfo: {
-            courseID: 2,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            teacherID: 123,
-            
-          },
-          courseClass: {
-            id: 2,
-            courseID: 2,
-            classNum: 1,
-            classCode: "100002",
-            currentExerciseChapter: "JAVA I/O 课后作业"
-          }
-        },
-        {
-          courseInfo: {
-            courseID: 3,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞",
-            teacherID: 123,
-            
-          },
-          courseClass: {
-            id: 3,
-            courseID: 3,
-            classNum: 1,
-            classCode: "100003",
-            currentExerciseChapter: "JAVA I/O 课后作业"
-          }
-        }
-      ]
+      items: []
     };
   },
   created() {
@@ -153,7 +104,6 @@ export default {
         }
         this.items = resp.data.data;
         console.log(resp.data, "resp.data");
-        console.log(this.items, "items");
       })
       .catch(err => {
         console.log(err);

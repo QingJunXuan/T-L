@@ -8,6 +8,7 @@
   </el-container>
 </template>
 <script>
+import store from '../../store/store.js'
 export default {
   name: "sChapterGraph",
   data() {

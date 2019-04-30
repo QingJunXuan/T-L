@@ -100,50 +100,7 @@ export default {
         }
       },
       chapterNameList: [],
-      items: [
-        {
-          courseInfo: {
-            courseID: 1,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞"
-          },
-          courseClass: {
-            id: 1,
-            courseID: 1,
-            classNum: 1,
-            classCode: "100001",
-            currentExerciseChapter: -1
-          }
-        },
-        {
-          courseInfo: {
-            courseID: 2,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞"
-          },
-          courseClass: {
-            id: 2,
-            courseID: 2,
-            classNum: 1,
-            classCode: "100002",
-            currentExerciseChapter: -1
-          }
-        },
-        {
-          courseInfo: {
-            courseID: 3,
-            courseName: "JavaEE",
-            teacherName: "范鸿飞"
-          },
-          courseClass: {
-            id: 3,
-            courseID: 3,
-            classNum: 1,
-            classCode: "100003",
-            currentExerciseChapter: -1
-          }
-        }
-      ]
+      items: []
     };
   },
   /*  var length = this.items.length;
@@ -183,10 +140,10 @@ export default {
       })
       .then(resp => {
         if (resp.data.state == 1) {
-          this.items = resp.data.data;
-          var length = this.items.length;
+          var length = resp.data.data.length;
           if (length != 0) {
             this.noCourse = false;
+            this.items = resp.data.data;
           }
         }
 

@@ -18,7 +18,7 @@
         </el-menu-item>
         <el-submenu v-for="(item1,index1) in tree" :index="index1.toString()" :key="index1">
           <template slot="title">
-            <span>{{item1.content+" "+item1.contentName}}</span>
+            <span style="color:#ddd">{{ '第 '+(index1+1)+' 章'}}</span><span>&nbsp;&nbsp;{{item1.contentName}}</span>
           </template>
           <div>
             <div v-for="(item2, index2) in item1.subCatalog" :key="index1*10+index2">
@@ -28,7 +28,8 @@
                     :to="{name: 'point', query:{chapterID: item2.id, name: item2.contentName}}"
                     class="router-link-active"
                   >
-                    <el-menu-item :index="index1.toString() + index2">{{item2.content+" "+item2.contentName}}</el-menu-item>
+                    <el-menu-item :index="index1.toString() + index2">
+                      <span>{{(index1+1)+'.'+(index2+1)}}</span>&nbsp;<span>{{item2.contentName}}</span></el-menu-item>
                   </router-link>
                 </el-col>
               </el-row>
@@ -41,7 +42,7 @@
               <el-menu-item :index="index1.toString() + 'pre'">课前摸底</el-menu-item>
             </router-link>
             <router-link
-              :to="{name: 'revExercise', query:{srevid: item1.id}}"
+              :to="{name: 'revExercise', query:{srevid: item1.id,index:index1}}"
               class="router-link-active"
             >
               <el-menu-item :index="index1.toString() + 'rev'">课后作业</el-menu-item>
@@ -58,6 +59,7 @@
 
 <script>
 import axios from 'axios'
+import store from '../../store/store.js';
 export default {
   name: "sChapterDetail",
   data() {
@@ -176,7 +178,13 @@ export default {
   },
   methods: {
     goBack() {
-      if (window.history.length <= 1) {
+      this.$router.push({
+          path:"/student/courseDetail",
+          query:{
+            courseID:this.courseID
+          }
+        });
+      /* if (window.history.length <= 1) {
         this.$router.push({ path: "/" });
         return false;
       } else {
@@ -186,7 +194,7 @@ export default {
             courseID:this.courseID
           }
         });
-      }
+      } */
     },
     handleChapterClose() {
       for (let i = 0; i < this.chapterData.length; i++) {
@@ -208,6 +216,7 @@ export default {
         })
         .then(resp => {
           this.tree = resp.data.data;
+          //store
           console.log(resp.data,"resp.data");
           console.log(this.courseID,"courseID");
         })

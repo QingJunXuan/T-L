@@ -89,6 +89,8 @@
 <script>
 import graph from "./chapterGraph.vue";
 import axios from "axios";
+let chapterNum=0;
+let sectionNum=0;
 export default {
   name: "tCourseDetail",
   components: {
@@ -505,12 +507,12 @@ export default {
       
       //console.log(h,"h",node,"node",data,"data",store,"store")
       if (data.parentID == 0) {
-        //this.number=this.number+1
+        chapterNum=chapterNum+1
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
               <span style="color:#000;font-size:15px">
-                {"第 "  + this.number+ " 章 "}&nbsp;
+                {"第 "  + chapterNum+ " 章 "}&nbsp;
               </span>
               <span>{node.label}</span>
             </span>
@@ -536,16 +538,16 @@ export default {
           </span>
         );
       } else {
+        sectionNum=sectionNum+1
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-              <span>&nbsp;</span>
+              <span>{chapterNum +'.'+sectionNum}&nbsp;</span>
               <span>{node.label}</span>
             </span>
           </span>
         );
       }
-      //this.number=this.number+1
     },
     pre(data) {
       console.log(data, "pre");

@@ -307,7 +307,7 @@
   </el-container>
 </template>
 <script>
-import store from "../../store/store.js";
+import store from '../../store/store.js'
 import axios from "axios";
 export default {
   name: "courseGraph",

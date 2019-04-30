@@ -1,7 +1,8 @@
 <template>
   <div style="margin-top；-40px">
     <h3>{{point.contentName}}</h3>
-    <div>{{point.content}}</div>
+    <div v-html="point.content"></div>
+   <!--  <div>{{point.content}}</div> -->
   </div>
 </template>
 <script>

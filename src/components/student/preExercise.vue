@@ -57,7 +57,7 @@
             </el-checkbox-group>
           </el-form-item>
           <!-- 主观 -->
-          <el-form-item
+          <!-- <el-form-item
             style="margin-left: 10px"
             v-else-if="item.exercise.exerciseType===3"
             :prop="index.toString()"
@@ -67,7 +67,7 @@
     ]"
           >
             <el-input type="textarea" :rows="4" placeholder="请输入答案" v-model="answer[index]"></el-input>
-          </el-form-item>
+          </el-form-item> -->
         </div>
         <el-form-item>
           <el-button type="primary" @click="submitForm('answer')" size="mini">确认提交</el-button>
@@ -86,10 +86,10 @@
             <span
               v-if="item.exercise.exerciseType===1 || item.exercise.exerciseType ===2"
             >
-              <span style="font-size:12px;color:rgb(100,100,100)">
+              <!-- <span style="font-size:12px;color:rgb(100,100,100)">
                 答案：
                 <span style="color:red;">{{item.exercise.exerciseAnswer}}&nbsp;&nbsp;</span>
-              </span>
+              </span> -->
               <span style="font-size:12px;color:rgb(100,100,100)">
                 你的选择：
                 <span
@@ -108,12 +108,12 @@
                 <span style="color:red;">{{score[index]}}</span> 分
               </span>
             </span>
-            <span v-else-if="item.exercise.exerciseType===3 && isScored===true">
+            <!-- <span v-else-if="item.exercise.exerciseType===3 && isScored===true">
               <span style="font-size:12px;color:rgb(100,100,100)">
                 得分:
                 <span style="color:red;">{{score[index]}}</span> 分
               </span>
-            </span>
+            </span> -->
           </p>
           <span v-if="item.exercise.exerciseType===1 || item.exercise.exerciseType ===2">
             <span
@@ -123,13 +123,13 @@
               :label="j - 1"
               style="margin-left:10px"
             >
-              <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
+              <span :class="setAnswerClass(item.exercise.exerciseAnswer, String.fromCharCode(j+64))">{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
             </span>
           </span>
-          <div
+          <!-- <div
             v-else-if="item.exercise.exerciseType===3"
             style="padding:10px;background-color:#ddd;height:50px"
-          >你的答案：{{answer[index]}}</div>
+          >你的答案：{{answer[index]}}</div> -->
           <div
             style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
           >解析：{{item.exercise.exerciseAnalysis}}</div>
@@ -148,7 +148,7 @@ export default {
   data() {
     return {
       isScored: false,
-      havePre: true,
+      havePre: false,
       before: true,
       after: false,
       beforeRate: true,
@@ -156,19 +156,12 @@ export default {
       sid: 0,
       type: 0,
       rate: 0,
-      answer: {
-        0: "",
-        1: [],
-        2: ""
-      },
-      score: {
-        0: "",
-        1: "",
-        2: ""
-      },
+      answer: {},
+      score: {},
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      exercises: [
+      exercises:[],
+     /*  exercises: [
         {
           exercise: {
             exerciseId: 1,
@@ -245,7 +238,7 @@ export default {
             }
           ]
         },
-        /*  {
+         {
           exercise: {
             exerciseId: 3,
             chapterId: 1,
@@ -282,7 +275,7 @@ export default {
               choice: "default"
             }
           ]
-        }, */
+        }, 
         {
           exercise: {
             exerciseId: 4,
@@ -321,7 +314,7 @@ export default {
             }
           ]
         }
-      ]
+      ] */
     };
   },
   create() {
@@ -344,7 +337,10 @@ export default {
     }
   },
   methods: {
-  
+    setAnswerClass(item, j) {
+      if (item.indexOf(j) >= 0 ) return "answer";
+      else return "";
+    },
     getPre() {
       const sid = this.$route.query.spreid;
       this.sid = sid;
@@ -366,6 +362,14 @@ export default {
 
             if (length != 0) {
               this.havePre = true;
+              for(var i=0;i<length;i++){
+              if(this.exercises[i].exercise.exerciseType==1){
+                this.answer[i.toString()]=null
+              }else if(this.exercises[i].exercise.exerciseType==2){
+                this.answer[i.toString()]=[]
+              }
+              this.score[i]=''
+            }
             }
             this.test();
           }
@@ -375,6 +379,7 @@ export default {
         });
     },
     test() {
+      var count=0;
       for (var i = 0; i < this.exercises.length; i++) {
         count += this.exercises[i].exercise.exercisePoint;
 
@@ -476,5 +481,8 @@ export default {
 <style>
 .test {
   color: #747a81;
+}
+.answer{
+  color: red;
 }
 </style>

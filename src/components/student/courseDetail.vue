@@ -54,8 +54,11 @@
   </div>
 </template>
 <script>
+import store from '../../store/store.js'
 import graph from "./chapterGraph.vue";
 import axios from "axios";
+let  chapterNum = 0;
+let  sectionNum=0;
 export default {
   name: "sCourseDetail",
   components: {
@@ -83,43 +86,7 @@ export default {
       ], //node：name+坐标信息
       links: [], //连线信息
 
-      tree: [
-        {
-          id: 1,
-          createTime: "2019-03-30T06:16:14.000+0000",
-          updateTime: "2019-03-31T00:36:54.000+0000",
-          courseID: 1,
-          contentName: "Java I/O",
-          parentID: 0,
-          siblingID: 0,
-          content: "一",
-          exerciseVisible_1: false,
-          exerciseVisible_2: false,
-          exerciseDeadline_1: "2019-04-20",
-          exerciseDeadline_2: "2019-04-20",
-          exerciseTotal_1: 100,
-          exerciseTotal_2: 100,
-          subCatalog: [
-            {
-              id: 4,
-              createTime: "2019-03-30T06:30:18.000+0000",
-              updateTime: "2019-03-31T00:36:54.000+0000",
-              courseID: 1,
-              contentName: "I/O介绍",
-              parentID: 1,
-              siblingID: 0,
-              content: "一.1",
-              exerciseVisible_1: false,
-              exerciseVisible_2: false,
-              exerciseDeadline_1: null,
-              exerciseDeadline_2: null,
-              exerciseTotal_1: null,
-              exerciseTotal_2: null,
-              subCatalog: []
-            }
-          ]
-        }
-      ],
+      tree: [],
       defaultProps: {
         children: "subCatalog",
         label: "contentName"
@@ -134,7 +101,7 @@ export default {
     const routerParams2 = this.$route.query.classID;
     this.classID = routerParams2;
     console.log(this.courseID);
-    this.getChapterGraph();
+    this.getChapterGraph();//图
     this.getNotice();
     this.getLesson();
   },
@@ -196,6 +163,7 @@ export default {
         .then(resp => {
           if (resp.data.state == 1) {
             this.tree = resp.data.data;
+            store.commit('setCatalog',this.tree)
           }
           console.log(resp.data, "resp.data");
           console.log(this.courseID, "courseID");
@@ -230,11 +198,13 @@ export default {
     },
     renderContent(h, { node, data, store }) {
       if (data.parentID == 0) {
+        //console.log("h",h,"node",node,"data",data,"store",store)
+        chapterNum=chapterNum+1;
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
               <span style="color:#000;font-size:15px">
-                {"第 " + data.content + " 章 "}&nbsp;
+                {"第 " + chapterNum + " 章 "}&nbsp;
               </span>
               <span>{node.label}</span>
             </span>
@@ -251,7 +221,7 @@ export default {
                 style="font-size: 12px;"
                 size="mini"
                 type="info"
-                on-click={() => this.rev(node, data)}
+                on-click={() => this.rev(node, data,chapterNum)}
                 round
               >
                 课后作业
@@ -260,10 +230,11 @@ export default {
           </span>
         );
       } else {
+        sectionNum=sectionNum+1
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-              <span>{data.content}&nbsp;</span>
+            <span>{chapterNum +'.'+sectionNum}&nbsp;</span>
               <span>{node.label}</span>
             </span>
           </span>
@@ -280,13 +251,14 @@ export default {
         }
       });
     },
-    rev(node, data) {
+    rev(node, data,num) {
       console.log(node, data, "rev");
       this.$router.push({
         path: "chapterDetail/revExercise",
         query: {
           srevid: data.id,
-          courseIDs: this.courseID
+          courseIDs: this.courseID,
+          index:num-1,
         }
       });
     },

@@ -13,7 +13,7 @@
           <span style="color:red;">{{totalScore}}</span> 分
         </span>
       </h3>
-      <h4 align="start" style="color:rgb(150,150,150)">截止时间：{{time}}</h4>
+      <h4 align="start" style="color:rgb(150,150,150)" v-if="time!=null">截止时间：{{time}}</h4>
       <el-form ref="answer" :model="answer" v-show="before">
         <div
           style="margin-top:15px;font-size:14px"
@@ -24,13 +24,13 @@
           <p style="margin-left:5px">
             {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
             <span
-              v-if="item.exercise.exerciseType===2"
+              v-if="item.exercise.exerciseType===5"
             >（多选）</span>
           </p>
           <!-- 单选 -->
           <el-form-item
             style="margin-top:10px;margin-left:10px;padding-bottom:10px"
-            v-if="item.exercise.exerciseType===1"
+            v-if="item.exercise.exerciseType===4"
             :prop="index.toString()"
             :rules="[
       { required: true, message: '请选择'},
@@ -49,7 +49,7 @@
           <!-- 多选 -->
           <el-form-item
             style="margin-left: 10px"
-            v-else-if="item.exercise.exerciseType===2"
+            v-else-if="item.exercise.exerciseType===5"
             :prop="index.toString()"
             :rules="[
       { required: true, message: '请选择'},
@@ -67,7 +67,7 @@
           <!-- 主观 -->
           <el-form-item
             style="margin-left: 10px"
-            v-else-if="item.exercise.exerciseType===3"
+            v-else-if="item.exercise.exerciseType===6"
             :prop="index.toString()"
             :rules="[
       { required: true, message: '请选择'},
@@ -91,20 +91,20 @@
           <p style="margin-left:5px">
             {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
             <span
-              v-if="item.exercise.exerciseType===1 || item.exercise.exerciseType ===2"
+              v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
             >
-            <span  style="font-size:12px;color:rgb(100,100,100)"
+           <!--  <span  style="font-size:12px;color:rgb(100,100,100)"
             >答案：<span style="color:red;">
               {{item.exercise.exerciseAnswer}}&nbsp;&nbsp;
             </span>
-            </span>
+            </span> -->
               <span style="font-size:12px;color:rgb(100,100,100)">
                 你的选择:
                 <span
                   style="color:red;"
-                  v-if="item.exercise.exerciseType===1"
+                  v-if="item.exercise.exerciseType===4"
                 >{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
-                <span style="color:red;" v-else-if="item.exercise.exerciseType===2">
+                <span style="color:red;" v-else-if="item.exercise.exerciseType===5">
                   <span
                     v-for="(num,index) in answer[index]"
                     :key="index"
@@ -116,14 +116,14 @@
                 <span style="color:red;">{{score[index]}}</span> 分
               </span>
             </span>
-            <span v-else-if="item.exercise.exerciseType===3 && isScored==true">
+            <span v-else-if="item.exercise.exerciseType===6 && isScored==true">
               <span style="font-size:12px;color:rgb(100,100,100)">
                 得分:
                 <span style="color:red;">{{score[index]}}</span> 分
               </span>
             </span>
           </p>
-          <span v-if="item.exercise.exerciseType===1 || item.exercise.exerciseType ===2">
+          <span v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5">
             <span
               v-for="j in item.exerciseChoiceList.length"
               :key="j"
@@ -131,11 +131,12 @@
               :label="j - 1"
               style="margin-left:10px"
             >
-              <span>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
+              <span v-if="isRated==false">{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>              
+              <span :class="setAnswerClass(item.exercise.exerciseAnswer, String.fromCharCode(j+64))" v-else>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
             </span>
           </span>
           <div
-            v-else-if="item.exercise.exerciseType===3"
+            v-else-if="item.exercise.exerciseType===6"
             style="padding:10px;background-color:#ddd;height:50px"
           >你的答案：{{answer[index]}}</div>
 
@@ -170,11 +171,12 @@
   </div>
 </template>
 <script>
+import store from '../../store/store.js'
 import axios from "axios";
 export default {
   data() {
     return {
-      time:"2019-01-01",
+      time:null,
       haveRev: false,
       half: true,
       before: true,
@@ -186,19 +188,11 @@ export default {
       type: 0,
       rate: 0,
       sid: 0,
-      answer: {
-        0: "",
-        1: [],
-        2: ""
-      },
-      score: {
-        0: "",
-        1: "",
-        2: ""
-      },
+      answer: {},
+      score: {},
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      exercises: []
+      exercises: [],
       /*  exercises: [
         {
           exercise: {
@@ -321,7 +315,7 @@ export default {
             exerciseType: 5,
             exerciseNumber: 1,
             exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: ["A", "B"],
+            exerciseAnswer: 'AB',
             exerciseAnalysis: "因为。。。",
             exercisePoint: 5
           },
@@ -364,7 +358,7 @@ export default {
             exercisePoint: 5
           }
         }
-      ] */
+      ]  */
     };
   },
   create() {
@@ -383,11 +377,23 @@ export default {
     this.getRev()
   }, */
   mounted() {
-    this.getRev();
+    //this.getRev();
+    this.setTime()
     //this.test();
   },
   methods: {
-      getTime(){
+    setAnswerClass(item, j) {
+      if (item.indexOf(j) >= 0 ) return "answer";
+      else return "";
+    },
+    setTime(){
+      const index =this.$route.query.index
+      var catalog = store.state.catalog
+      if(catalog.length!=0 && catalog[index].exerciseDeadline_2!=null){
+      this.time = catalog[index].exerciseDeadline_2
+      }
+    },
+    getTime(){
       axios
         .get("/api/getChapterByID", {
           headers: {
@@ -418,7 +424,6 @@ export default {
     getRev() {
       const sid = this.$route.query.srevid;
       this.sid = sid;
-      this.getTime()
       axios
         .get("/api/question/view", {
           headers: {
@@ -427,7 +432,7 @@ export default {
           },
           params: {
             chapterId: sid,
-            type: "preview"
+            type: "review"
           }
         })
         .then(resp => {
@@ -435,8 +440,25 @@ export default {
           if(resp.data.state==1){
           this.exercises = resp.data.data;
           var length = this.exercises.length;
+          //var isShow = store.state.catalog
           if (length != 0) {
-            this.haveRev = true;
+            //this.haveRev = true;
+             const index =this.$route.query.index
+             var catalog = store.state.catalog
+             if(catalog.length!=0 && catalog[index].exerciseVisible_2==true){
+               this.haveRev=true
+               }
+            //生成answer[],score[]
+            for(var i=0;i<length;i++){
+              if(this.exercises[i].exercise.exerciseType==4){
+                this.answer[i.toString()]=null
+              }else if(this.exercises[i].exercise.exerciseType==5){
+                this.answer[i.toString()]=[]
+              }else if(this.exercises[i].exercise.exerciseType==6){
+                this.answer[i.toString()]=''
+              }
+              this.score[i]=''
+            }
           }
 
           this.test();
@@ -446,7 +468,7 @@ export default {
           console.log(err);
         });
     },
-    submitForm(formname) {
+    submitForm(formname) {//暂存
       var length = Object.keys(this.answer).length;
       this.$refs[formname].validate(valid => {
         if (valid) {
@@ -497,7 +519,7 @@ export default {
       }
       //var total = 0
     },
-    submit() {
+    submit() {//提交
       if (this.before == true) {
         alert("请先完成题目");
       } else if (this.rate == 0) {
@@ -542,5 +564,8 @@ export default {
 <style>
 .test {
   color: #747a81;
+}
+.answer{
+  color: red;
 }
 </style>
