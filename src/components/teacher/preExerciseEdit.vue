@@ -859,14 +859,14 @@ export default {
             contentName: this.chapterInfo.contentName,
             parentID: this.chapterInfo.parentID,
             siblingID: this.chapterInfo.siblingID,
-            content: this.chapterInfo.content,
+            content: this.chapterInfo.content === null? new String():this.chapterInfo.content,
             exerciseTitle: this.chapterInfo.contentName + "练习题",
             exerciseVisible_1: true,
-            exerciseVisible_2: this.chapterInfo.exerciseVisible_2,
+            //exerciseVisible_2: this.chapterInfo.exerciseVisible_2,
             exerciseDeadline_1: deadline,
-            exerciseDeadline_2: this.chapterInfo.exerciseDeadline_2,
+            //exerciseDeadline_2: this.chapterInfo.exerciseDeadline_2,
             exerciseTotal_1: Number(this.totalScore),
-            exerciseTotal_2: this.chapterInfo.exerciseTotal_2
+            //exerciseTotal_2: this.chapterInfo.exerciseTotal_2
           },
           {
             headers: {

@@ -156,9 +156,8 @@ export default {
       });
   },
   methods: {
-    
     toAnalysis() {
-      this.$router.push({ path: "/student/studentAnalysis" ,query:{studentID:1}});
+      this.$router.push({ path: "/student/studentAnalysis" ,query:{studentID: 1612345, studentName: '车希彤', userID: 1}});
     },
     submit: function() {
       //获取课程信息，进行确认

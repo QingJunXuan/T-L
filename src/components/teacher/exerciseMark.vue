@@ -23,9 +23,7 @@
             <!-- 成绩和学生信息 -->
             <el-row style="margin-top: 3px">
               <el-col :span="4" align="center">
-                <div class="grade">
-                  总成绩：{{totalScore[index]}}
-                </div>
+                <div class="grade">总成绩：{{totalScore[index]}}</div>
               </el-col>
               <el-col :span="13" align="end">
                 <div v-if="notSelect">
@@ -228,9 +226,7 @@ export default {
       this.$http
         .get(
           // 传值chapterid
-          "/api/question/view?chapterId=" +
-            this.chapterID +
-            "&type=preview",
+          "/api/question/view?chapterId=" + this.chapterID + "&type=review",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -242,17 +238,20 @@ export default {
             if (response.status === 200) {
               let exerciseList = JSON.parse(response.bodyText);
               if (exerciseList.state === 1) {
-                let i = 1;
+                let i = 0;
                 while (i < exerciseList.data.length) {
-                  if (exerciseList.data[i].exercise.exerciseType === 3) {
+                  if (exerciseList.data[i].exercise.exerciseType === 6) {
                     this.question.push({
                       id: exerciseList.data[i].exercise.exerciseId,
                       content: exerciseList.data[i].exercise.exerciseContent,
-                      score: exerciseList.data[i].exercise.exercisePoint
+                      score: exerciseList.data[i].exercise.exercisePoint,
+                      order: exerciseList.data[i].exercise.exerciseNumber
                     });
                   }
+                  this.studentInfo[i].score.push(0);
                   i++;
                 }
+                this.question.sort(this.compare("order"));
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -263,7 +262,7 @@ export default {
           }
         );
     },
-    getStudentInfo(index) {
+    getStudentInfo() {
       this.studentInfo = [];
       this.studentOptions = [];
       this.$http
@@ -297,17 +296,15 @@ export default {
                       " " +
                       studentList.data[i].name
                   });
-                  for (let k = 0; k < this.question.length; k++) {
-                    this.studentInfo[i].score.push(0);
-                    //this.getAnswers(i, this.question[k].id, this.studentInfo[i].studentId)
-                    this.studentInfo[i].answer.push({
-                      id: i * 10 + k,
-                      content: "学生答案"
-                    });
-                  }
+                  this.studentInfo[i].answer.push({
+                    id: i,
+                    content: '答案'
+                  })
+                  //this.getAnswers(i);
                   i++;
                 }
               }
+              this.getExercises();
               console.log(this.studentInfo.length);
               console.log(this.studentOptions.length);
             } else {
@@ -319,13 +316,14 @@ export default {
           }
         );
     },
-    getAnswers(index, exerciseId, studentId) {
+    getAnswers(index) {
       this.$http
         .get(
-          "/api/question/findOneAnswer?exerciseId=" +
-            exerciseId +
-            "&studentId=1",
-          // + studentId
+          "/api/question/viewSomeAnswer?chapterId=" +
+            this.chapterID +
+            "&studentId=" +
+            this.studentInfo[index].studentId +
+            "&type=review",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -337,10 +335,18 @@ export default {
             if (response.status === 200) {
               let answer = JSON.parse(response.bodyText);
               if (answer.state === 1) {
-                this.studentInfo[index].answer.push({
-                  id: answer.data.id,
-                  content: answer.data.studentAnswer
-                });
+                let i = 0;
+                while (i < answer.data.length) {
+                  if (anser.data[i].exercise.exerciseType === 6) {
+                    this.studentInfo[index].answer.push({
+                      id: answer.data[i].exercise.exerciseId,
+                      content: answer.data[i].answer,
+                      order: answer.data.exercise.exerciseNumber
+                    });
+                  }
+                  i++;
+                }
+                this.studentInfo[index].answer.sort(this.compare("order"));
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -350,13 +356,55 @@ export default {
             this.$message({ type: "error", message: "加载失败!" });
           }
         );
+    },
+    submit() {
+      this.$http
+        .post(
+          "/api/question/correctAll",
+          {
+            scores: this.studentInfo[this.index].score,
+            studentId: this.studentInfo[this.index].studentId,
+            chapterId: this.chapterID,
+            type: 'review'
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              this.$message({ type: "success", message: "提交成功!" });
+            } else {
+              this.$message({ type: "error", message: "提交失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "提交失败!" });
+          }
+        );
+    },
+    // 比较器
+    compare(propertyName) {
+      return function(object1, object2) {
+        var value1 = object1[propertyName];
+        var value2 = object2[propertyName];
+        if (value2 < value1) {
+          return 1;
+        } else if (value2 > value1) {
+          return -1;
+        } else {
+          return 0;
+        }
+      };
     }
   },
   created() {
     this.chapterID = this.$route.query.chapterID;
     this.classID = this.$route.query.classID;
-    //this.getStudentInfo();
-    this.getExercises();
+    this.getStudentInfo();
   },
   computed: {
     totalScore() {
