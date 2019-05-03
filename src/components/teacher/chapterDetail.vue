@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside>
+    <el-aside  style="width:340px">
       <el-menu
         default-active="0-0"
         style="height: 720px"
@@ -8,6 +8,8 @@
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
+        v-loading="menuLoading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
       >
       <el-menu-item>
           <span>
@@ -18,17 +20,18 @@
         </el-menu-item>
         <el-submenu v-for="(item1,index1) in tree" :index="index1.toString()" :key="index1">
           <template slot="title">
-            <span>{{item1.content+" "+item1.contentName}}</span>
+            <span style="color:#ddd">{{ '第 '+(index1+1)+' 章'}}</span><span>&nbsp;&nbsp;{{item1.contentName}}</span>
           </template>
           <div>
             <div v-for="(item2, index2) in item1.subCatalog" :key="index1*10+index2">
               <el-row class="vertical-middle">
-                <el-col :span="16">
+                <el-col>
                   <router-link
                     :to="{name: 'tpoint', query:{chapterIDt: item2.id, name: item2.contentName}}"
                     class="router-link-active"
                   >
-                    <el-menu-item :index="index1.toString() + index2">{{item2.content+" "+item2.contentName}}</el-menu-item>
+                    <el-menu-item :index="index1.toString() + index2">
+                      <span style="color:#ddd">{{(index1+1)+'.'+(index2+1)}}</span>&nbsp;<span>{{item2.contentName}}</span></el-menu-item>
                   </router-link>
                 </el-col>
               </el-row>
@@ -41,7 +44,7 @@
               <el-menu-item :index="index1.toString() + 'pre'">课前摸底</el-menu-item>
             </router-link>
             <router-link
-              :to="{name: 'trevExercise', query:{trevid: item1.id}}"
+              :to="{name: 'trevExercise', query:{trevid: item1.id,index:index1}}"
               class="router-link-active"
             >
               <el-menu-item :index="index1.toString() + 'rev'">课后作业</el-menu-item>
@@ -63,84 +66,23 @@ export default {
   data() {
     return {
       // 章节知识点列表
-      catalog: [
-        {
-          chapterName: "章节一",
-          type: "0",
-          predecessor: [],
-          points: [
-            {
-              name: "知识点1",
-              edit: false
-            },
-            {
-              name: "知识点2",
-              edit: false
-            },
-            {
-              name: "知识点3",
-              edit: false
-            }
-          ]
-        },
-        {
-          chapterName: "章节二",
-          type: "0",
-          predecessor: [0],
-          points: [
-            {
-              name: "知识点1",
-              edit: false
-            },
-            {
-              name: "知识点2",
-              edit: false
-            },
-            {
-              name: "知识点3",
-              edit: false
-            }
-          ]
-        },
-        {
-          chapterName: "章节三",
-          type: "0",
-          predecessor: [0, 1],
-          points: [
-            {
-              name: "知识点1",
-              edit: false
-            },
-            {
-              name: "知识点2",
-              edit: false
-            },
-            {
-              name: "知识点3",
-              edit: false
-            }
-          ]
-        }
-      ],
+      catalog: [],
       chapterData: [],
       courseID:0,
       updateChapterVisible: false,
-     tree:[],
-      typeOptions: [
-        {
-          value: "0",
-          label: "一级章节"
-        },
-        {
-          value: "1",
-          label: "二级章节"
-        }
-      ]
+      tree:[],
+      typeOptions: [],
+      menuLoading: false
     };
   },
   methods: {
     goBack() {
-      if (window.history.length <= 1) {
+      this.$router.push({
+          path:"/teacher/courseDetail",
+          query:{
+            courseID:this.courseID}
+          });
+     /*  if (window.history.length <= 1) {
         this.$router.push({ path: "/" });
         return false;
       } else {
@@ -149,7 +91,7 @@ export default {
           query:{
             courseID:this.courseID}
           });
-      }
+      } */
     },
     handleChapterClose() {
       for (let i = 0; i < this.chapterData.length; i++) {
@@ -157,9 +99,10 @@ export default {
       }
     },
      getCatalog(){
+       this.menuLoading = true;
        const routerParams = this.$route.query.courseIDt;
-     this.courseID = routerParams;
-     axios
+       this.courseID = routerParams;
+       axios
         .get("/api/getCourseCatalog", {
           headers: {
             Authorization:
@@ -171,6 +114,7 @@ export default {
         })
         .then(resp => {
           this.tree = resp.data.data;
+          this.menuLoading = false;
           console.log(resp.data,"resp.data");
           console.log(this.courseID,"courseID");
         })
@@ -203,21 +147,9 @@ export default {
 a {
   text-decoration: none;
 }
-
 .router-link-active {
   text-decoration: none;
 }
-
-.exit {
-  position: absolute;
-}
-
-.vertical-middle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .router-view {
   width: 700px;
   margin: 0 auto;

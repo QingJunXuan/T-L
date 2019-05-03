@@ -3,9 +3,8 @@
   <div style="margin:0 auto;width:700px"  v-if="havePre">
     <h4 align="start">
       客观题（<span>{{totalPoint}}</span>分）
-      <span v-show="after">得分：{{totalScore}} 分</span>
     </h4>
-    <el-form  v-show="before">
+    <el-form>
       <div
         style="margin-top:15px;font-size:14px"
         align="start"
@@ -62,179 +61,12 @@ export default {
     return {
       tid:0,
       havePre:false,
-      before: true,
-      after: false,
       type: 0,
       rate: 0,
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      exercises: [
-        {
-          exercise: {
-            exerciseId: 1,
-            chapterId: 1,
-            exerciseType: 1,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        },
-        {
-          exercise: {
-            exerciseId: 2,
-            chapterId: 1,
-            exerciseType: 1,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        },
-        {
-          exercise: {
-            exerciseId: 3,
-            chapterId: 1,
-            exerciseType: 1,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        },
-        {
-          exercise: {
-            exerciseId: 4,
-            chapterId: 1,
-            exerciseType: 2,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: ["A", "B"],
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        }
-      ]
+      exercises: []
     };
-  },
-  create() {
-   /*  var sid = this.$route.query.sid + 1;
-    this.$axios.get("/api/question/view", {
-      params: {
-        chapterId: sid,
-        type: "preview"
-      }.then(resp => {
-        this.exercises = resp.data;
-      })
-    }); */
-   //this.test()
   },
   mounted(){
    this.getPre()
@@ -261,67 +93,17 @@ export default {
       if(length!=0){
         this.havePre=true
       }
-          this.test()
+          this.setTotalPoint()
         })
         .catch(err => {
           console.log(err);
         });
     },
-    test(){
+    setTotalPoint(){
        for(var i=0;i<this.exercises.length;i++){
         this.totalPoint += this.exercises[i].exercise.exercisePoint
       }
-      console.log(this.totalPoint)
     },
-    submitForm(formname) {
-      var length = 0;
-      for (var i in this.answer) {
-        length++;
-      }
-
-      //var length=Object.getOwnPropertyNames(this.answer).length
-      if (length == this.exercises.length) {
-        for (var i = 0; i < length; i++) {
-          var type = typeof this.answer[i];
-          console.log(type, "type");
-          if (type == "number") {
-            var resp = String.fromCharCode(this.answer[i] + 65);
-            var ans = this.exercises[i].exercise.exerciseAnswer;
-            if (resp == ans) {
-              this.score[i] = this.exercises[i].exercise.exercisePoint;
-            } else {
-              this.score[i] = 0;
-            }
-          } else {
-            var respNum = this.answer[i].length;
-            var array = [];
-            for (var j = 0; j < respNum; j++) {
-              array[j] = String.fromCharCode(this.answer[i][j] + 65);
-            }
-            var ansArray = this.exercises[i].exercise.exerciseAnswer;
-            var ansNum = ansArray.length;
-            var isEqual = array.sort().toString() === ansArray.toString();
-
-            if (isEqual) {
-              this.score[i] = this.exercises[i].exercise.exercisePoint;
-            } else {
-              this.score[i] = 0;
-            }
-          }
-        }
-        console.log(this.score, "score");
-
-        this.before = false;
-        this.after = true;
-        //对比正确答案确定“得分”
-      } else {
-        alert("有习题未完成");
-      }
-
-      for(var i=0;i<this.exercises.length;i++){
-        this.totalScore+=this.score[i]
-      }
-    }
   }
 };
 </script>

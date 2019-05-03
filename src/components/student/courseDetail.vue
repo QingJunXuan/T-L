@@ -55,15 +55,11 @@
 </template>
 <script>
 import store from '../../store/store.js'
-import graph from "./chapterGraph.vue";
 import axios from "axios";
 let  chapterNum = 0;
 let  sectionNum=0;
 export default {
   name: "sCourseDetail",
-  components: {
-    graph
-  },
   data() {
     return {
       courseID: 1,
@@ -101,6 +97,8 @@ export default {
     const routerParams2 = this.$route.query.classID;
     this.classID = routerParams2;
     console.log(this.courseID);
+    chapterNum=0;
+    sectionNum=0;
     this.getChapterGraph();//图
     this.getNotice();
     this.getLesson();
@@ -186,7 +184,7 @@ export default {
     },
     handleNodeClick(object) {
       console.log(object, "node-object");
-      if (object.subCatalog.length == 0) {
+      if (object.parentID != 0) {
         this.$router.push({
           path: "chapterDetail/point",
           query: {
@@ -199,7 +197,9 @@ export default {
     renderContent(h, { node, data, store }) {
       if (data.parentID == 0) {
         //console.log("h",h,"node",node,"data",data,"store",store)
+        //chapterNum=0
         chapterNum=chapterNum+1;
+        sectionNum=0;
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
@@ -230,6 +230,7 @@ export default {
           </span>
         );
       } else {
+        
         sectionNum=sectionNum+1
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
@@ -278,9 +279,9 @@ export default {
       // 计算节点位置
       let nodes = this.graphTree.map(i => [
         i.chapterNode.contentName,
-        { level: 0, subCourses: i.subChapterNodes.map(k => k.contentName) }
+        { level: 0, subCourses: i.subCatalog.map(k => k.contentName) }
       ]);
-			console.log("TCL: init -> nodes", nodes)
+			console.log("TCL: init -> nodes", this.graphTree, nodes)
       for (let j = 0; j < nodes.length; j++) {
         let curr = nodes[j][1];
         if (curr.subCourses.length) {
@@ -329,13 +330,6 @@ export default {
       
       var length = this.graphTree.length;
       for (var i = 0; i < length; i++) {
-        // var addData = {
-        //   name: this.graphTree[i].chapterNode.content,
-        //   //category: "test",
-        //   x: Math.round(Math.random() * 500),
-        //   y: Math.round(Math.random() * 500) + 50
-        // };
-        // this.data.push(addData);
         var num = this.graphTree[i].preChapterNodes.length;
         var name = this.graphTree[i].chapterNode.contentName;
         if (num == 0) {
@@ -372,8 +366,6 @@ export default {
           }
         }
       }
-      console.log(this.data, "this.data");
-      console.log(this.links, "this.links");
       this.draw();
     },
     draw() {

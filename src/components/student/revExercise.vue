@@ -193,172 +193,6 @@ export default {
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
       exercises: [],
-      /*  exercises: [
-        {
-          exercise: {
-            exerciseId: 1,
-            chapterId: 1,
-            exerciseType: 4,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        },
-        {
-          exercise: {
-            exerciseId: 2,
-            chapterId: 1,
-            exerciseType: 4,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        },
-        {
-          exercise: {
-            exerciseId: 3,
-            chapterId: 1,
-            exerciseType: 4,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: "A",
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        },
-        {
-          exercise: {
-            exerciseId: 4,
-            chapterId: 1,
-            exerciseType: 5,
-            exerciseNumber: 1,
-            exerciseContent: "选出下列正确的一项",
-            exerciseAnswer: 'AB',
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          },
-          exerciseChoiceList: [
-            {
-              id: 1,
-              exerciseId: 4,
-              exerciceChoiceId: "A",
-              choice: "IDEA是JAVA编译器"
-            },
-            {
-              id: 2,
-              exerciseId: 4,
-              exerciceChoiceId: "B",
-              choice: "default"
-            },
-            {
-              id: 3,
-              exerciseId: 4,
-              exerciceChoiceId: "C",
-              choice: "default"
-            },
-            {
-              id: 4,
-              exerciseId: 4,
-              exerciceChoiceId: "D",
-              choice: "default"
-            }
-          ]
-        },
-        {
-          exercise: {
-            exerciseId: 4,
-            chapterId: 1,
-            exerciseType: 6,
-            exerciseNumber: 1,
-            exerciseContent: "主观题测试",
-            exerciseAnswer: "aaaaa",
-            exerciseAnalysis: "因为。。。",
-            exercisePoint: 5
-          }
-        }
-      ]  */
     };
   },
   create() {
@@ -372,14 +206,21 @@ export default {
       })
     }); */
     //进入界面确定界面状态  before after isScored 总得分
-  },
-  /*  beforeMount(){
-    this.getRev()
-  }, */
-  mounted() {
+    
     //this.getRev();
-    this.setTime()
-    //this.test();
+    //this.setTime()
+  },
+  mounted() {
+    this.getRev();
+    this.setTime();
+    this.setAnswer();
+  },
+  watch: {
+    $route(to, from) {
+      this.getPre();
+      this.setTime();
+      this.setAnswer();
+    }
   },
   methods: {
     setAnswerClass(item, j) {
@@ -407,7 +248,6 @@ export default {
           console.log("pre", resp.data);
           if (resp.data.state == 1) {
             console.log(resp.data.data,"time")
-            //this.time = resp.data.data.exerciseDeadline_2
           }
         })
         .catch(err => {
@@ -415,11 +255,10 @@ export default {
         });
 
     },
-    test() {
+    setTotalPoint() {
       for (var i = 0; i < this.exercises.length; i++) {
         this.totalPoint += this.exercises[i].exercise.exercisePoint;
       }
-      console.log(this.totalPoint, "totalPoint");
     },
     getRev() {
       const sid = this.$route.query.srevid;
@@ -440,16 +279,23 @@ export default {
           if(resp.data.state==1){
           this.exercises = resp.data.data;
           var length = this.exercises.length;
-          //var isShow = store.state.catalog
           if (length != 0) {
-            //this.haveRev = true;
              const index =this.$route.query.index
              var catalog = store.state.catalog
              if(catalog.length!=0 && catalog[index].exerciseVisible_2==true){
                this.haveRev=true
                }
-            //生成answer[],score[]
-            for(var i=0;i<length;i++){
+          }
+          this.setTotalPoint();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    setAnswer(){   
+       var length = this.exercises.length;
+       for(var i=0;i<length;i++){
               if(this.exercises[i].exercise.exerciseType==4){
                 this.answer[i.toString()]=null
               }else if(this.exercises[i].exercise.exerciseType==5){
@@ -459,14 +305,6 @@ export default {
               }
               this.score[i]=''
             }
-          }
-
-          this.test();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
     },
     submitForm(formname) {//暂存
       var length = Object.keys(this.answer).length;

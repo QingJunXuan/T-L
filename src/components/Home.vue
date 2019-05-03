@@ -233,7 +233,8 @@
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }, {emulateJSON:false}).then(response => {
-                localStorage.setItem('token', response.data.token);
+                console.log(response.data)
+                localStorage.setItem('token', response.data.data.token.token);
                 localStorage.setItem('username', this.ruleForm.account);
                 that.logining = false;
                 that.$notify({

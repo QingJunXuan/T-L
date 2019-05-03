@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside>
+    <el-aside style="width:340px">
       <el-menu
         default-active="0-0"
         style="height: 720px"
@@ -8,6 +8,8 @@
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
+        v-loading="menuLoading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
       >
       <el-menu-item>
           <span>
@@ -23,13 +25,13 @@
           <div>
             <div v-for="(item2, index2) in item1.subCatalog" :key="index1*10+index2">
               <el-row class="vertical-middle">
-                <el-col :span="16">
+                <el-col>
                   <router-link
                     :to="{name: 'point', query:{chapterID: item2.id, name: item2.contentName}}"
                     class="router-link-active"
                   >
                     <el-menu-item :index="index1.toString() + index2">
-                      <span>{{(index1+1)+'.'+(index2+1)}}</span>&nbsp;<span>{{item2.contentName}}</span></el-menu-item>
+                      <span style="color:#ddd">{{(index1+1)+'.'+(index2+1)}}</span>&nbsp;<span>{{item2.contentName}}</span></el-menu-item>
                   </router-link>
                 </el-col>
               </el-row>
@@ -65,115 +67,13 @@ export default {
   data() {
     return {
       // 章节知识点列表
-      catalog: [
-        {
-          chapterName: "章节一",
-          type: "0",
-          predecessor: [],
-          points: [
-            {
-              name: "知识点1",
-              edit: false
-            },
-            {
-              name: "知识点2",
-              edit: false
-            },
-            {
-              name: "知识点3",
-              edit: false
-            }
-          ]
-        },
-        {
-          chapterName: "章节二",
-          type: "0",
-          predecessor: [0],
-          points: [
-            {
-              name: "知识点1",
-              edit: false
-            },
-            {
-              name: "知识点2",
-              edit: false
-            },
-            {
-              name: "知识点3",
-              edit: false
-            }
-          ]
-        },
-        {
-          chapterName: "章节三",
-          type: "0",
-          predecessor: [0, 1],
-          points: [
-            {
-              name: "知识点1",
-              edit: false
-            },
-            {
-              name: "知识点2",
-              edit: false
-            },
-            {
-              name: "知识点3",
-              edit: false
-            }
-          ]
-        }
-      ],
+      catalog: [],
       chapterData: [],
       courseID:0,
       updateChapterVisible: false,
-      tree: [
-        {
-          id: 1,
-          createTime: "2019-03-30T06:16:14.000+0000",
-          updateTime: "2019-03-31T00:36:54.000+0000",
-          courseID: 1,
-          contentName: "Java I/O",
-          parentID: 0,
-          siblingID: 0,
-          content: "一",
-          exerciseVisible_1: false,
-          exerciseVisible_2: false,
-          exerciseDeadline_1: "2019-04-20",
-          exerciseDeadline_2: "2019-04-20",
-          exerciseTotal_1: 100,
-          exerciseTotal_2: 100,
-          subCatalog: [
-            {
-              id: 4,
-              createTime: "2019-03-30T06:30:18.000+0000",
-              updateTime: "2019-03-31T00:36:54.000+0000",
-              courseID: 1,
-              contentName: "I/O介绍",
-              parentID: 1,
-              siblingID: 0,
-              content: "一.1",
-              exerciseVisible_1: false,
-              exerciseVisible_2: false,
-              exerciseDeadline_1: null,
-              exerciseDeadline_2: null,
-              exerciseTotal_1: null,
-              exerciseTotal_2: null,
-              subCatalog: []
-            }
-          ]
-        }
-      ],
-      typeOptions: [
-        {
-          value: "0",
-          label: "一级章节"
-        },
-        {
-          value: "1",
-          label: "二级章节"
-        }
-      ]
+      tree: [ ],
+      typeOptions: [],
+      menuLoading: false
     };
   },
   methods: {
@@ -202,6 +102,7 @@ export default {
       }
     },
     getCatalog(){
+      this.menuLoading = true;
        const routerParams = this.$route.query.courseIDs;
      this.courseID = routerParams;
      axios
@@ -217,6 +118,7 @@ export default {
         .then(resp => {
           this.tree = resp.data.data;
           //store
+          this.menuLoading = false;
           console.log(resp.data,"resp.data");
           console.log(this.courseID,"courseID");
         })

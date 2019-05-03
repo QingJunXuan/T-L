@@ -8,55 +8,6 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        /*   courseList: [
-              {
-                  courseID: 1,
-                  createTime: "2019-03-28T04:53:06.000+0000",
-                  updateTime: "2019-04-03T06:23:53.000+0000",
-                  teacherID: 443,
-                  courseName: "软件测试",
-                  teacherName: "范鸿飞",
-                  courseYear: 2018,
-                  courseSemester: "秋季",
-                  startTime: "2019-03-28",
-                  endTime: "2019-03-29",
-                  successor: ["start"],
-  
-              }, {
-                  teacherName: "李老师",
-                  teacherID: 1001,
-                  courseNum: 2,
-                  courseName: '软件项目与过程管理',
-                  courseCode: '100001',
-                  startTime: '2018-9-1',
-                  endTime: '2019-2-1',
-              }, {
-                  teacherName: "李老师",
-                  teacherID: 1001,
-                  courseNum: 2,
-                  courseName: 'web系统与技术',
-                  courseCode: '100003',
-                  startTime: '2018-9-1',
-                  endTime: '2019-2-1',
-              }, {
-                  teacherName: "张老师",
-                  teacherID: 1004,
-                  courseNum: 1,
-                  courseName: '软件测试',
-                  courseCode: '100004',
-                  startTime: '2018-9-1',
-                  endTime: '2019-2-1',
-              }, {
-                  teacherName: "赵老师",
-                  teacherID: 1005,
-                  courseNum: 1,
-                  courseName: '安全体系结构与管理',
-                  courseCode: '100005',
-                  startTime: '2018-9-1',
-                  endTime: '2019-2-1',
-              }
-          ],//课程详细信息-ruleForm
-           */
         List: [
             {
                 courseID: 1,
@@ -293,14 +244,5 @@ export default new Vuex.Store({
             state.links = array
             console.log(state.links,"links")
         },
-        edgeStyle(state, index) {
-            var value = state.links[index].label.normal.show
-            if (value == false) {
-                state.links[index].label.normal.show = true
-            } else {
-                state.links[index].label.normal.show = false
-            }
-
-        }
     }
 })

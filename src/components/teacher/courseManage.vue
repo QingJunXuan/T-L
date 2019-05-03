@@ -7,7 +7,7 @@
         </el-col>
         <el-col :span="16">
           <el-card
-            style="margin-top:10px;height:340px;text-align:center"
+            style="margin-top:10px;height:600px;text-align:center"
             body-style="{padding:'0px'}" shadow="never"
           >
             <graph></graph>

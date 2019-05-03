@@ -87,15 +87,11 @@
   </div>
 </template>
 <script>
-import graph from "./chapterGraph.vue";
 import axios from "axios";
 let chapterNum=0;
 let sectionNum=0;
 export default {
   name: "tCourseDetail",
-  components: {
-    graph
-  },
   data() {
     return {
       number:0,//章节号
@@ -508,6 +504,7 @@ export default {
       //console.log(h,"h",node,"node",data,"data",store,"store")
       if (data.parentID == 0) {
         chapterNum=chapterNum+1
+        sectionNum=0;
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>

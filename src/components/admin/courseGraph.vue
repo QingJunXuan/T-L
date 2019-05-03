@@ -4,7 +4,7 @@
       <div>
         <el-col :span="12" :offset="2">
           <div
-            style="height:650px;margin-top:0px;padding-right:10px;border:1px solid #ddd"
+            style="height:700px;margin-top:0px;padding-right:10px;border:1px solid #ddd"
             ref="graph"
           ></div>
         </el-col>
@@ -287,14 +287,14 @@
             </el-table-column>
             <!-- <el-table-column prop="classNum" label="班级数"></el-table-column> -->
           </el-table>
-        </el-dialog>
+        </el-dialog><!-- 
         <el-dialog title="请选择要进行的操作" :visible.sync="isDelCourse" width="30%" center>
           <p style="text-align:center">确定要删除该课程吗？</p>
           <span slot="footer" class="dialog-footer">
             <el-button type="danger" @click="delCourse" size="small">确 认</el-button>
             <el-button @click="isDelCourse=false" size="small">取 消</el-button>
           </span>
-        </el-dialog>
+        </el-dialog> -->
         <el-dialog title="请选择要进行的操作" :visible.sync="dialog2" width="30%" center>
           <p style="text-align:center">
             <el-button @click="editClassVisible" size="small" type="primary">编辑信息</el-button>
@@ -307,7 +307,6 @@
   </el-container>
 </template>
 <script>
-import store from '../../store/store.js'
 import axios from "axios";
 export default {
   name: "courseGraph",
@@ -328,13 +327,7 @@ export default {
       editClassNum: false,
       dataIndex: 0,
       rowIndex: 0,
-      data: [
-        {
-          name: "start",
-          x: 1000,
-          y: 0
-        }
-      ],
+      data: [],
       links: [],
       allCourse: [], //不重名列表用于显示左侧
       dupCourse: [],
@@ -343,24 +336,18 @@ export default {
       pickerOptions0: this.startTime(),
       pickerOptions1: this.endTime(),
       pickerOptions2: this.courseYear(),
-      courses: [
-        { courseName: "java" },
-        { courseName: "软件测试" },
-        { courseName: "软件工程" },
-        { courseName: "计算机网络" },
-        { courseName: "web技术" }
-      ],
+      courses: [],
       //避免清除
       relayForm: {},
       //添加
       classNum: null,
       ruleForm1: {
-        courseName: ""
-        //successor:{}
+        courseName: "",
+        successor:{}
       },
       ruleForm2: {
-        courseName: ""
-        //successor:{}
+        courseName: "",
+        successor:{}
       },
       ruleForm3: {
         teacherName: "",
@@ -487,13 +474,12 @@ export default {
   },
   methods: {
     set(length) {
-      //var length = this.allCourse.length
-
       // 计算节点位置
       let nodes = this.allCourse.map(i => [
         i.courseName.courseName,
         { level: 0, subCourses: i.subCoursesName.map(k => k.courseName) }
       ]);
+      console.log("nodes", nodes)
       for (let j = 0; j < nodes.length; j++) {
         let curr = nodes[j][1];
         if (curr.subCourses.length) {
@@ -503,9 +489,12 @@ export default {
               nodes[findIndex][0],
               Object.assign({}, nodes[findIndex][1], { level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1 })
             ];
+            console.log("!!!", nodes[findIndex])
           });
         }
       }
+      
+      //console.log("nodes", nodes)
 
       let tempData = new Map();
       nodes.forEach(n => {
@@ -516,13 +505,16 @@ export default {
       });
 
       let data = [];
+      var width=2800;
+      var init=0;
       for (let item of tempData.entries()) {
-        console.log("TCL: set -> item", item[0]);
+        var num=item[1].length
+        init=1400/num
         item[1].forEach((value, index) => {
           let addData = {
             name: value,
-            x: Math.round((1000 / item[1].length) * index),
-            y: (parseInt(item[0]) + 1) * 300
+            x: Math.round(init+(width / num) * index),
+            y: (parseInt(item[0]) + 1) * 340
           };
           data.push(addData);
         });
@@ -530,7 +522,7 @@ export default {
 
       data.push({
         name: "start",
-        x: 0,
+        x: 1400,
         y: 0
       });
 
@@ -543,23 +535,7 @@ export default {
         var num = this.allCourse[i].preCoursesName.length;
         var name = this.allCourse[i].courseName.courseName;
 
-        /* var addData = {
-          name: name,
-          //category: "test",
-          x: Math.round(Math.random() * 2000),
-          y: Math.round(Math.random() * 2000) + Math.round(Math.random()* 100)+50
-        };
-        this.data.push(addData); */
         if (num == 0) {
-        //   var nopre_x = Math.round(Math.random() * 200) * 10;
-        //   var nopre_y = Math.round(Math.random() * 200) * 5 + 100;
-        //   var addData = {
-        //     name: name,
-        //     //category: "test",
-        //     x: nopre_x,
-        //     y: nopre_y
-        //   };
-        //   this.data.push(addData);
           //无前继节点的，连接start
           var addLink = {
             target: name,
@@ -575,15 +551,6 @@ export default {
           };
           this.links.push(addLink);
         } else {
-          // var nopre_x = Math.round(Math.random() * 200) * 10;
-          // var nopre_y = Math.round(Math.random() * 200) * 5 + 1200; //100+1000+100
-          // var addData = {
-          //   name: name,
-          //   //category: "test",
-          //   x: nopre_x,
-          //   y: nopre_y
-          // };
-          // this.data.push(addData);
 
           //所有前继节点
           for (var j = 0; j < num; j++) {
@@ -603,14 +570,10 @@ export default {
           }
         }
       }
+			console.log("TCL: set -> links", this.links)
       this.draw();
-      store.commit("set", {
-        list: this.allCourse,
-        data: this.data,
-        links: this.links
-      });
     },
-    setAllCourse() {
+     setAllCourse() {
       axios
         .get("/api/getAllCoursesRelation", {
           headers: {
@@ -619,13 +582,13 @@ export default {
         })
         .then(resp => {
           if (resp.data.state == 1) {
-            store.commit("setAllCourse", resp.data.data);
+            this.allCourse=resp.data.data
           }
         })
         .catch(err => {
           console.log(err);
         });
-    },
+    }, 
     initGraph() {
       var init = this.$refs.graph;
       var graph = this.$echarts.init(init);
@@ -673,10 +636,6 @@ export default {
       var result = val.getFullYear();
       return result;
     },
-    edgeFunc() {
-      store.commit("edgeStyle", this.dataIndex);
-      this.test();
-    },
     getDupCourse() {
       axios
         .get("/api/getAllCoursesByNameID", {
@@ -703,7 +662,7 @@ export default {
           console.log(err);
         });
     },
-    submitForm1(formName) {
+    submitForm1(formName) {//添加课程
       this.$refs[formName].validate(valid => {
         if (valid) {
           var length = this.data.length;
@@ -726,8 +685,7 @@ export default {
       });
       this.resetForm(formName);
     },
-    submitForm2(formName) {
-      //console.log(this.dataIndex)
+    submitForm2(formName) {//修改课程
       var length = this.data.length;
       for (var i = 0; i < length; i++) {
         if (
@@ -744,7 +702,7 @@ export default {
       }
       this.editCourse();
     },
-    submitForm3(formName) {
+    submitForm3(formName) {//添加课程下班级
       //addClass
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -813,8 +771,7 @@ export default {
         this.resetForm(formName);
       });
     },
-    submitForm4(formName) {
-      //editClass
+    submitForm4(formName) {//修改课程下班级
       this.$refs[formName].validate(valid => {
         if (valid) {
           var form = Object.assign({}, this.ruleForm4);
@@ -866,67 +823,24 @@ export default {
       this.$refs[formName].resetFields();
     },
     addCourse() {
-      //data
       //计算坐标
-      /*  var addData = {
-        name: this.ruleForm1.courseName,
-        category: "test",
-        x: Math.round(Math.random() * 1000),
-        y: Math.round(Math.random() * 1000)
-      };
-      store.commit("addData", addData); */
-
-      let nodes = this.allCourse.map(i => [i.courseName.courseName, {level: 0, subCourses: i.subCoursesName.map(k => k.courseName)}]);
-      for (let j = 0; j < nodes.length ; j++ ) {
-        let curr = nodes[j][1]
-        if (curr.subCourses.length) {
-          curr.subCourses.forEach((p) => {
-            let findIndex = nodes.findIndex(node => node[0] === p)
-            nodes[findIndex] = [nodes[findIndex][0], Object.assign({}, nodes[findIndex][1], {level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1})]
-          })
-        }
-      }
-
-      let tempData = new Map()
-      nodes.forEach((n) => {
-        tempData.set(n[1].level, [])
-      })
-      nodes.forEach((n) => {
-        tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]))
-      })
-
-      let data = []
-      for (let item of tempData.entries()) {
-				console.log("TCL: set -> item", item[0])
-        item[1].forEach((value, index) => {
-          let addData = {
-            name: value,
-            x: Math.round((1000 / item[1].length) * index ),
-            y: (parseInt(item[0]) + 1) * 300
-          };
-          store.commit("addData", addData);
-        })
-      }
-
-      store.commit("addData", {
-        name: 'start',
-        x: 0,
-        y: 0
-      });
-
-      // this.data = data
-      // console.log("TCL: set -> data", data)
-      // var name = this.ruleForm1.courseName;
-      // var num = this.ruleForm1.successor.length;
+      var name=this.ruleForm1.courseName
+      var num = this.ruleForm1.successor.length
       // //所有前继节点
       if (num == 0) {
-      //   var addData = {
-      //     name: name,
-      //     category: "test",
-      //     x: Math.round(Math.random() * 200) * 10,
-      //     y: Math.round(Math.random() * 200) * 5 + 100
-      //   };
-          // store.commit("addData", addData);
+        var dataNum=this.data.length
+          this.data.forEach((value,index) =>{
+            if(value.y==340){
+              this.data[index].x= Math.round(1400/(dataNum+1) +(2800 / (dataNum+1)) * index)
+            }
+          })
+        
+        var addData={
+          name:name,
+          x:Math.round(1400/(dataNum+1) +(2800 / (dataNum+1)) * dataNum),
+          y:340
+        };
+        this.data.push(addData)
         //无前继节点的，连接start
         var addLink = {
           target: name,
@@ -940,16 +854,30 @@ export default {
             normal: { curveness: 0.2 }
           }
         };
-        store.commit("addLinks", addLink);
+        this.links.push(addLink)
       } else {
-        // var addData = {
-        //   name: name,
-        //   category: "test",
-        //   x: Math.round(Math.random() * 200) * 10,
-        //   y: Math.round(Math.random() * 200) * 5 + 1200 //100+1000+100
-        // };
-        // store.commit("addData", addData);
-
+        var max_y=0;
+        for(var i=0;i<num;i++){
+          this.data.forEach((value,index) =>{
+            if(value.name==this.ruleForm1.successor[i]){
+              if(value.y>max_y){
+                max_y=value.y
+              }
+            }
+          })
+        }
+        var dataNum=this.data.length
+          this.data.forEach((value,index) =>{
+            if(value.y==max_y+340){
+              this.data[index].x= Math.round(1400/(dataNum+1) +(2800 / (dataNum+1)) * index)
+            }
+          })
+        var addData={
+          name:name,
+          x:Math.round(1400/(dataNum+1) +(2800 / (dataNum+1)) * dataNum),
+          y:max_y+340
+        };
+        this.data.push(addData)
         for (var i = 0; i < num; i++) {
           var addLink = {
             target: this.ruleForm1.courseName,
@@ -962,14 +890,12 @@ export default {
             lineStyle: {
               normal: { curveness: 0.2 }
             }
-          };
-          store.commit("addLinks", addLink);
+          };        
+          this.links.push(addLink)
         }
       }
 
       var addCourse = Object.assign({}, this.ruleForm1);
-      console.log(addCourse);
-      console.log(addCourse.successor, "successor");
       var params = new URLSearchParams();
       params.append("courseName", addCourse.courseName);
       axios
@@ -1017,17 +943,7 @@ export default {
         .catch(err => {
           console.log("err", err);
         });
-
-      //addCourse
-      //store.commit("addCourse", addCourse);
-      //console.log(addCourse,"addCourse");
-      this.allCourse = store.state.courseList;
-      this.data = store.state.data;
-      this.links = store.state.links;
       this.test();
-
-      //==================向后端提交ruleForm1=========================
-      //message添加成功
     },
     addCourseVisible() {
       if (this.isAddCourse == false) {
@@ -1060,24 +976,38 @@ export default {
       var oldName = this.data[this.dataIndex].name;
       var newName = this.ruleForm2.courseName;
       var length = this.allCourse[this.dataIndex - 1].preCoursesName.length;
+
       var oldLinks = new Array();
       var oldLinksID = new Array();
-      for (var i = 0; i < length; i++) {
+      for (var i = 0; i < length; i++) {//该节点原来的前继节点们
         oldLinks[i] = this.allCourse[this.dataIndex - 1].preCoursesName[
           i
         ].courseName;
         oldLinksID[i] = this.allCourse[this.dataIndex - 1].preCoursesName[
           i
         ].courseNameID;
-      } //该节点原来的前继节点们
-      var newLinks = this.ruleForm2.successor; //该节点修改后的前继节点
-      console.log(oldLinks, newLinks);
+      } 
+      //该节点修改后的前继节点
+      var newLinks = this.ruleForm2.successor; 
 
       var editCourse = Object.assign({}, this.ruleForm2);
+
       //如果名字被更改，更新courseList、data和links里的名称
       if (newName != oldName) {
-        store.commit("editName", { name: newName, index: this.dataIndex });
-        console.log(this.data);
+            this.data[this.dataIndex].name = newName
+            //修改links里的name
+            var length = this.links.length
+            for (var i = 0; i < length; i++) {
+                if (this.links[i].target == oldName) {
+                    this.links[i].target = newName
+                    break;
+                }
+                if (this.links[i].source == oldName) {
+                    this.links[i].source = newName
+                    break;
+                }
+            }
+        console.log(this.data,"this.data-edit");
         var params = new URLSearchParams();
         params.append("courseNameID", id);
         params.append("courseName", newName);
@@ -1105,7 +1035,48 @@ export default {
       console.log(isEqual);
       if (isEqual == false) {
         //更改links
-        store.commit("editLinks", { new: newLinks, index: this.dataIndex });
+        //store.commit("editLinks", { new: newLinks, index: this.dataIndex });
+         var newLength = this.newLinks.length
+
+            var array = this.links.filter(function (item) {
+                if (item.target != newName) {
+                    return item
+                }
+            })
+            console.log(array,"array")
+            if (newLength == 0 ) {
+                
+                var addLink = {
+                    target: newName,
+                    source: "start",
+                    label: {
+                        normal: {
+                            show: false
+                        }
+                    },
+                    lineStyle: {
+                        normal: { curveness: 0.2 }
+                    }
+                };
+                array.push(addLink)
+            } else if(newLength!=0){
+                for (var i = 0; i < newLength; i++) {
+                    var addLink = {
+                        target: newName,
+                        source: this.newLinks[i],
+                        label: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        lineStyle: {
+                            normal: { curveness: 0.2 }
+                        }
+                    };
+                    array.push(addLink)
+                }
+            }
+            this.links = array
         console.log(this.links, "links");
 
         //去重-获得需删除的link
@@ -1191,9 +1162,6 @@ export default {
         this.test();
         this.setAllCourse();
         this.$message("修改成功");
-        //===============================
-        //this.resetForm("ruleForm2");
-        //===============================
       } else {
         alert("没有要修改的信息");
       }
@@ -1236,19 +1204,6 @@ export default {
       this.ruleForm4.classNum = num; */
       console.log(this.ruleForm4);
     },
-    editClass() {
-      var length = this.dupCourse.length;
-
-      var editClass = Object.assign({}, this.ruleForm4);
-      //提交ruleForm2
-      this.resetForm("ruleForm4");
-      this.isEditClass = false;
-      this.isAddCourse = true;
-      this.$message("修改成功");
-
-      //================向后端提交ruleForm2和classNum==========================
-      //提交之后返回成功后，message修改成功
-    },
     editClassNumVisible() {
       this.dialog1 = false;
       this.dialog2 = false;
@@ -1259,20 +1214,11 @@ export default {
       this.editClassNum = true;
       //this.editClassNum = false;
     },
-
     selsChange(arr) {
       this.multipleSelection = arr;
       console.log(arr);
       console.log(this.allCourse);
     },
-    //表格多选删除
-    /*  delCourse() {
-      store.commit("delNode", this.multipleSelection);
-      console.log(this.allCourse);
-      //this.test();
-      this.test();
-    }, */
-    //find
     addClassNum() {
       this.isAddClassNum = false;
       var params = new URLSearchParams();
@@ -1291,14 +1237,11 @@ export default {
         });
     },
     delClassNum(data) {
-      //splice
-      //this.dupCourse.splice(this.rowIndex, 1);
       console.log(this.rowIndex, "rowindex1");
       this.rowIndex.courseClasses.splice(data.$index, 1);
       console.log(this.rowIndex, "rowindex2");
       console.log(data.$index);
-      //=================================================================后端
-      axios
+     axios
         .get("/api/deleteClass", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -1336,44 +1279,17 @@ export default {
           }
         });
     },
-    delCourse() {
-      //直接删除所有该名的课程
-      this.dialog1 = false;
-      this.isDelCourse = false;
-      //this.resetForm("ruleForm2");
-      store.commit("delNode2", this.dataIndex);
-      this.test();
-      //====================向后端提交====================
-      /*  axios
-        .get("/api/deleteCourse", {
-          headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
-          },
-          params: {
-            courseID: this.allCourse[this.dataIndex - 1].courseID
-          }
-        })
-        .then(resp => {
-          console.log("success");
-          if (resp.state == 0) {
-            alert("删除失败");
-          }
-        });
-     */
-    },
     test() {
       var option = {
         series: [
           {
-            data: store.state.data,
-            links: store.state.links
+            data: this.data,
+            links: this.links
           }
         ]
       };
       console.log("test");
       this.initGraph().setOption(option);
-      console.log("test2");
     },
     draw() {
       var myChart = this.initGraph();
@@ -1388,31 +1304,27 @@ export default {
           feature: {
             //保存为图片
             saveAsImage: { show: true }
-            /* dataZoom:{
-              show:true,
-              title:{
-                dataZoom:'区域缩放',
-                dataZoomReset:'区域缩放后退'
-
-              }
-            } */
           }
         },
         series: [
           {
             type: "graph",
             layout: "none",
+            top:30,                   
+            right:"auto", 
             symbolSize: 30,
-            color: "#ec7814",
             roam: true,
             label: {
               normal: {
-                show: true
+                show: true,
+                textStyle:{
+                  fontColor:"#000"
+                }
               }
             },
             edgeSymbol: ["circle", "arrow"],
-            edgeSymbolSize: [4, 10],
-            //edgeColor:"#000",
+            edgeSymbolSize: [4, 14],
+            edgeSymbolColor:'#000',
             edgeLabel: {
               normal: {
                 textStyle: {
@@ -1423,7 +1335,12 @@ export default {
             },
             data: this.data,
             links: this.links,
-
+            itemStyle:{
+              normal:{
+                color: "#ec7814",
+                opacity:0.8,
+              }
+            },
             lineStyle: {
               normal: {
                 opacity: 0.9,
@@ -1436,22 +1353,43 @@ export default {
       };
       myChart.setOption(option);
       var that = this;
+      let focusNum=0;
       myChart.on("click", function(params) {
-        console.log(params, "params");
-        //点击高亮
-
+      
+        focusNum++
         if (params.dataType == "edge") {
           //that.handleClick(params);
           that.dataIndex = params.dataIndex;
-          store.commit("edgeStyle", that.dataIndex);
+           var value = that.links[that.dataIndex].label.normal.show
+            if (value == false) {
+                that.links[that.dataIndex].label.normal.show = true
+            } else {
+                that.links[that.dataIndex].label.normal.show = false
+            }
           myChart.setOption(option);
         } else if (params.dataType == "node") {
-          /*  that.myChart.dispatchAction({
-          type: "focusNodeAdjacency",
-          // 使用 dataIndex 来定位节点。
-          dataIndex: params.dataIndex
-        }); */
-          that.dataIndex = params.dataIndex;
+          if(focusNum%2==1){//点击高亮
+            that.myChart.dispatchAction({
+              type: "focusNodeAdjacency",
+              // 使用 dataIndex 来定位节点。
+              dataIndex: params.dataIndex
+              });
+          }else if(focusNum%2==0){//再次点击取消高亮
+            that.myChart.dispatchAction({
+            type: "unfocusNodeAdjacency",
+            // 使用 seriesId 或 seriesIndex 或 seriesName 来定位 series.
+            seriesIndex: params.seriesIndex
+            });
+          }
+        }
+      });
+      //取消右键的弹出菜单
+      document.oncontextmenu = function() {
+        return false;
+      };
+      //右键显示操作框
+      myChart.on("contextmenu", function(params) {
+        that.dataIndex = params.dataIndex;
           if (that.dataIndex == 0) {
             alert("不可对该节点进行操作");
           } else {
@@ -1461,19 +1399,6 @@ export default {
               that.allCourse[that.dataIndex - 1].courseName.courseNameID;
             that.dialog1 = true;
           }
-        }
-      });
-      //取消右键的弹出菜单
-      document.oncontextmenu = function() {
-        return false;
-      };
-      //右键取消高亮
-      myChart.on("contextmenu", function(params) {
-        that.myChart.dispatchAction({
-          type: "unfocusNodeAdjacency",
-          // 使用 seriesId 或 seriesIndex 或 seriesName 来定位 series.
-          seriesIndex: params.seriesIndex
-        });
       });
       that.myChart = myChart;
     }
