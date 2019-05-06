@@ -76,7 +76,7 @@
             <el-row style="padding-bottom:20px">
               <el-card shadow="hover" class="grade">
                 <p style="margin-bottom:0px">{{item.contentName+"（"+item.exerciseDeadline_2+"）"}}</p>
-                <el-button type="text" @click="grade(item.id)">点击进入评分</el-button>
+                <el-button type="text" @click="grade(item.id, item.exerciseTitle)">点击进入评分</el-button>
               </el-card>
             </el-row>
             </div>
@@ -330,13 +330,14 @@ export default {
         return true
       }
     },
-    grade(id) {
+    grade(id, title) {
       this.$router.push({
         path: "/teacher/mark",
         name: "exerciseMark",
         query: {
           chapterID: id,
-          classID: this.classID
+          classID: this.classID,
+          name: title
         }
       });
     },

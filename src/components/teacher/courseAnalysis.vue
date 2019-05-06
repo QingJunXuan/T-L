@@ -266,7 +266,7 @@
                             ></el-option>
                           </el-select>
                         </el-col>
-                        <el-col :span="11" align="end" style="padding-right: 20px">
+                        <el-col :span="11" align="end" style="padding-right: 25px">
                           <el-rate
                             v-model="chapterRate"
                             disabled
@@ -286,10 +286,10 @@
                           :key="item.id"
                         >
                           <el-row :gutter="5">
-                            <el-col :span="4">
+                            <el-col :span="2">
                               <div class="title">评分</div>
                             </el-col>
-                            <el-col :span="20">
+                            <el-col :span="15">
                               <el-rate
                                 v-model="item.rate"
                                 disabled
@@ -336,7 +336,7 @@ export default {
       // 传值
       courseID: 0,
       // TODO: 本地存teacherID
-      teacherID: 1001,
+      teacherID: 202,
       teacherName: "李正正",
       activeNames: ["1"],
       courseGrade: 0,
@@ -2260,6 +2260,7 @@ export default {
   color: #41abf1;
   padding-top: 2px;
   padding-bottom: 2px;
+  padding-left: 5px;
 }
 
 .response .rate {

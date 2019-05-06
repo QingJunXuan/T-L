@@ -13,19 +13,19 @@
                   </el-button>
                 </div>
               </el-col>
-              <el-col :span="22" align="start">
-                <div class="title">第{{chapterID}}章-课前习题</div>
+              <el-col :span="22" align="center">
+                <div class="title">{{name}}</div>
               </el-col>
             </el-row>
           </div>
           <!-- 主体 -->
           <div class="cardbody">
             <!-- 成绩和学生信息 -->
-            <el-row style="margin-top: 3px">
+            <el-row style="margin-top: 3px;">
               <el-col :span="4" align="center">
-                <div class="grade">总成绩：{{totalScore[index]}}</div>
+                <div style="font-size: 14px; margin-left: 20px;margin-top: 13px; font-weight: 450; letter-spacing: 1px">总成绩：{{totalScore[index]}}</div>
               </el-col>
-              <el-col :span="13" align="end">
+              <el-col :span="13" align="end" style="height: 10px">
                 <div v-if="notSelect">
                   <el-button
                     type="text"
@@ -36,12 +36,12 @@
                   </el-button>
                 </div>
                 <div v-else>
-                  <br>
+                  &nbsp;
                 </div>
               </el-col>
               <el-col :span="5" align="center">
                 <div
-                  v-if="notSelect"
+                  v-if="notSelect && studentInfo.length > 0"
                   @dblclick="notSelect = false"
                   class="student-info"
                 >{{studentInfo[index].id}} {{studentInfo[index].name}}</div>
@@ -74,15 +74,15 @@
               </el-col>
             </el-row>
             <!-- 问题答案和选择分数 -->
-            <div>
-              <div v-for="i in question.length" :key="i" align="start" class="question">
-                <div class="notice">{{i}}.{{question[i - 1].content}}({{question[i-1].score}}分)</div>
-                <div class="answer">{{studentInfo[index].answer[i - 1].content}}</div>
+            <div v-if="question.length > 0 && studentInfo.length > 0 && question.length === studentInfo[index].answer.length">
+              <div v-for="(question, i) in question" :key="i" align="start" class="question">
+                <div style="font-weight: 400; letter-spacing: 0.8px; font-size: 14px">{{question.order}}.{{question.content}}({{question.score}}分)</div>
+                <div class="answer">{{studentInfo[index].answer[i].content}}</div>
                 <div style="margin-top: 15px">
                   <span class="notice">得分</span>
                   <span style="margin-left: 10px">
                     <el-select
-                      v-model="studentInfo[index].score[i - 1]"
+                      v-model="studentInfo[index].score[i]"
                       size="small"
                       style="width: 100px"
                     >
@@ -90,7 +90,7 @@
                         v-for="item in scoreOptions"
                         :key="item.value * 10"
                         :label="item.label"
-                        :value="item.value * question[i-1].score"
+                        :value="item.value * question.score"
                       ></el-option>
                     </el-select>
                   </span>
@@ -99,7 +99,7 @@
             </div>
           </div>
           <div style="margin-top: 20px; padding-bottom: 15px;" align="center">
-            <el-button type="primary" class="submit-button" size="small">提交</el-button>
+            <el-button type="primary" class="submit-button" size="small" @click="submit">提交</el-button>
           </div>
         </el-card>
       </div>
@@ -115,72 +115,15 @@ export default {
       // 章节id需要传值
       chapterID: 0,
       classID: 0,
+      name: '',
       // 控制选框的显示
       notSelect: true,
       // getExercises
-      question: [
-        {
-          id: 1,
-          content: "第1题的题目",
-          score: "10"
-        }
-      ],
+      question: [],
       index: 0,
       // getStudentInfo
-      studentInfo: [
-        {
-          id: "1612341",
-          name: "学生1",
-          answer: [
-            {
-              id: 1,
-              content: "第1题的答案"
-            },
-            {
-              id: 2,
-              content: "第2题的答案"
-            },
-            {
-              id: 3,
-              content: "第3题的答案"
-            },
-            {
-              id: 4,
-              content: "第4题的答案"
-            }
-          ],
-          score: [0, 0, 0, 0]
-        },
-        {
-          id: "1612341",
-          name: "学生2",
-          answer: [
-            {
-              id: 1,
-              content: "第1题的答案"
-            },
-            {
-              id: 2,
-              content: "第2题的答案"
-            },
-            {
-              id: 3,
-              content: "第3题的答案"
-            },
-            {
-              id: 4,
-              content: "第4题的答案"
-            }
-          ],
-          score: [0, 0, 0, 0]
-        }
-      ],
-      studentOptions: [
-        {
-          value: 0,
-          label: "1612341 学生1"
-        }
-      ],
+      studentInfo: [],
+      studentOptions: [],
       // loading
       submitLoading: false,
       questionLoading: false,
@@ -248,9 +191,9 @@ export default {
                       order: exerciseList.data[i].exercise.exerciseNumber
                     });
                   }
-                  this.studentInfo[i].score.push(0);
                   i++;
                 }
+                this.getStudentInfo();
                 this.question.sort(this.compare("order"));
               }
             } else {
@@ -283,8 +226,8 @@ export default {
                 let i = 0;
                 while (i < studentList.data.length) {
                   this.studentInfo.push({
-                    answer: [],
-                    score: [],
+                    answer: new Array(),
+                    score: new Array(),
                     id: studentList.data[i].workID,
                     name: studentList.data[i].name,
                     studentId: studentList.data[i].userID
@@ -296,15 +239,10 @@ export default {
                       " " +
                       studentList.data[i].name
                   });
-                  this.studentInfo[i].answer.push({
-                    id: i,
-                    content: '答案'
-                  })
-                  //this.getAnswers(i);
+                  this.getAnswers(i);
                   i++;
                 }
               }
-              this.getExercises();
               console.log(this.studentInfo.length);
               console.log(this.studentOptions.length);
             } else {
@@ -321,8 +259,8 @@ export default {
         .get(
           "/api/question/viewSomeAnswer?chapterId=" +
             this.chapterID +
-            "&studentId=" +
-            this.studentInfo[index].studentId +
+            "&studentId=1" +
+            //this.studentInfo[index].studentId +
             "&type=review",
           {
             headers: {
@@ -337,16 +275,27 @@ export default {
               if (answer.state === 1) {
                 let i = 0;
                 while (i < answer.data.length) {
-                  if (anser.data[i].exercise.exerciseType === 6) {
+                  if (answer.data[i].exercise.exerciseType === 6) {
                     this.studentInfo[index].answer.push({
                       id: answer.data[i].exercise.exerciseId,
                       content: answer.data[i].answer,
-                      order: answer.data.exercise.exerciseNumber
+                      order: answer.data[i].exercise.exerciseNumber
                     });
+                    this.studentInfo[index].score.push(0);
                   }
                   i++;
                 }
                 this.studentInfo[index].answer.sort(this.compare("order"));
+              }
+              else {
+                for (let i = 0;i < this.question.length;i++) {
+                  this.studentInfo[index].answer.push({
+                      id: this.question[i].id,
+                      content: '[[[该学生未提交答案!]]]',
+                      order: this.question[i].order
+                    });
+                    this.studentInfo[index].score.push(0);
+                }
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -358,12 +307,13 @@ export default {
         );
     },
     submit() {
+      let scores = this.studentInfo[this.index].score.length === 1? this.studentInfo[this.index].score[0] : this.studentInfo[this.index].score;
       this.$http
         .post(
           "/api/question/correctAll",
           {
-            scores: this.studentInfo[this.index].score,
-            studentId: this.studentInfo[this.index].studentId,
+            scores: scores,
+            studentId: 1,//this.studentInfo[this.index].studentId,
             chapterId: this.chapterID,
             type: 'review'
           },
@@ -404,7 +354,8 @@ export default {
   created() {
     this.chapterID = this.$route.query.chapterID;
     this.classID = this.$route.query.classID;
-    this.getStudentInfo();
+    this.name = this.$route.query.name;
+    this.getExercises();
   },
   computed: {
     totalScore() {
@@ -436,18 +387,9 @@ export default {
   margin-top: 13px;
   font-size: 14px;
   color: #292929;
-  margin-left: 40%;
+  margin-left: -40px;
   font-weight: 450;
   letter-spacing: 1px;
-}
-
-.grade {
-  margin-top: 13px;
-  font-size: 14px;
-  letter-spacing: 1px;
-  color: #292929;
-  font-weight: 450;
-  margin-left: 20px;
 }
 
 .question {
@@ -455,9 +397,9 @@ export default {
 }
 
 .question .notice {
-  font-size: 14px;
   font-weight: 400;
   letter-spacing: 0.8px;
+  font-size: 14px;
 }
 
 .question .answer {
@@ -489,9 +431,10 @@ export default {
 }
 
 .switch-button {
-  margin-top: 1.5px;
+  margin-top: 13px;
   color: #292929;
   font-size: 16px;
+  padding: 0 0 0 0;
 }
 
 .student-info {
@@ -515,7 +458,6 @@ export default {
 
 .cardbody {
   height: 680px;
-  position: relative;
 }
 
 .submit-button {
