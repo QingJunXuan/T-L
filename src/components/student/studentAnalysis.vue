@@ -40,7 +40,7 @@
           <el-card class="select-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="center">
               <div style="width: 64%" align="start">
-                <el-row class="select-title">指标</el-row>
+                <el-row class="select-title">分析内容</el-row>
                 <el-row>
                   <el-select v-model="xy" @change="handleComparison" size="small">
                     <el-option
@@ -185,7 +185,7 @@ export default {
       courseID: 0,
       classID: 0,
       //
-      currentName: "",
+      currentName: "暂无学习记录",
       activeNames: ["1"],
       xyOptions: [
         {
@@ -320,6 +320,7 @@ export default {
                 });
                 i++;
               }
+              this.getStudentInfo(this.userID);
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -351,17 +352,9 @@ export default {
                     courseID: courseList.data[i].courseInfo.courseID,
                     classID: courseList.data[i].courseClass.id
                   });
-                  this.courseOptions.push({
-                    value: i + 1,
-                    label: courseList.data[i].courseInfo.courseName,
-                    courseID: courseList.data[i].courseInfo.courseID,
-                    classID: courseList.data[i].courseClass.id
-                  });
                   i++;
                 }
                 this.getChapterOptions();
-                this.getStudentData(this.userID, 0);
-                this.getStudentInfo(this.userID);
                 this.getProcess();
               }
             } else {
@@ -375,6 +368,7 @@ export default {
     },
     getStudentInfo(studentID) {
       this.studentInfo = [];
+      this.xData = [];
       this.$http
         .get(
           "/api/getCourseScoreAndComment?courseID=" +
@@ -408,8 +402,10 @@ export default {
                   chapter: res.data[i].chapterName,
                   chapterID: res.data[i].studentChapter.chapterID
                 });
+                this.xData.push(res.data[i].chapterName);
                 i++;
               }
+              this.getStudentData(this.userID, 0);
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -740,7 +736,8 @@ export default {
       this.comparison = 0;
       this.classID = this.courseOptions[val].classID;
       this.courseID = this.courseOptions[val].courseID;
-      this.getCourses();
+      this.getChapterOptions();
+      this.getProcess();
       this.seriesData = [
         {
           name: this.studentName,
@@ -764,8 +761,7 @@ export default {
         // 章节-平均成绩
         case 0: {
           for (let m = 0; m < this.studentInfo.length; m++) {
-            let end = this.studentInfo[m].chapter.indexOf("章");
-            this.xData.push(this.studentInfo[m].chapter.substring(0, end + 1));
+            this.xData.push(this.studentInfo[m].chapter);
           }
           switch (this.comparison) {
             // 学生

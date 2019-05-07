@@ -43,7 +43,6 @@
           >提交</el-button>
         </el-row>
       </el-dialog>
-      <el-button @click="selectHistoryVisible = true">导入习题</el-button>
       <!-- 客观题 -->
       <h4>客观题({{totalObject}}分)</h4>
       <div v-for="(item1, i) in exercisesObj" :key="100+i" align="start" class="exercises">
@@ -341,14 +340,20 @@
         </el-button>
       </div>
       <div align="center" style="margin-top: 20px">
+        <el-button type="success"
+          plain
+          class="edit-button" @click="selectHistoryVisible = true" size="small">导入</el-button>
         <el-button
-          type="primary"
+          type="success"
+          plain
+          class="edit-button"
           @click="submitReview"
           :loading="submitLoading"
           :disabled="funcButton"
+          size="small"
         >保存</el-button>
-        <el-button type="success" @click="dialogTableVisible = true" :disabled="funcButton">发布</el-button>
-        <el-button type="info" @click="getRevExercises" :disabled="funcButton">重置</el-button>
+        <el-button type="success" @click="dialogTableVisible = true" :disabled="funcButton" size="small">发布</el-button>
+        <el-button type="info" @click="getRevExercises" :disabled="funcButton" size="small">重置</el-button>
       </div>
     </div>
   </el-container>
@@ -1417,46 +1422,47 @@ export default {
       } else {
         deadline = this.time;
       }
-      let entity = {
-        id: this.chapterInfo.id,
-        courseID: this.chapterInfo.courseID,
-        contentName: this.chapterInfo.contentName,
-        parentID: this.chapterInfo.parentID,
-        siblingID: this.chapterInfo.siblingID,
-        content:
-          this.chapterInfo.content === null
-            ? new String()
-            : this.chapterInfo.content,
-        exerciseTitle: this.chapterInfo.contentName + "[课后习题]",
-        exerciseVisible_1: this.chapterInfo.exerciseVisible_1,
-        exerciseVisible_2: 1,
-        exerciseDeadline_1: this.chapterInfo.exerciseDeadline_1,
-        exerciseDeadline_2: deadline,
-        exerciseTotal_1: this.chapterInfo.exerciseTotal_1,
-        exerciseTotal_2: Number(this.totalObject + this.totalSubject)
-      };
-      let str = "";
-      for (var key in entity) {
-        str += key + ":" + entity[key] + "\n";
+      let entity = {};
+      if (this.chapterInfo.exerciseVisible_1 === null) {
+        entity = {
+          id: this.chapterInfo.id,
+          courseID: this.chapterInfo.courseID,
+          contentName: this.chapterInfo.contentName,
+          parentID: this.chapterInfo.parentID,
+          siblingID: this.chapterInfo.siblingID,
+          content:
+            this.chapterInfo.content === null
+              ? new String()
+              : this.chapterInfo.content,
+          exerciseTitle: this.chapterInfo.contentName + "[课后习题]",
+          exerciseVisible_2: true,
+          exerciseDeadline_2: deadline,
+          exerciseTotal_2: Number(this.totalObject + this.totalSubject)
+        };
+      } else {
+        entity = {
+          id: this.chapterInfo.id,
+          courseID: this.chapterInfo.courseID,
+          contentName: this.chapterInfo.contentName,
+          parentID: this.chapterInfo.parentID,
+          siblingID: this.chapterInfo.siblingID,
+          content:
+            this.chapterInfo.content === null
+              ? new String()
+              : this.chapterInfo.content,
+          exerciseTitle: this.chapterInfo.contentName + "[课后习题]",
+          exerciseVisible_1: this.chapterInfo.exerciseVisible_1,
+          exerciseVisible_2: true,
+          exerciseDeadline_1: this.chapterInfo.exerciseDeadline_1,
+          exerciseDeadline_2: deadline,
+          exerciseTotal_1: this.chapterInfo.exerciseTotal_1,
+          exerciseTotal_2: Number(this.totalObject + this.totalSubject)
+        };
       }
       this.$http
         .post(
           "/api/alertChapter",
-          {
-            id: this.chapterInfo.id,
-            courseID: this.chapterInfo.courseID,
-            contentName: this.chapterInfo.contentName,
-            parentID: this.chapterInfo.parentID,
-            siblingID: this.chapterInfo.siblingID,
-            content: this.chapterInfo.content,
-            exerciseTitle: this.chapterInfo.contentName + "练习题",
-            exerciseVisible_1: this.chapterInfo.exerciseVisible_1,
-            exerciseVisible_2: 1,
-            exerciseDeadline_1: this.chapterInfo.exerciseDeadline_1,
-            exerciseDeadline_2: deadline,
-            exerciseTotal_1: this.chapterInfo.exerciseTotal_1,
-            exerciseTotal_2: Number(this.totalObject + this.totalSubject)
-          },
+          entity,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")

@@ -336,8 +336,8 @@ export default {
       // 传值
       courseID: 0,
       // TODO: 本地存teacherID
-      teacherID: 202,
-      teacherName: "李正正",
+      teacherID: 203,
+      teacherName: "古唏",
       activeNames: ["1"],
       courseGrade: 0,
       courseAmountBoy: 0,
@@ -549,8 +549,14 @@ export default {
               let courseList = JSON.parse(response.bodyText);
               if (courseList.state === 1) {
                 let i = 0;
+                let courseIndex = 0;
                 this.courseID = courseList.data[i].courseInfo.courseID;
-                this.courseName = courseList.data[i].courseInfo.courseName;
+                this.courseName =
+                  courseList.data[i].courseInfo.courseName +
+                  "[" +
+                  courseList.data[i].courseInfo.courseYear +
+                  courseList.data[i].courseInfo.courseSemester +
+                  "]";
                 this.courseNameID = courseList.data[i].courseNameID;
                 while (i < courseList.data.length) {
                   let notExist = true;
@@ -565,11 +571,17 @@ export default {
                   }
                   if (notExist) {
                     this.courseOptions.push({
-                      value: i,
-                      label: courseList.data[i].courseInfo.courseName,
+                      value: courseIndex,
+                      label:
+                        courseList.data[i].courseInfo.courseName +
+                        "[" +
+                        courseList.data[i].courseInfo.courseYear +
+                        courseList.data[i].courseInfo.courseSemester +
+                        "]",
                       courseID: courseList.data[i].courseInfo.courseID,
                       courseNameID: courseList.data[i].courseNameID
                     });
+                    courseIndex++;
                   }
                   i++;
                 }
@@ -591,7 +603,7 @@ export default {
       this.$http
         .get(
           "/api/getStudentsByClassID?courseClassID=" +
-            this.studentOptions[index].value,
+            this.studentOptions[index].id,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -645,12 +657,14 @@ export default {
                   label: classList.data[i].classNum + "班"
                 });
                 this.studentOptions.push({
-                  value: classList.data[i].id,
+                  value: i,
+                  id: classList.data[i].id,
                   label: classList.data[i].classNum + "班",
                   children: []
                 });
                 this.genderOptions.push({
-                  value: classList.data[i].id,
+                  value: i,
+                  id: classList.data[i].id,
                   label: classList.data[i].classNum + "班",
                   children: new Array(2)
                 });
@@ -1383,9 +1397,15 @@ export default {
     },
     // 下拉框事件
     handleCourse(val) {
+      this.drawLoading = false;
       this.courseID = this.courseOptions[val].courseID;
       this.courseName = this.courseOptions[val].label;
       this.courseNameID = this.courseOptions[val].courseNameID;
+      this.detailValue = [];
+      this.detail = [];
+      this.xyIndex = [0, 0];
+      this.xy = 2;
+      this.comparison = 2;
       this.getChapters();
       this.getTeacherInfo();
       this.getBaseInfo();
@@ -1395,6 +1415,7 @@ export default {
       this.genderIndex = new Array(2);
     },
     handleComparison(val) {
+      this.drawLoading = false;
       this.xy = this.xyOptions[val[0]].children[val[1]].xyValue;
       switch (this.xy) {
         // 章节-平均成绩
@@ -1520,6 +1541,7 @@ export default {
       }
     },
     handleDetail() {
+      this.drawLoading = false;
       this.detailValue = [];
       this.detail = [];
       this.gradeAttribute = 0;
@@ -1544,12 +1566,12 @@ export default {
         // 原来有值现在没值
         let c = this.studentIndex[index][0];
         let s = this.studentIndex[index][1];
-        this.studentOptions[c - 1].children[s].disabled = false;
+        this.studentOptions[c].children[s].disabled = false;
       } else {
         // 现在有值
         let c = val[0];
         let s = val[1];
-        this.studentOptions[c - 1].children[s].disabled = true;
+        this.studentOptions[c].children[s].disabled = true;
         this.studentIndex[index] = new Array();
         this.studentIndex[index] = val;
       }
@@ -1563,12 +1585,12 @@ export default {
         // 原来有值现在没值
         let c = this.genderIndex[index][0];
         let s = this.genderIndex[index][1];
-        this.genderOptions[c - 1].children[s].disabled = false;
+        this.genderOptions[c].children[s].disabled = false;
       } else {
         // 现在有值
         let c = val[0];
         let s = val[1];
-        this.genderOptions[c - 1].children[s].disabled = true;
+        this.genderOptions[c].children[s].disabled = true;
         this.genderIndex[index] = new Array();
         this.genderIndex[index] = val;
       }
@@ -1604,7 +1626,7 @@ export default {
                 for (let i = 0; i < this.studentMap.length; i++) {
                   let val = this.studentMap[i];
                   if (val !== undefined && Object.keys(val).length !== 0) {
-                    let c = val[0] - 1;
+                    let c = val[0];
                     let s = val[1];
                     this.seriesData.push({
                       name: this.studentOptions[c].children[s].label,
@@ -1635,7 +1657,7 @@ export default {
                 }
               } else {
                 let val = this.studentMap[0];
-                let c = val[0] - 1;
+                let c = val[0];
                 let s = val[1];
                 this.seriesData = new Array(2);
                 this.seriesData[0] = {
@@ -1676,7 +1698,7 @@ export default {
                   this.drawLoading = false;
                   return;
                 }
-                let c = val[0] - 1;
+                let c = val[0];
                 let g = val[1];
                 this.seriesData.push({
                   name:
@@ -1693,7 +1715,7 @@ export default {
                 for (let j = 0; j < this.chapterOptions.length; j++) {
                   this.getOtherScoreData(
                     this.chapterOptions[j].id,
-                    this.genderOptions[c].value,
+                    this.genderOptions[c].id,
                     j
                   );
                 }
@@ -1753,7 +1775,7 @@ export default {
                   this.drawLoading = false;
                   return;
                 }
-                let c = val[0] - 1;
+                let c = val[0];
                 let g = val[1];
                 this.seriesData.push({
                   name:
@@ -1769,7 +1791,7 @@ export default {
                 );
                 this.getScoreDistributeData(
                   this.chapterOptions[this.chapterSettings].id,
-                  this.genderOptions[c].value,
+                  this.genderOptions[c].id,
                   i,
                   this.genderOptions[c].children[g].value
                 );

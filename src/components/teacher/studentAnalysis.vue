@@ -40,7 +40,7 @@
           <el-card class="select-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="center">
               <div style="width: 64%" align="start">
-                <el-row class="select-title">指标</el-row>
+                <el-row class="select-title">分析内容</el-row>
                 <el-row>
                   <el-select v-model="xy" @change="handleComparison" size="small">
                     <el-option
@@ -79,49 +79,16 @@
                   <el-row>
                     <el-row>
                       <el-select
-                        v-model="studentMap[0]"
+                        v-model="studentMap"
                         size="small"
                         filterable
                         clearable
-                        @change="handleStudent(0)"
+                        multiple
+                        :multiple-limit="3"
                       >
                         <el-option
                           v-for="item in studentOptions"
-                          :disabled="item.disabled"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
-                        ></el-option>
-                      </el-select>
-                    </el-row>
-                    <el-row class="select">
-                      <el-select
-                        v-model="studentMap[1]"
-                        size="small"
-                        filterable
-                        clearable
-                        @change="handleStudent(1)"
-                      >
-                        <el-option
-                          v-for="item in studentOptions"
-                          :disabled="item.disabled"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
-                        ></el-option>
-                      </el-select>
-                    </el-row>
-                    <el-row class="select">
-                      <el-select
-                        v-model="studentMap[2]"
-                        size="small"
-                        filterable
-                        clearable
-                        @change="handleStudent(2)"
-                      >
-                        <el-option
-                          v-for="item in studentOptions"
-                          :disabled="item.disabled"
+                          v-show="!item.disabled"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value"
@@ -199,7 +166,7 @@ export default {
       userID: 0,
       courseID: 0,
       classID: 0,
-      currentName: "",
+      currentName: "暂无学习记录",
       //
       activeNames: ["1"],
       xyOptions: [
@@ -208,7 +175,7 @@ export default {
           label: "学习成绩",
           xName: "章节",
           yName: "平均成绩"
-        },
+        }
       ],
       cOptions: [
         {
@@ -324,6 +291,9 @@ export default {
                     label: studentList.data[i].name,
                     disabled: false
                   });
+                  if (studentList.data[i].userID === this.userID) {
+                    this.studentOptions[i].disabled = true;
+                  }
                   i++;
                 }
               }
@@ -338,6 +308,7 @@ export default {
     },
     getStudentInfo(studentID) {
       this.studentInfo = [];
+      this.xData = [];
       this.$http
         .get(
           "/api/getCourseScoreAndComment?courseID=" +
@@ -368,8 +339,10 @@ export default {
                   chapter: res.data[i].chapterName,
                   chapterID: res.data[i].studentChapter.chapterID
                 });
+                this.xData.push(res.data[i].chapterName);
                 i++;
               }
+              this.getStudentData(this.userID, 0);
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -536,9 +509,6 @@ export default {
       } else {
         this.gradeOptions[3].disabled = false;
       }
-    },
-    handleStudent(index) {
-      // TODO: 禁用
     },
     // 确认
     getCharts() {
@@ -749,13 +719,9 @@ export default {
     this.xData = new Array();
     this.colorOptions.push(this.colors[0]);
     this.legendData.push(this.studentName);
-    this.getStudentData(this.userID, 0);
     this.getStudentInfo(this.userID);
     this.getStudentOptions();
     this.getProcess();
-  },
-  mounted() {
-    this.drawChart();
   }
 };
 </script>

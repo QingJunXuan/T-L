@@ -23,7 +23,9 @@
             <!-- 成绩和学生信息 -->
             <el-row style="margin-top: 3px;">
               <el-col :span="4" align="center">
-                <div style="font-size: 14px; margin-left: 20px;margin-top: 13px; font-weight: 450; letter-spacing: 1px">总成绩：{{totalScore[index]}}</div>
+                <div
+                  style="font-size: 14px; margin-left: 20px;margin-top: 13px; font-weight: 450; letter-spacing: 1px"
+                >总成绩：{{totalScore[index]}}</div>
               </el-col>
               <el-col :span="13" align="end" style="height: 10px">
                 <div v-if="notSelect">
@@ -35,9 +37,7 @@
                     <i class="el-icon-caret-left"></i>
                   </el-button>
                 </div>
-                <div v-else>
-                  &nbsp;
-                </div>
+                <div v-else>&nbsp;</div>
               </el-col>
               <el-col :span="5" align="center">
                 <div
@@ -74,9 +74,13 @@
               </el-col>
             </el-row>
             <!-- 问题答案和选择分数 -->
-            <div v-if="question.length > 0 && studentInfo.length > 0 && question.length === studentInfo[index].answer.length">
+            <div
+              v-if="question.length > 0 && studentInfo.length > 0 && question.length === studentInfo[index].answer.length"
+            >
               <div v-for="(question, i) in question" :key="i" align="start" class="question">
-                <div style="font-weight: 400; letter-spacing: 0.8px; font-size: 14px">{{question.order}}.{{question.content}}({{question.score}}分)</div>
+                <div
+                  style="font-weight: 400; letter-spacing: 0.8px; font-size: 14px"
+                >{{question.order}}.{{question.content}}({{question.score}}分)</div>
                 <div class="answer">{{studentInfo[index].answer[i].content}}</div>
                 <div style="margin-top: 15px">
                   <span class="notice">得分</span>
@@ -115,7 +119,7 @@ export default {
       // 章节id需要传值
       chapterID: 0,
       classID: 0,
-      name: '',
+      name: "",
       // 控制选框的显示
       notSelect: true,
       // getExercises
@@ -286,15 +290,14 @@ export default {
                   i++;
                 }
                 this.studentInfo[index].answer.sort(this.compare("order"));
-              }
-              else {
-                for (let i = 0;i < this.question.length;i++) {
+              } else {
+                for (let i = 0; i < this.question.length; i++) {
                   this.studentInfo[index].answer.push({
-                      id: this.question[i].id,
-                      content: '[[[该学生未提交答案!]]]',
-                      order: this.question[i].order
-                    });
-                    this.studentInfo[index].score.push(0);
+                    id: this.question[i].id,
+                    content: "[[[该学生未提交答案!]]]",
+                    order: this.question[i].order
+                  });
+                  this.studentInfo[index].score.push(0);
                 }
               }
             } else {
@@ -307,15 +310,22 @@ export default {
         );
     },
     submit() {
-      let scores = this.studentInfo[this.index].score.length === 1? this.studentInfo[this.index].score[0] : this.studentInfo[this.index].score;
+      if (this.studentInfo[this.index].score.length === 0) {
+        this.$message({ type: "warning", message: "学生没有作答，无法评分!" });
+        return;
+      }
+      let scores =
+        this.studentInfo[this.index].score.length === 1
+          ? this.studentInfo[this.index].score[0]
+          : this.studentInfo[this.index].score;
       this.$http
         .post(
           "/api/question/correctAll",
           {
             scores: scores,
-            studentId: 1,//this.studentInfo[this.index].studentId,
+            studentId: 1, //this.studentInfo[this.index].studentId,
             chapterId: this.chapterID,
-            type: 'review'
+            type: "review"
           },
           {
             headers: {

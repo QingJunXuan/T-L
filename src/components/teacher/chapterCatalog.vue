@@ -221,6 +221,7 @@ export default {
     return {
       courseID: 0,
       teacherID: 202,
+      classID: 0,
       // 章节知识点列表
       catalog: [
         {
@@ -268,7 +269,8 @@ export default {
         this.$router.push({
           path: "/teacher/courseDetail",
           query: {
-            courseID: this.courseID
+            courseID: this.courseID,
+            classID: this.classID
           }
         });
       }
@@ -1542,6 +1544,7 @@ export default {
   },
   created() {
     this.courseID = this.$route.query.id;
+    this.classID = this.$route.query.classID;
     this.getCatalog();
     this.getCourses();
     bus.$on("reloadCatalog", val => this.getData(val));

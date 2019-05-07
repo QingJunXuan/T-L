@@ -78,7 +78,12 @@
                 <el-row v-if="setCourse">
                   <el-row class="select-title">选择课程</el-row>
                   <el-row>
-                    <el-select v-model="courseSettings" size="small" filterable>
+                    <el-select
+                      v-model="courseSettings"
+                      size="small"
+                      filterable
+                      @change="handleCourseDetail"
+                    >
                       <el-option
                         v-for="item in courseOptions"
                         :key="item.value"
@@ -528,6 +533,7 @@ export default {
     // 下拉框事件
     handleComparison(val) {
       this.xy = this.xyOptions[val[0]].children[val[1]].xyValue;
+      this.drawLoading = false;
       switch (this.xy) {
         // 课程-选课人数
         case 0: {
@@ -616,6 +622,11 @@ export default {
         default:
           break;
       }
+    },
+    handleCourseDetail() {
+      this.drawLoading = false;
+      this.detailValue = [];
+      this.detail = [];
     },
     handleDetail(val) {
       this.drawLoading = false;

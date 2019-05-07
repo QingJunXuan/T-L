@@ -43,7 +43,6 @@
           >提交</el-button>
         </el-row>
       </el-dialog>
-      <el-button @click="selectHistoryVisible = true">导入习题</el-button>
       <h4>客观题({{totalScore}}分)</h4>
       <div v-for="(item1, i) in exercises" :key="i" align="start" class="exercises">
         <!-- 正常显示 -->
@@ -234,13 +233,28 @@
       </div>
       <div align="center" style="margin-top: 20px">
         <el-button
-          type="primary"
+          type="success"
+          plain
+          class="edit-button"
+          @click="selectHistoryVisible = true"
+          size="small"
+        >导入</el-button>
+        <el-button
+          type="success"
+          plain
+          class="edit-button"
           :loading="submitLoading"
           @click="submitPreview"
           :disabled="funcButton"
+          size="small"
         >保存</el-button>
-        <el-button type="success" @click="dialogTableVisible = true" :disabled="funcButton">发布</el-button>
-        <el-button @click="getPreExercises" :disabled="funcButton" type="info">重置</el-button>
+        <el-button
+          type="success"
+          @click="dialogTableVisible = true"
+          :disabled="funcButton"
+          size="small"
+        >发布</el-button>
+        <el-button @click="getPreExercises" :disabled="funcButton" type="info" size="small">重置</el-button>
       </div>
     </div>
   </el-container>
@@ -987,33 +1001,49 @@ export default {
       } else {
         deadline = this.time;
       }
+      let entity = {};
+      if (this.chapterInfo.exerciseVisible_2 === null) {
+        entity = {
+          id: this.chapterInfo.id,
+          courseID: this.chapterInfo.courseID,
+          contentName: this.chapterInfo.contentName,
+          parentID: this.chapterInfo.parentID,
+          siblingID: this.chapterInfo.siblingID,
+          content:
+            this.chapterInfo.content === null
+              ? new String()
+              : this.chapterInfo.content,
+          exerciseTitle: this.chapterInfo.contentName + "[课前习题]",
+          exerciseVisible_1: true,
+          exerciseDeadline_1: deadline,
+          exerciseTotal_1: Number(this.totalScore)
+        };
+      } else {
+        entity = {
+          id: this.chapterInfo.id,
+          courseID: this.chapterInfo.courseID,
+          contentName: this.chapterInfo.contentName,
+          parentID: this.chapterInfo.parentID,
+          siblingID: this.chapterInfo.siblingID,
+          content:
+            this.chapterInfo.content === null
+              ? new String()
+              : this.chapterInfo.content,
+          exerciseTitle: this.chapterInfo.contentName + "[课前习题]",
+          exerciseVisible_1: true,
+          exerciseVisible_2: this.chapterInfo.exerciseVisible_2,
+          exerciseDeadline_1: deadline,
+          exerciseDeadline_2: this.chapterInfo.exerciseDeadline_2,
+          exerciseTotal_1: Number(this.totalScore),
+          exerciseTotal_2: this.chapterInfo.exerciseTotal_2
+        };
+      }
       this.$http
-        .post(
-          "/api/alertChapter",
-          {
-            id: this.chapterInfo.id,
-            courseID: this.chapterInfo.courseID,
-            contentName: this.chapterInfo.contentName,
-            parentID: this.chapterInfo.parentID,
-            siblingID: this.chapterInfo.siblingID,
-            content:
-              this.chapterInfo.content === null
-                ? new String()
-                : this.chapterInfo.content,
-            exerciseTitle: this.chapterInfo.contentName + "[课前习题]",
-            exerciseVisible_1: true,
-            exerciseVisible_2: this.chapterInfo.exerciseVisible_2,
-            exerciseDeadline_1: deadline,
-            exerciseDeadline_2: this.chapterInfo.exerciseDeadline_2,
-            exerciseTotal_1: Number(this.totalScore),
-            exerciseTotal_2: this.chapterInfo.exerciseTotal_2
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token")
-            }
+        .post("/api/alertChapter", entity, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
+        })
         .then(
           response => {
             if (response.status === 200) {
