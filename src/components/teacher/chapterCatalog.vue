@@ -954,7 +954,7 @@ export default {
     // chapter
     confirmEdit() {
       if (Number(this.chapterForm.order) < 0) {
-        this.$message({ type: "warning", message: "章节号不能为负数!" });
+        this.$message({ type: "warning", message: "请正确填写章节号!" });
       }
       let sibID = 0;
       this.submitLoading = true;
@@ -1423,7 +1423,7 @@ export default {
     },
     submitEdit(item1, item2, index) {
       if (this.newPoint.order <= 0 || this.newPoint.order === "") {
-        this.$message({ type: "warning", message: "请正确知识点序号!" });
+        this.$message({ type: "warning", message: "请正确填写知识点序号!" });
         return;
       }
       if (this.newPoint.name == undefined || this.newPoint.name === "") {

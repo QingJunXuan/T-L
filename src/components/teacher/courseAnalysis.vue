@@ -234,29 +234,32 @@
                       </el-row>
                     </el-collapse-item>
                     <el-collapse-item title="教学反馈" name="2" id="start">
-                      <el-row>
-                        <el-col :span="4" align="start" style="padding-left: 20px">
-                          <el-select
-                            v-model="classSettings"
-                            @change="handleClass"
-                            size="small"
-                            style="width: 80px"
-                          >
-                            <el-option
-                              v-for="item in classOptions"
-                              :key="item.value"
-                              :label="item.label"
-                              :value="item.value"
-                            ></el-option>
-                          </el-select>
+                      <el-row class="chapter-set">
+                        <el-col
+                          :span="7"
+                          align="start"
+                          style="padding-top: 5px; padding-bottom: 5px;"
+                        >
+                          <el-radio
+                            v-model="responseType"
+                            :label="0"
+                            style="zoom: 90%"
+                            @change="handleResponse"
+                          >按课程</el-radio>
+                          <el-radio
+                            v-model="responseType"
+                            :label="1"
+                            style="zoom: 90%"
+                            @change="handleResponse"
+                          >按章节</el-radio>
                         </el-col>
-                        <el-col :span="9" align="center">
+                        <el-col :span="9" align="start" v-if="responseType === 1">
                           <el-select
                             v-model="chapterIndex"
                             @change="handleChapter"
                             filterable
                             size="small"
-                            style="width: 300px"
+                            style="width: 250px"
                           >
                             <el-option
                               v-for="item in chapterOptions"
@@ -266,7 +269,7 @@
                             ></el-option>
                           </el-select>
                         </el-col>
-                        <el-col :span="11" align="end" style="padding-right: 25px">
+                        <el-col :span="8" align="start" v-if="responseType === 1">
                           <el-rate
                             v-model="chapterRate"
                             disabled
@@ -277,19 +280,24 @@
                           ></el-rate>
                         </el-col>
                       </el-row>
-                      <el-row v-loading="commentLoading">
+                      <el-row>
                         <div
                           align="start"
                           class="response"
                           style="margin-top: 10px"
-                          v-for="item in currentInfo"
-                          :key="item.id"
+                          v-for="(item, index) in classInfo"
+                          :key="index"
+                          v-loading="commentLoading"
                         >
-                          <el-row :gutter="5">
-                            <el-col :span="2">
-                              <div class="title">评分</div>
+                          <el-row>
+                            <div class="title">班级{{item.classNum}}</div>
+                          </el-row>
+                          <el-row :gutter="5" style="margin-top: 20px">
+                            <el-col :span="5" align="right">
+                              <div class="notice" v-if="responseType === 0">课程评分</div>
+                              <div class="notice" v-else>章节评分</div>
                             </el-col>
-                            <el-col :span="15">
+                            <el-col :span="14" style="padding-left: 20px">
                               <el-rate
                                 v-model="item.rate"
                                 disabled
@@ -300,20 +308,18 @@
                               ></el-rate>
                             </el-col>
                           </el-row>
-                          <el-row style="margin-top: 13px">
-                            <div class="text">{{item.comment}}</div>
+                          <el-row :gutter="10" style="margin-top: 20px">
+                            <el-col :span="5" align="end">
+                              <div class="notice">{{item.positive}}人赞赏</div>
+                            </el-col>
+                            <el-col :span="14" align="center">
+                              <vs-bar :percentage="item.percentage" :width="90"></vs-bar>
+                            </el-col>
+                            <el-col :span="5" align="start">
+                              <div class="notice">{{item.negative}}人吐槽</div>
+                            </el-col>
                           </el-row>
                         </div>
-                      </el-row>
-                      <el-row>
-                        <el-pagination
-                          :page-size="10"
-                          layout="prev, pager, next"
-                          small
-                          :total="totalCount"
-                          :current-page.sync="currentPage"
-                          @current-change="getCurrent(currentPage)"
-                        ></el-pagination>
                       </el-row>
                     </el-collapse-item>
                   </el-collapse>
@@ -329,8 +335,12 @@
 
 <script>
 import echarts from "echarts";
+import vsBar from "../tools/vsbar.vue";
 export default {
   name: "courseAnalysis",
+  components: {
+    vsBar
+  },
   data() {
     return {
       // 传值
@@ -492,15 +502,19 @@ export default {
       genderMap: [],
       genderIndex: [],
       // 反馈
-      classSettings: 0,
-      classInfo: [],
+      responseType: 0,
       chapterIndex: 0,
       chapterRate: 0,
+      classInfo: [
+        {
+          classNum: 0,
+          rate: 0,
+          positive: "-",
+          negative: "-",
+          percentage: 0
+        }
+      ],
       commentLoading: false,
-      // 翻页
-      totalCount: 0,
-      currentPage: 1,
-      currentInfo: [],
       // 学生和成绩
       studentOptions: [],
       studentMap: [],
@@ -522,18 +536,6 @@ export default {
       } else {
         this.$router.go(-1);
       }
-    },
-    // 翻页
-    getCurrent(page) {
-      this.commentLoading = true;
-      this.currentInfo = [];
-      for (let i = (page - 1) * 10; i < page * 10; i++) {
-        if (i === this.classInfo.length) break;
-        this.currentInfo.push(this.classInfo[i]);
-      }
-      this.commentLoading = false;
-      const start = document.getElementById("start");
-      start.scrollIntoView();
     },
     // 获取列表
     getCourses() {
@@ -687,7 +689,7 @@ export default {
                 this.detail.push(this.classOptions[i]);
                 this.detailValue.push(i);
               }
-              this.getClassInfo(this.chapterOptions[this.chapterIndex].id);
+              this.getClassInfo();
               this.getCharts();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -823,15 +825,114 @@ export default {
           }
         );
     },
+    getClassInfo() {
+      this.commentLoading = true;
+      this.$http
+        .get("/api/getCourseClassAvgScore?courseID=" + this.courseID, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let classList = JSON.parse(response.bodyText);
+              if (this.classInfo[0].classNum === 0) {
+                let i = 0;
+                this.classInfo = [];
+                while (i < classList.data.classInfo.length) {
+                  this.classInfo.push({
+                    classNum: i + 1, //classList.data.classInfo[i].classNum,
+                    rate: Number(
+                      Number(
+                        (classList.data.classInfo[i].girlAvgRate +
+                          classList.data.classInfo[i].boyAvgRate) /
+                          2
+                      ).toFixed(1)
+                    ),
+                    percentage: 0,
+                    positive: "-",
+                    negative: "-"
+                  });
+                  i++;
+                }
+                this.getClassNLP();
+              } else {
+                let i = 0;
+                while (i < classList.data.classInfo.length) {
+                  this.classOptions[i].rate = Number(
+                    Number(
+                      (classList.data.classInfo[i].girlAvgRate +
+                        classList.data.classInfo[i].boyAvgRate) /
+                        2
+                    ).toFixed(1)
+                  );
+                  this.classInfo[i].positive = "-";
+                  this.classInfo[i].negative = "-";
+                  i++;
+                }
+                this.getClassNLP();
+              }
+              this.commentLoading = false;
+            } else {
+              this.commentLoading = false;
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.commentLoading = false;
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getClassNLP() {
+      this.$http
+        .get("/api/getCourseClassNLPRateNum?courseID=" + this.courseID, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let classList = JSON.parse(response.bodyText);
+              let i = 0;
+              while (i < classList.data.classInfo.length) {
+                for (let j = 0; j < this.classInfo.length; j++) {
+                  if (
+                    this.classInfo[j].classNum ===
+                    classList.data.classInfo[i].classNum
+                  ) {
+                    this.classInfo[j].percentage = Math.round(
+                      (Number(classList.data.classInfo[i].classPositiveNum) /
+                        Number(classList.data.classInfo[i].classStudentNum)) *
+                        100
+                    );
+                    this.classInfo[j].positive =
+                      classList.data.classInfo[i].classPositiveNum;
+                    this.classInfo[j].negative =
+                      classList.data.classInfo[i].classNegativeNum;
+                  }
+                }
+                i++;
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
     // 按班级和章节获取反馈信息
-    getClassInfo(chapterID) {
-      this.classInfo = [];
+    getChapterClassInfo(chapterID) {
+      this.commentLoading = true;
       this.$http
         .get(
           "/api/getCourseScoreAndCommentByGender?chapterID=" +
             chapterID +
-            "&getDetail=1&courseClassID=" +
-            this.classOptions[this.classSettings].id,
+            "&getDetail=0",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -842,32 +943,82 @@ export default {
           response => {
             if (response.status === 200) {
               let classList = JSON.parse(response.bodyText);
-              let i = 0;
-              let n = classList.data[0].scoreInfo.boys.length;
+              if (this.classInfo[0].classNum === 0) {
+                let i = 0;
+                this.classInfo = [];
+                while (i < classList.data.length) {
+                  this.classInfo.push({
+                    classNum: classList.data[i].classNum,
+                    rate: Number(
+                      Number(classList.data[i].scoreInfo.totalRateAvg).toFixed(
+                        1
+                      )
+                    ),
+                    percentage: 0,
+                    positive: "-",
+                    negative: "-"
+                  });
+                  i++;
+                }
+                this.getChapterClassNLP(chapterID);
+              } else {
+                let i = 0;
+                while (i < this.classInfo.length) {
+                  this.classInfo[i].rate = Number(
+                    Number(classList.data[i].scoreInfo.totalRateAvg).toFixed(1)
+                  );
+                  this.classInfo[i].positive = "-";
+                  this.classInfo[i].negative = "-";
+                  i++;
+                }
+                this.getChapterClassNLP(chapterID);
+              }
               this.chapterRate = Number(
                 classList.data[0].scoreInfo.totalRateAvg.toFixed(1)
               );
-              while (i < n) {
-                this.classInfo.push({
-                  id: classList.data[0].scoreInfo.boys[i].id,
-                  rate: classList.data[0].scoreInfo.boys[i].rate,
-                  comment: classList.data[0].scoreInfo.boys[i].comment
-                });
+              this.commentLoading = false;
+            } else {
+              this.commentLoading = false;
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.commentLoading = false;
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getChapterClassNLP(chapterID) {
+      this.$http
+        .get("/api/getChapterNLPRateNum?chapterID=" + chapterID, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(
+          response => {
+            if (response.status === 200) {
+              let classList = JSON.parse(response.bodyText);
+              let i = 0;
+              while (i < classList.data.classInfo.length) {
+                for (let j = 0; j < this.classInfo.length; j++) {
+                  if (
+                    this.classInfo[j].classNum ===
+                    classList.data.classInfo[i].classNum
+                  ) {
+                    this.classInfo[j].percentage = Math.round(
+                      (Number(classList.data.classInfo[i].classPositiveNum) /
+                        Number(classList.data.classInfo[i].classStudentNum)) *
+                        100
+                    );
+                    this.classInfo[j].positive =
+                      classList.data.classInfo[i].classPositiveNum;
+                    this.classInfo[j].negative =
+                      classList.data.classInfo[i].classNegativeNum;
+                  }
+                }
                 i++;
               }
-              i = 0;
-              let m = classList.data[0].scoreInfo.girls.length;
-              this.totalCount = m + n;
-              while (i < m) {
-                this.classInfo.push({
-                  id: classList.data[0].scoreInfo.girls[i].id,
-                  rate: classList.data[0].scoreInfo.girls[i].rate,
-                  comment: classList.data[0].scoreInfo.girls[i].comment
-                });
-                i++;
-              }
-              this.currentPage = 1;
-              this.getCurrent(this.currentPage);
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1595,14 +1746,35 @@ export default {
         this.genderIndex[index] = val;
       }
     },
-    handleClass(val) {
-      this.chapterIndex = 0;
-      let chapterID = this.chapterOptions[0].id;
-      this.getClassInfo(chapterID);
-    },
     handleChapter(val) {
       let chapterID = this.chapterOptions[val].id;
-      this.getClassInfo(chapterID);
+      this.getChapterClassInfo(chapterID);
+    },
+    handleResponse() {
+      if (this.responseType === 0) {
+        this.classInfo = [
+          {
+            classNum: 0,
+            rate: 0,
+            positive: "-",
+            negative: "-",
+            percentage: 0
+          }
+        ];
+        this.getClassInfo();
+      }
+      if (this.responseType === 1) {
+        this.classInfo = [
+          {
+            classNum: 0,
+            rate: 0,
+            positive: "-",
+            negative: "-",
+            percentage: 0
+          }
+        ];
+        this.getChapterClassInfo(this.chapterSettings);
+      }
     },
     // 按键事件
     getCharts() {
@@ -2228,7 +2400,7 @@ export default {
 }
 
 .course-info .name span {
-  font-size: 24px;
+  font-size: 21px;
   font-weight: bold;
   color: #41abf1;
 }
@@ -2270,9 +2442,25 @@ export default {
   border-color: #7cc8fb;
 }
 
+.chapter-set {
+  border-top: 1px solid #eaeef3;
+  padding: 10px 20px 0 40px;
+}
+
+.chapter-set .notice {
+  letter-spacing: 0.6px;
+  font-size: 12px;
+}
+
 .response {
   border-top: 1px solid #eaeef3;
-  padding: 20px 20px 20px 20px;
+  padding: 20px 40px 20px 40px;
+}
+
+.response .notice {
+  letter-spacing: 0.6px;
+  font-size: 13px;
+  color: #616161;
 }
 
 .response .title {
@@ -2282,23 +2470,11 @@ export default {
   color: #41abf1;
   padding-top: 2px;
   padding-bottom: 2px;
-  padding-left: 5px;
 }
 
 .response .rate {
   zoom: 90%;
-  margin-top: 4px;
+  margin-top: 2px;
   margin-bottom: 3px;
-}
-
-.response .grade {
-  letter-spacing: 0.6px;
-  font-size: 12px;
-}
-
-.response .text {
-  min-height: 100px;
-  background-color: #fafafa;
-  padding: 5px 10px 5px 10px;
 }
 </style>
