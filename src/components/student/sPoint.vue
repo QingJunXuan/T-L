@@ -13,8 +13,8 @@ export default {
       courseID: 0,
       chapterID: 0,
       point: {
-        contentName: "标题",
-        content: "内容"
+        contentName: "",
+        content: ""
       }
     };
   },

@@ -14,7 +14,7 @@
         :key="index"
       >
         <p style="margin-left:5px">
-          {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
+          <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
           <span
             v-if="item.exercise.exerciseType===2"
           >（多选）</span>

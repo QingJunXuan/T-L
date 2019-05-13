@@ -1,5 +1,5 @@
 <template>
-  <div style="height:700px">
+  <div style="height:778px">
     <el-col :span="20" :offset="2">
       <el-row>
         <el-col :span="2" :offset="2" style="margin-top:30px;">

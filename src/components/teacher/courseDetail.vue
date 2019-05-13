@@ -52,21 +52,26 @@
         </div>
         <div v-show="isLesson" class="noticeBack">
           <el-row>
-            <el-col :span="1" :offset="17" style="margin-top:-130px">
+            <el-col :span="2" :offset="16" style="margin-top:-130px">
+              <el-button type="text" @click="changeLesson">切换</el-button>
               <el-button type="text" @click="editChapter">编辑章节</el-button>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="12" :offset="6" style="margin-top:-80px;margin-bottom:40px">
-              <div style="height:300px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
-              <el-tree
+              <div v-show="isGraph==true">
+                <div style="height:300px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
+              </div>
+              <div v-show="isGraph==false">
+                <el-tree
                 :data="tree"
                 :props="defaultProps"
                 @node-click="handleNodeClick"
                 default-expand-all
                 :expand-on-click-node="false"
                 :render-content="renderContent"
-              ></el-tree>
+                ></el-tree>
+              </div>
             </el-col>
           </el-row>
         </div>
@@ -100,6 +105,7 @@ export default {
       isNotice: false,
       isLesson: true,
       isGrade: false,
+      isGraph:true,
       notice: "Java是一门面向对象编程语言.",
       textarea: "添加/修改课程介绍",
       //data: null,
@@ -119,74 +125,6 @@ export default {
       },
       graphTree: [],
       tree:[],
-     /*  tree: [
-        {
-          id: 1,
-          createTime: "2019-03-30T06:16:14.000+0000",
-          updateTime: "2019-03-31T00:36:54.000+0000",
-          courseID: 1,
-          contentName: "Java I/O",
-          parentID: 0,
-          siblingID: 0,
-          content: "一",
-          exerciseVisible_1: false,
-          exerciseVisible_2: false,
-          exerciseDeadline_1: "2019-04-20",
-          exerciseDeadline_2: "2019-04-20",
-          exerciseTotal_1: 100,
-          exerciseTotal_2: 100,
-          subCatalog: [
-            {
-              id: 4,
-              createTime: "2019-03-30T06:30:18.000+0000",
-              updateTime: "2019-03-31T00:36:54.000+0000",
-              courseID: 1,
-              contentName: "I/O介绍",
-              parentID: 1,
-              siblingID: 0,
-              content: "一.1",
-              exerciseVisible_1: false,
-              exerciseVisible_2: false,
-              exerciseDeadline_1: null,
-              exerciseDeadline_2: null,
-              exerciseTotal_1: null,
-              exerciseTotal_2: null,
-              subCatalog: []
-            }
-          ]
-        },
-        {
-          id: 2,
-          createTime: "2019-03-30T06:16:14.000+0000",
-          updateTime: "2019-03-31T00:36:54.000+0000",
-          courseID: 1,
-          contentName: "Java I/O",
-          parentID: 0,
-          siblingID: 0,
-          content: "一",
-          exerciseVisible_1: false,
-          exerciseVisible_2: false,
-          exerciseDeadline_1: "2019-04-27",
-          exerciseDeadline_2: "2019-04-27",
-          exerciseTotal_1: 100,
-          exerciseTotal_2: 100,
-          subCatalog: []
-          }
-      ], */
-      items: [
-        {
-          id: 1,
-          content: "点击开始评分-1"
-        },
-        {
-          id: 2,
-          content: "开始评分-2"
-        },
-        {
-          id: 3,
-          content: "开始评分-3"
-        }
-      ]
     };
   },
   created() {
@@ -226,7 +164,6 @@ export default {
       const routerParams = this.$route.query.courseID;
       this.courseID = routerParams;
       this.classID = this.$route.query.classID;
-      //console.log(routerParams);
       this.getNotice();
     },
     getNotice() {
@@ -300,6 +237,13 @@ export default {
           console.log(err);
         });
     },
+    changeLesson(){
+      if(this.isGraph==true) this.isGraph=false
+      else {
+        this.isGraph=true
+        //this.draw()
+      }
+    },
     getGrade() {
       if (this.isGrade == false) {
         this.isNotice = false;
@@ -362,26 +306,65 @@ export default {
     courseBack() {
       this.$router.push({ path: "/teacher/courseManagement" });
     },
-   
-    init() {
-      //var list = state.courseList
-      
-      
+   init() {
+      // 计算节点位置
+      let nodes = this.graphTree.map(i => [
+        i.chapterNode.contentName,
+        { level: 0, subChapter: i.subChapterNodes.map(k => k.contentName) }
+      ]);
+			console.log("TCL: init -> nodes", this.graphTree, nodes)
+      for (let j = 0; j < nodes.length; j++) {
+        let curr = nodes[j][1];
+        if (curr.subChapter.length) {
+          curr.subChapter.forEach(p => {
+            let findIndex = nodes.findIndex(node => node[0] === p);
+            nodes[findIndex] = [
+              nodes[findIndex][0],
+              Object.assign({}, nodes[findIndex][1], { level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1 })
+            ];
+          });
+        }
+      }
+
+      let tempData = new Map();
+      nodes.forEach(n => {
+        tempData.set(n[1].level, []);
+      });
+      nodes.forEach(n => {
+        tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]));
+      });
+
+      let data = [];
+      var width=3600;
+      var init=0;
+
+      for (let item of tempData.entries()) {
+        var num=item[1].length
+        init=1800/num
+        item[1].forEach((value, index) => {
+          let addData = {
+            name: value,
+            x: Math.round(init+(width / num) * index),
+            y: (parseInt(item[0]) + 1) * 350
+          };
+          data.push(addData);
+        });
+      }
+      data.push({
+        name: "start",
+        x: 1800,
+        y: 0
+      });
+      this.data = data;
+      console.log("TCL: set -> data", data);
+
+      // 计算结束
       var length = this.graphTree.length;
       for (var i = 0; i < length; i++) {
-        var name = this.graphTree[i].chapterNode.contentName;
-        
         var num = this.graphTree[i].preChapterNodes.length;
+        var name = this.graphTree[i].chapterNode.contentName;
         if (num == 0) {
           //无前继节点的，连接start
-          var addData = 
-        {
-          name:name,
-          //category: "test",
-          x: Math.round(Math.random() * 500),
-          y: Math.round(Math.random() * 500) + 100
-        };
-        this.data.push(addData);
           var addLink = {
             target: name,
             source: "start",
@@ -397,14 +380,6 @@ export default {
           this.links.push(addLink);
         } else {
           //所有前继节点
-          var addData = 
-        {
-          name:name,
-          //category: "test",
-          x: Math.round(Math.random() * 500),
-          y: Math.round(Math.random() * 500) + 700
-        };
-        this.data.push(addData);
           for (var j = 0; j < num; j++) {
             var addLink = {
               target: name,
@@ -422,12 +397,9 @@ export default {
           }
         }
       }
-      console.log(this.data, "this.data");
-      console.log(this.links, "this.links");
       this.draw();
     },
     draw() {
-      console.log("draw");
       var init = this.$refs.graph;
       var myChart = this.$echarts.init(init);
       var option = {
@@ -447,17 +419,28 @@ export default {
           {
             type: "graph",
             layout: "none",
+            top:30,
             symbolSize: 20,
             color: "#ec7814",
             roam: true,
-            label: {
-              normal: {
-                show: true
+            itemStyle:{
+              normal:{
+                color: "#ec7814",
+                //opacity:0.8,
+                label:{
+                  show:true,
+                  fontSize:12,
+                  //color: '#000',
+                  formatter:function(val){   
+                    //让series 中的文字进行换行
+                    if(val.name.indexOf("、")!= -1)
+                      return val.name.split("、").join("\n")
+                    else  return val.name.split(" ").join("\n");}
+                  }
               }
             },
             edgeSymbol: ["circle", "arrow"],
             edgeSymbolSize: [4, 10],
-            //edgeColor:"#000",
             edgeLabel: {
               normal: {
                 textStyle: {
@@ -466,8 +449,6 @@ export default {
                 }
               }
             },
-            //data: this.data,
-            //links: this.links,
             data: this.data,
             links: this.links,
             lineStyle: {
@@ -482,15 +463,34 @@ export default {
       };
       myChart.setOption(option);
       var that = this;
+      let focusNum=0;
       myChart.on("click", function(params) {
-        console.log(params);
+
+        focusNum++;
         if (params.dataType == "edge") {
-          //that.handleClick(params);
           that.dataIndex = params.dataIndex;
           //显示边
+          var value = that.links[that.dataIndex].label.normal.show
+            if (value == false) {
+                that.links[that.dataIndex].label.normal.show = true
+            } else {
+                that.links[that.dataIndex].label.normal.show = false
+            }
           myChart.setOption(option);
         } else if (params.dataType == "node") {
-          that.dataIndex = params.dataIndex;
+           if(focusNum%2==1){//点击高亮
+            that.myChart.dispatchAction({
+              type: "focusNodeAdjacency",
+              // 使用 dataIndex 来定位节点。
+              dataIndex: params.dataIndex
+              });
+          }else if(focusNum%2==0){//再次点击取消高亮
+            that.myChart.dispatchAction({
+            type: "unfocusNodeAdjacency",
+            // 使用 seriesId 或 seriesIndex 或 seriesName 来定位 series.
+            seriesIndex: params.seriesIndex
+            });
+          } 
         }
       });
       //取消右键的弹出菜单
@@ -500,8 +500,6 @@ export default {
       that.myChart = myChart;
     },
     renderContent(h, { node, data, store }) {
-      
-      //console.log(h,"h",node,"node",data,"data",store,"store")
       if (data.parentID == 0) {
         chapterNum=chapterNum+1
         sectionNum=0;

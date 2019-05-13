@@ -1,5 +1,5 @@
 <template>
-  <div style="height:700px">
+  <div style="height:778px">
     <el-col :span="20" :offset="2">
       <el-row :gutter="40">
         <el-col :span="2" style="margin-top:10px">
@@ -135,7 +135,7 @@ export default {
           Authorization: "Bearer " + localStorage.getItem("token")
         },
         params: {
-          studentID: 1
+          studentID: localStorage.getItem('userid')
         }
       })
       .then(resp => {
@@ -148,7 +148,7 @@ export default {
         }
 
         console.log(resp, "resp");
-        console.log(resp.data, "resp.data");
+        console.log(resp.data, "courselist");
         console.log(this.items, "items");
       })
       .catch(err => {

@@ -31,22 +31,32 @@
     </el-row>
     <el-row>
       <div>
-        <div v-show="isNotice" class="noticeBack">
+        <div v-show="isNotice" style=" padding: 150px 0;height: 100px;">
           <el-col :span="10" :offset="7">
             <div class="notice">{{notice}}</div>
           </el-col>
         </div>
-        <div v-show="isLesson" class="lessonBack">
-          <el-col :span="12" :offset="6" style="padding-top:20px;margin-bottom:40px">
-            <div style="height:300px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
-            <el-tree
+        <div v-show="isLesson">
+          <el-col :span="12" :offset="6" style="margin-bottom:40px;margin-top:80px">
+            <div style="padding-bottom:20px">
+              <el-col :span="3"><el-button type="success" size="small" @click="changeLesson">
+                <span v-if="isGraph==true">查看章节目录</span>
+                <span v-else>查看关系图</span>
+              </el-button></el-col>
+            </div>
+            <div v-show="isGraph==true">
+              <div style="height:800px;border:1px solid #ddd;margin-bottom:20px;margin-top:40px" ref="graph"></div>
+            </div>
+            <div v-show="isGraph==false" style="margin-top:40px">
+             <el-tree
               :data="tree"
               :props="defaultProps"
               @node-click="handleNodeClick"
               default-expand-all
               :expand-on-click-node="false"
               :render-content="renderContent"
-            ></el-tree>
+             ></el-tree>
+            </div>
           </el-col>
         </div>
       </div>
@@ -57,7 +67,7 @@
 import store from '../../store/store.js'
 import axios from "axios";
 let  chapterNum = 0;
-let  sectionNum=0;
+//let  sectionNum=0;
 export default {
   name: "sCourseDetail",
   data() {
@@ -66,6 +76,7 @@ export default {
       classID: 1,
       isNotice: false,
       isLesson: true,
+      isGraph:true,
       notice: "Java是一门面向对象编程语言.",
       rate: 20,
       lesson: null,
@@ -91,37 +102,36 @@ export default {
   },
   created() {
     //获得课程目录
-    console.log(this.courseID);
+    console.log(this.courseID,"courseid");
     const routerParams1 = this.$route.query.courseID;
     this.courseID = routerParams1;
     const routerParams2 = this.$route.query.classID;
     this.classID = routerParams2;
-    console.log(this.courseID);
+    console.log(this.courseID,"courseid");
     chapterNum=0;
-    sectionNum=0;
+    //sectionNum=0;
     this.getChapterGraph();//图
     this.getNotice();
     this.getLesson();
+    this.getScore();
   },
   mounted() {
-    //console.log(this.data);
-    this.draw();
+    //this.draw();
   },
   methods: {
-    getChapterGraph() {
+    getScore(){
       axios
-        .get("/api/getChapterRelationByCourseID", {
+        .get("/api/getCourseScoreAndComment", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
-          params: { courseID: this.courseID }
+          params: { courseID: this.courseID,studentID:localStorage.getItem('userid') }
         })
         .then(resp => {
           console.log(resp.data);
           if (resp.data.state == 1) {
-            console.log(resp.data,"chapter-tree")
-            this.graphTree = resp.data.data;
-            this.init();
+            console.log(resp.data,"score")
+            store.commit("setScore",resp.data.data)
           }
         })
         .catch(err => {
@@ -163,8 +173,6 @@ export default {
             this.tree = resp.data.data;
             store.commit('setCatalog',this.tree)
           }
-          console.log(resp.data, "resp.data");
-          console.log(this.courseID, "courseID");
         })
         .catch(err => {
           console.log(err);
@@ -174,12 +182,22 @@ export default {
       if (this.isNotice == false) {
         this.isNotice = true;
         this.isLesson = false;
+        //this.isGraph=false;
       }
     },
     showLesson() {
       if (this.isLesson == false) {
         this.isNotice = false;
         this.isLesson = true;
+        //this.isGraph=false;
+        //this.draw()
+      }
+    },
+    changeLesson(){//切换章节目录和关系图
+      if(this.isGraph==true) this.isGraph=false
+      else {
+        this.isGraph=true
+        //this.draw()
       }
     },
     handleNodeClick(object) {
@@ -196,23 +214,18 @@ export default {
     },
     renderContent(h, { node, data, store }) {
       if (data.parentID == 0) {
-        //console.log("h",h,"node",node,"data",data,"store",store)
-        //chapterNum=0
         chapterNum=chapterNum+1;
-        sectionNum=0;
+        var num=chapterNum
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-              <span style="color:#000;font-size:15px">
-                {"第 " + chapterNum + " 章 "}&nbsp;
-              </span>
               <span>{node.label}</span>
             </span>
             <span>
               <el-button
                 style="font-size: 12px;color:#000;"
                 size="mini"
-                on-click={() => this.pre(data)}
+                on-click={() => this.pre(data,num)}
                 round
               >
                 课前摸底
@@ -221,7 +234,7 @@ export default {
                 style="font-size: 12px;"
                 size="mini"
                 type="info"
-                on-click={() => this.rev(node, data,chapterNum)}
+                on-click={() => this.rev(data,num)}
                 round
               >
                 课后作业
@@ -230,38 +243,75 @@ export default {
           </span>
         );
       } else {
-        
-        sectionNum=sectionNum+1
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-            <span>{chapterNum +'.'+sectionNum}&nbsp;</span>
               <span>{node.label}</span>
             </span>
           </span>
         );
       }
     },
-    pre(data) {
-      console.log(data, "pre");
+    pre(data,num) {
       this.$router.push({
         path: "chapterDetail/preExercise",
         query: {
           spreid: data.id,
-          courseIDs: this.courseID
+          courseIDs: this.courseID,
+          index:num-1
         }
       });
+     /*  var length = store.state.score.length
+			console.log("TCL: pre -> length", length)
+      if(num>length){
+      this.$router.push({
+        path: "chapterDetail/preExercise",
+        query: {
+          spreid: data.id,
+          courseIDs: this.courseID,
+          index:num-1
+        }
+      });
+      }else{
+        this.$router.push({
+        path: "chapterDetail/scoredPre",
+        query: {
+          spreid: data.id,
+          courseIDs: this.courseID,
+          index:num-1
+        }
+      });
+      } */
     },
-    rev(node, data,num) {
-      console.log(node, data, "rev");
+    rev(data,num) {
       this.$router.push({
         path: "chapterDetail/revExercise",
         query: {
           srevid: data.id,
           courseIDs: this.courseID,
-          index:num-1,
+          index:num-1
         }
       });
+    /*  var length = store.state.score.length
+      if(num>length){
+      this.$router.push({
+        path: "chapterDetail/revExercise",
+        query: {
+          srevid: data.id,
+          courseIDs: this.courseID,
+          index:num-1
+        }
+      });
+      }else{
+        this.$router.push({
+        path: "chapterDetail/scoredRev",
+        query: {
+          srevid: data.id,
+          courseIDs: this.courseID,
+          index:num-1
+        }
+      });
+      } */
     },
     courseBack() {
       this.$router.push({ path: "/student/courseManagement" });
@@ -274,18 +324,38 @@ export default {
         }
       });
     },
+    getChapterGraph() {
+      console.log(this.courseID,"getgraph-courseid")
+      axios
+        .get("/api/getChapterRelationByCourseID", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          },
+          params: { courseID: this.courseID }
+        })
+        .then(resp => {
+          console.log(resp.data);
+          if (resp.data.state == 1) {
+            console.log(resp.data,"chapter-tree")
+            this.graphTree = resp.data.data;
+            this.init();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     init() {
-      //var list = state.courseList
       // 计算节点位置
       let nodes = this.graphTree.map(i => [
         i.chapterNode.contentName,
-        { level: 0, subCourses: i.subCatalog.map(k => k.contentName) }
+        { level: 0, subChapter: i.subChapterNodes.map(k => k.contentName) }
       ]);
 			console.log("TCL: init -> nodes", this.graphTree, nodes)
       for (let j = 0; j < nodes.length; j++) {
         let curr = nodes[j][1];
-        if (curr.subCourses.length) {
-          curr.subCourses.forEach(p => {
+        if (curr.subChapter.length) {
+          curr.subChapter.forEach(p => {
             let findIndex = nodes.findIndex(node => node[0] === p);
             nodes[findIndex] = [
               nodes[findIndex][0],
@@ -304,30 +374,30 @@ export default {
       });
 
       let data = [];
+      var width=3800;
+      var init=0;
+
       for (let item of tempData.entries()) {
-        console.log("TCL: set -> item", item[0]);
+        var num=item[1].length
+        init=1900/num
         item[1].forEach((value, index) => {
           let addData = {
             name: value,
-            x: Math.round((1000 / item[1].length) * index),
-            y: (parseInt(item[0]) + 1) * 300
+            x: Math.round(init+(width / num) * index),
+            y: (parseInt(item[0]) + 1) * 350
           };
           data.push(addData);
         });
       }
-
       data.push({
         name: "start",
-        x: 0,
+        x: 1900,
         y: 0
       });
-
       this.data = data;
       console.log("TCL: set -> data", data);
 
       // 计算结束
-
-      
       var length = this.graphTree.length;
       for (var i = 0; i < length; i++) {
         var num = this.graphTree[i].preChapterNodes.length;
@@ -369,7 +439,6 @@ export default {
       this.draw();
     },
     draw() {
-      console.log("draw");
       var init = this.$refs.graph;
       var myChart = this.$echarts.init(init);
       var option = {
@@ -389,12 +458,23 @@ export default {
           {
             type: "graph",
             layout: "none",
-            symbolSize: 20,
-            color: "#ec7814",
+            top:30,
+            symbolSize: 25,
             roam: true,
-            label: {
-              normal: {
-                show: true
+            itemStyle:{
+              normal:{
+                color: "#ec7814",
+                //opacity:0.8,
+                label:{
+                  show:true,
+                  fontSize:12,
+                  //color: '#000',
+                  formatter:function(val){   
+                    //让series 中的文字进行换行
+                    if(val.name.indexOf("、")!= -1)
+                      return val.name.split("、").join("\n")
+                    else  return val.name.split(" ").join("\n");}
+                  }
               }
             },
             edgeSymbol: ["circle", "arrow"],
@@ -408,10 +488,9 @@ export default {
                 }
               }
             },
-            //data: this.data,
-            //links: this.links,
             data: this.data,
             links: this.links,
+            
             lineStyle: {
               normal: {
                 opacity: 0.9,
@@ -424,15 +503,35 @@ export default {
       };
       myChart.setOption(option);
       var that = this;
+      let focusNum=0;
       myChart.on("click", function(params) {
-        console.log(params);
+
+        focusNum++;
         if (params.dataType == "edge") {
           //that.handleClick(params);
           that.dataIndex = params.dataIndex;
           //显示边
+          var value = that.links[that.dataIndex].label.normal.show
+            if (value == false) {
+                that.links[that.dataIndex].label.normal.show = true
+            } else {
+                that.links[that.dataIndex].label.normal.show = false
+            }
           myChart.setOption(option);
         } else if (params.dataType == "node") {
-          that.dataIndex = params.dataIndex;
+          if(focusNum%2==1){//点击高亮
+            that.myChart.dispatchAction({
+              type: "focusNodeAdjacency",
+              // 使用 dataIndex 来定位节点。
+              dataIndex: params.dataIndex
+              });
+          }else if(focusNum%2==0){//再次点击取消高亮
+            that.myChart.dispatchAction({
+            type: "unfocusNodeAdjacency",
+            // 使用 seriesId 或 seriesIndex 或 seriesName 来定位 series.
+            seriesIndex: params.seriesIndex
+            });
+          } 
         }
       });
       //取消右键的弹出菜单

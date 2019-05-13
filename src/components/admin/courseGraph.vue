@@ -525,16 +525,13 @@ export default {
         x: 1400,
         y: 0
       });
-
       this.data = data;
       console.log("TCL: set -> data", data);
 
       // 计算结束
-
       for (var i = 0; i < length; i++) {
         var num = this.allCourse[i].preCoursesName.length;
         var name = this.allCourse[i].courseName.courseName;
-
         if (num == 0) {
           //无前继节点的，连接start
           var addLink = {
@@ -573,7 +570,7 @@ export default {
 			console.log("TCL: set -> links", this.links)
       this.draw();
     },
-     setAllCourse() {
+    setAllCourse() {
       axios
         .get("/api/getAllCoursesRelation", {
           headers: {

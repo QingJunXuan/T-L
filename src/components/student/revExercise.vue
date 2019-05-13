@@ -22,7 +22,7 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
+            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===5"
             >（多选）</span>
@@ -89,7 +89,7 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
+            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
             >
@@ -143,11 +143,11 @@
           <div
             v-show="isRated"
             style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-          >解析：{{item.exercise.exerciseAnalysis}}</div>
+          >解析：<pre>{{item.exercise.exerciseAnalysis}}</pre></div>
         </div>
       </div>
-      <div v-if="isRated==false" style="background-color:#545c64;height:110px">
-        <p style="padding-top:10px;color:#fff">
+      <div v-if="isRated==false" style="border:1px solid #ddd;height:200px">
+        <p style="padding-top:10px;color:#000">
           评分
           <span style="font-size:12px;">（评分后方可提交作业）</span>
         </p>
@@ -157,12 +157,13 @@
           :allow-half="half"
           style="margin-top:-5px;padding-bottom:10px"
         ></el-rate>
-        <el-button size="mini" type="primary" @click="submit" round>提 交</el-button>
+        <el-input type="textarea" placeholder="输入评价" v-model="comment" rows="2" resize="none" style="width:400px;padding-top:10px"></el-input>
+        <p><el-button size="mini" type="primary" @click="submit" round>提 交</el-button></p>
       </div>
-      <div v-else style="background-color:#545c64;height:90px">
+      <div v-else style="background-color:#545c64;height:120px">
         <p style="padding-top:10px;color:#fff">评分</p>
-
         <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
+        <p style="color:#fff">{{comment}}</p>
       </div>
     </div>
     <div v-else>
@@ -187,6 +188,7 @@ export default {
       //afterRate: false,
       type: 0,
       rate: 0,
+      comment:'',
       sid: 0,
       answer: {},
       score: {},
@@ -217,7 +219,7 @@ export default {
   },
   watch: {
     $route(to, from) {
-      this.getPre();
+      this.getRev();
       this.setTime();
       this.setAnswer();
     }
@@ -263,6 +265,8 @@ export default {
     getRev() {
       const sid = this.$route.query.srevid;
       this.sid = sid;
+      const index =this.$route.query.index
+      var catalog = store.state.catalog
       axios
         .get("/api/question/view", {
           headers: {
@@ -280,11 +284,7 @@ export default {
           this.exercises = resp.data.data;
           var length = this.exercises.length;
           if (length != 0) {
-             const index =this.$route.query.index
-             var catalog = store.state.catalog
-             if(catalog.length!=0 && catalog[index].exerciseVisible_2==true){
-               this.haveRev=true
-               }
+             this.haveRev=true
           }
           this.setTotalPoint();
           }
@@ -292,6 +292,35 @@ export default {
         .catch(err => {
           console.log(err);
         });
+/*       if(catalog.length!=0 && catalog[index].exerciseVisible_2==true){
+				console.log("TCL: getRev -> exerciseVisible_2", catalog[index].exerciseVisible_2)
+         axios
+        .get("/api/question/view", {
+          headers: {
+            Authorization:
+              "Bearer "+localStorage.getItem("token")
+          },
+          params: {
+            chapterId: sid,
+            type: "review"
+          }
+        })
+        .then(resp => {
+          console.log("rev", resp.data);
+          if(resp.data.state==1){
+          this.exercises = resp.data.data;
+          var length = this.exercises.length;
+          if (length != 0) {
+             this.haveRev=true
+          }
+          this.setTotalPoint();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+     } */
+      
     },
     setAnswer(){   
        var length = this.exercises.length;
@@ -369,7 +398,7 @@ export default {
         params.append("studentId",1)
         params.append("chapterId",this.sid)
         params.append('type',"review")
-        params.append('comment',1)
+        params.append('comment',this.comment)
         params.append('rate',this.rate)
         axios
           .post(

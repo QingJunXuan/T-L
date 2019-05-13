@@ -13,7 +13,9 @@
       >
         <p
           style="margin-left:5px"
-        >{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</p>
+        >
+        <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
+        </p>
         <!-- 单选 -->
         <el-form-item
           style="margin-top:10px;margin-left:10px;padding-bottom:10px"

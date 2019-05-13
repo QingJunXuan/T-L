@@ -30,7 +30,9 @@ import revExercise from '../components/student/revExercise.vue'
 import tpoint from '../components/teacher/tPoint.vue'
 import tpreExercise from '../components/teacher/preExercise.vue'
 import trevExercise from '../components/teacher/revExercise.vue'
-import chapterGraph from '../components/student/chapterGraph.vue'
+import scoredPre from '../components/student/scoredPre.vue'
+import scoredRev from '../components/student/scoredRev.vue'
+
 
 Vue.use(Router)
 Vue.prototype.$ajax=axios
@@ -83,6 +85,16 @@ export default new Router({
             path:'revExercise',
             name:'revExercise',
             component:revExercise,
+          },
+          {
+            path: 'scoredPre',
+            name: 'scoredPre',
+            component: scoredPre,
+          },
+          {
+            path: 'scoredRev',
+            name: 'scoredRev',
+            component: scoredRev,
           }
         ],
         meta: {

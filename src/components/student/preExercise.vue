@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="margin:0 auto;width:700px" v-if="havePre">
+    <div style="margin:0 auto;width:778px" v-if="havePre">
       <h3 align="start">
         客观题（
         <span>{{totalPoint}}</span>分）
@@ -14,7 +14,7 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
+            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===2"
             >（多选）</span>
@@ -56,18 +56,6 @@
               >{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <!-- 主观 -->
-          <!-- <el-form-item
-            style="margin-left: 10px"
-            v-else-if="item.exercise.exerciseType===3"
-            :prop="index.toString()"
-            :rules="[
-      { required: true, message: '请作答'},
-      { type: 'string', message: '请作答'}
-    ]"
-          >
-            <el-input type="textarea" :rows="4" placeholder="请输入答案" v-model="answer[index]"></el-input>
-          </el-form-item> -->
         </div>
         <el-form-item>
           <el-button type="primary" @click="submitForm('answer')" size="mini">确认提交</el-button>
@@ -82,14 +70,10 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            {{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）
+            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===1 || item.exercise.exerciseType ===2"
             >
-              <!-- <span style="font-size:12px;color:rgb(100,100,100)">
-                答案：
-                <span style="color:red;">{{item.exercise.exerciseAnswer}}&nbsp;&nbsp;</span>
-              </span> -->
               <span style="font-size:12px;color:rgb(100,100,100)">
                 你的选择：
                 <span
@@ -108,12 +92,6 @@
                 <span style="color:red;">{{score[index]}}</span> 分
               </span>
             </span>
-            <!-- <span v-else-if="item.exercise.exerciseType===3 && isScored===true">
-              <span style="font-size:12px;color:rgb(100,100,100)">
-                得分:
-                <span style="color:red;">{{score[index]}}</span> 分
-              </span>
-            </span> -->
           </p>
           <span v-if="item.exercise.exerciseType===1 || item.exercise.exerciseType ===2">
             <span
@@ -126,13 +104,9 @@
               <span :class="setAnswerClass(item.exercise.exerciseAnswer, String.fromCharCode(j+64))">{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
             </span>
           </span>
-          <!-- <div
-            v-else-if="item.exercise.exerciseType===3"
-            style="padding:10px;background-color:#ddd;height:50px"
-          >你的答案：{{answer[index]}}</div> -->
           <div
             style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-          >解析：{{item.exercise.exerciseAnalysis}}</div>
+          >解析：<pre>{{item.exercise.exerciseAnalysis}}</pre></div>
         </div>
       </div>
     </div>
@@ -143,7 +117,6 @@
 </template>
 <script>
 import axios from "axios";
-//import qs from 'qs'
 export default {
   data() {
     return {
@@ -202,7 +175,6 @@ export default {
 
             if (length != 0) {
               this.havePre = true;
-              
             }
             this.setTotalPoint();
           }
@@ -312,7 +284,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 .test {
   color: #747a81;
 }
