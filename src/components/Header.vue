@@ -74,6 +74,9 @@
         }).then(() => {
           localStorage.removeItem('username');
           localStorage.removeItem('token');
+          localStorage.removeItem('userID');
+          localStorage.removeItem('name');
+          localStorage.removeItem('workID')
           location.reload();
           this.isLogin = false;
         }).catch(() => {

@@ -78,12 +78,12 @@
         <div v-show="isGrade" class="gradeBack">
           <el-col :span="10" :offset="7" v-for="(item,index) in tree" :key="index">
             <div v-if="gradeItem(index)">
-            <el-row style="padding-bottom:20px">
-              <el-card shadow="hover" class="grade">
-                <p style="margin-bottom:0px">{{item.contentName+"（"+item.exerciseDeadline_2+"）"}}</p>
-                <el-button type="text" @click="grade(item.id)">点击进入评分</el-button>
-              </el-card>
-            </el-row>
+              <el-row style="padding-bottom:20px">
+                <el-card shadow="hover" class="grade">
+                  <p style="margin-bottom:0px">{{item.contentName+"（"+item.exerciseDeadline_2+"）"}}</p>
+                  <el-button type="text" @click="grade(item.id, item.exerciseTitle)">点击进入评分</el-button>
+                </el-card>
+              </el-row>
             </div>
           </el-col>
         </div>
@@ -93,13 +93,13 @@
 </template>
 <script>
 import axios from "axios";
-let chapterNum=0;
-let sectionNum=0;
+let chapterNum = 0;
+let sectionNum = 0;
 export default {
   name: "tCourseDetail",
   data() {
     return {
-      number:0,//章节号
+      number: 0, //章节号
       courseID: 1,
       classID: 1,
       isNotice: false,
@@ -129,6 +129,7 @@ export default {
   },
   created() {
     //获得课程目录
+    this.getParams();
     console.log(this.courseID);
     const routerParams = this.$route.query.courseID;
     this.courseID = routerParams;
@@ -143,17 +144,16 @@ export default {
       axios
         .get("/api/getChapterRelationByCourseID", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: { courseID: this.courseID }
         })
         .then(resp => {
           console.log(resp.data);
-          if(resp.data.state==1){
-          this.graphTree = resp.data.data;
-          console.log(this.graphTree,"graphtree-teacher")
-          this.init();
+          if (resp.data.state == 1) {
+            this.graphTree = resp.data.data;
+            console.log(this.graphTree, "graphtree-teacher");
+            this.init();
           }
         })
         .catch(err => {
@@ -170,16 +170,15 @@ export default {
       axios
         .get("/api/getNoticeByCouID", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
           }
         })
         .then(resp => {
-          if(resp.data.state==1){
-          this.textarea = resp.data.data.courseNotice;
+          if (resp.data.state == 1) {
+            this.textarea = resp.data.data.courseNotice;
           }
         })
         .catch(err => {
@@ -187,28 +186,23 @@ export default {
         });
     },
     changeNotice() {
-       var params = new URLSearchParams()
-        params.append("courseID",this.courseID)
-        params.append("courseNotice",this.textarea)
+      var params = new URLSearchParams();
+      params.append("courseID", this.courseID);
+      params.append("courseNotice", this.textarea);
       axios
-        .post(
-          "/api/addCourseNotice",
-          params,
-          {
-            headers: {
-              'Content-Type':'application/x-www-form-urlencoded',
-              Authorization:
-               "Bearer "+localStorage.getItem("token")
-            }
+        .post("/api/addCourseNotice", params, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
+        })
         .then(resp => {
-          console.log("notice success",resp.data);
-          
-           if (resp.data.state == 1) {
+          console.log("notice success", resp.data);
+
+          if (resp.data.state == 1) {
             this.$message("修改成功");
-          }else{
-            this.$message(resp.data.message)
+          } else {
+            this.$message(resp.data.message);
           }
         })
         .catch(err => {
@@ -219,17 +213,16 @@ export default {
       axios
         .get("/api/getCourseCatalog", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
           }
         })
         .then(resp => {
-          if(resp.data.state==1){
-          this.tree = resp.data.data;
-          console.log(this.tree,"lesson-tree")
+          if (resp.data.state == 1) {
+            this.tree = resp.data.data;
+            console.log(this.tree, "lesson-tree");
           }
           console.log(this.courseID);
         })
@@ -265,22 +258,23 @@ export default {
         this.isGrade = false;
       }
     },
-    gradeItem(index){
-      var currentDate = new Date()
-      var stringDate=this.tree[index].exerciseDeadline_2
-      var deadDate=new Date(stringDate)
+    gradeItem(index) {
+      var currentDate = new Date();
+      var stringDate = this.tree[index].exerciseDeadline_2;
+      var deadDate = new Date(stringDate);
       //console.log(stringDate,deadDate,currentDate)
-      if(deadDate<currentDate){
-        return true
+      if (deadDate < currentDate) {
+        return true;
       }
     },
-    grade(id) {
+    grade(id, title) {
       this.$router.push({
         path: "/teacher/mark",
         name: "exerciseMark",
         query: {
           chapterID: id,
-          classID: this.classID
+          classID: this.classID,
+          name: title
         }
       });
     },
@@ -290,7 +284,7 @@ export default {
           path: "chapterDetail/point",
           query: {
             chapterIDt: object.id,
-            courseIDt:this.courseID
+            courseIDt: this.courseID
           }
         });
       }
@@ -299,7 +293,8 @@ export default {
       this.$router.push({
         path: "/teacher/chapterEdit",
         query: {
-          id: this.courseID
+          id: this.courseID,
+          classID: this.classID
         }
       });
     },
@@ -501,13 +496,13 @@ export default {
     },
     renderContent(h, { node, data, store }) {
       if (data.parentID == 0) {
-        chapterNum=chapterNum+1
-        sectionNum=0;
+        chapterNum = chapterNum + 1;
+        sectionNum = 0;
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
               <span style="color:#000;font-size:15px">
-                {"第 "  + chapterNum+ " 章 "}&nbsp;
+                {"第 " + chapterNum + " 章 "}&nbsp;
               </span>
               <span>{node.label}</span>
             </span>
@@ -533,11 +528,11 @@ export default {
           </span>
         );
       } else {
-        sectionNum=sectionNum+1
+        sectionNum = sectionNum + 1;
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-              <span>{chapterNum +'.'+sectionNum}&nbsp;</span>
+              <span>{chapterNum + "." + sectionNum}&nbsp;</span>
               <span>{node.label}</span>
             </span>
           </span>
@@ -550,7 +545,7 @@ export default {
         path: "chapterDetail/preExercise",
         query: {
           tpreid: data.id,
-          courseIDt:this.courseID
+          courseIDt: this.courseID
         }
       });
     },
@@ -560,18 +555,19 @@ export default {
         path: "chapterDetail/revExercise",
         query: {
           trevid: data.id,
-          courseIDt:this.courseID}
-        })
+          courseIDt: this.courseID
+        }
+      });
     },
-    stuDetail(){
+    stuDetail() {
       this.$router.push({
-        path: '/teacher/studentList',
+        path: "/teacher/studentList",
         query: {
           classID: this.classID,
           courseID: this.courseID
         }
       });
-    },
+    }
   }
 };
 </script>

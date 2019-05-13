@@ -91,7 +91,7 @@ export default {
             "Bearer "+localStorage.getItem("token")
         },
         params: {
-          teacherID: 1001
+          teacherID: 203
         }
       })
       .then(resp => {
@@ -114,7 +114,7 @@ export default {
       this.$router.push({
         path: '/teacher/courseAnalysis', 
         query: {
-          teacherID: 1
+          teacherID: 203
         }
       });
     },

@@ -3,7 +3,7 @@
     <div class="main" align="start">
       <el-dialog title="请选择截止时间" :visible.sync="dialogTableVisible">
         <div align="center">
-          <el-date-picker v-model="time" type="date" size="small"></el-date-picker>
+          <el-date-picker v-model="time" type="date" size="small" :picker-options="startLimit"></el-date-picker>
           <el-button
             @click="publish"
             :loading="publishLoading"
@@ -12,6 +12,36 @@
             class="confirm-button"
           >确认</el-button>
         </div>
+      </el-dialog>
+      <el-dialog title="请选择习题" :visible.sync="selectHistoryVisible">
+        <el-row type="flex" justify="center">
+          <el-select size="small" v-model="importSettings" @change="handleChapter">
+            <el-option
+              v-for="item in importData"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
+            ></el-option>
+          </el-select>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-top: 10px">
+          <el-select size="small" v-model="chapterSettings">
+            <el-option
+              v-for="item in chapterData"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
+            ></el-option>
+          </el-select>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-top: 15px">
+          <el-button
+            type="primary"
+            size="small"
+            @click="confirmImport()"
+            :loading="importLoading"
+          >提交</el-button>
+        </el-row>
       </el-dialog>
       <h4>客观题({{totalScore}}分)</h4>
       <div v-for="(item1, i) in exercises" :key="i" align="start" class="exercises">
@@ -203,13 +233,28 @@
       </div>
       <div align="center" style="margin-top: 20px">
         <el-button
-          type="primary"
+          type="success"
+          plain
+          class="edit-button"
+          @click="selectHistoryVisible = true"
+          size="small"
+        >导入</el-button>
+        <el-button
+          type="success"
+          plain
+          class="edit-button"
           :loading="submitLoading"
           @click="submitPreview"
           :disabled="funcButton"
+          size="small"
         >保存</el-button>
-        <el-button type="success" @click="dialogTableVisible = true" :disabled="funcButton">发布</el-button>
-        <el-button @click="getPreExercises" :disabled="funcButton" type="info">重置</el-button>
+        <el-button
+          type="success"
+          @click="dialogTableVisible = true"
+          :disabled="funcButton"
+          size="small"
+        >发布</el-button>
+        <el-button @click="getPreExercises" :disabled="funcButton" type="info" size="small">重置</el-button>
       </div>
     </div>
   </el-container>
@@ -222,6 +267,8 @@ export default {
     return {
       id: 0,
       chapterInfo: {},
+      courseID: 0,
+      teacherID: 202,
       // 课前习题
       exercises: [
         {
@@ -245,16 +292,28 @@ export default {
       ],
       exerciseNew: {},
       totalScore: 0,
+      importData: [],
+      importSettings: "暂无数据",
+      chapterData: [],
+      chapterSettings: "暂无数据",
       addButton: true,
       funcButton: false,
       submitLoading: false,
       publishLoading: false,
+      importLoading: false,
       dialogTableVisible: false,
-      time: ""
+      selectHistoryVisible: false,
+      time: "",
+      startLimit: {
+        disabledDate(time) {
+          return time.getTime() < Date.now(); //开始时间不选时，结束时间最大值小于等于当天
+        }
+      }
     };
   },
   methods: {
     getParams() {
+      this.courseID = this.$route.query.courseID;
       this.id = this.$route.query.id;
     },
     getChapterInfo() {
@@ -365,6 +424,95 @@ export default {
           }
         );
     },
+    getCourses() {
+      this.importData = [];
+      this.$http
+        .get(
+          // 传值课程号
+          "/api/question/sameCoursesById?courseId=" +
+            this.courseID +
+            "&teacherId=" +
+            this.teacherID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let courseList = JSON.parse(response.bodyText);
+              if (courseList.state === 1) {
+                let i = 0;
+                let index = 0;
+                while (i < courseList.data.length) {
+                  if (
+                    Number(courseList.data[i].courseID) !==
+                    Number(this.courseID)
+                  ) {
+                    this.importData.push({
+                      value: index,
+                      label:
+                        courseList.data[i].courseYear +
+                        courseList.data[i].courseSemester,
+                      id: courseList.data[i].courseID
+                    });
+                    index++;
+                  }
+                  i++;
+                }
+              }
+              if (this.importData.length > 0) {
+                this.importSettings = 0;
+                this.getChapterID();
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getChapterID() {
+      this.chapterData = [];
+      this.$http
+        .get(
+          // 传值课程号
+          "/api/getCourseCatalog?courseID=" +
+            this.importData[this.importSettings].id,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let chapterList = JSON.parse(response.bodyText);
+              if (chapterList.state === 1) {
+                let i = 0;
+                this.chapterSettings = chapterList.data[i].id;
+                while (i < chapterList.data.length) {
+                  this.chapterData.push({
+                    value: chapterList.data[i].id,
+                    label: chapterList.data[i].contentName
+                  });
+                  i++;
+                }
+              }
+            } else {
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
     setAnswerClass(item, j) {
       if (item.answer.indexOf(j) >= 0 && !item.delete) return "answer";
       else return "";
@@ -375,6 +523,9 @@ export default {
           this.exerciseNew.answer.splice(i, 1);
         }
       }
+    },
+    handleChapter() {
+      this.getChapterID();
     },
     // 添加选项
     addOption() {
@@ -850,30 +1001,49 @@ export default {
       } else {
         deadline = this.time;
       }
+      let entity = {};
+      if (this.chapterInfo.exerciseVisible_2 === null) {
+        entity = {
+          id: this.chapterInfo.id,
+          courseID: this.chapterInfo.courseID,
+          contentName: this.chapterInfo.contentName,
+          parentID: this.chapterInfo.parentID,
+          siblingID: this.chapterInfo.siblingID,
+          content:
+            this.chapterInfo.content === null
+              ? new String()
+              : this.chapterInfo.content,
+          exerciseTitle: this.chapterInfo.contentName + "[课前习题]",
+          exerciseVisible_1: true,
+          exerciseDeadline_1: deadline,
+          exerciseTotal_1: Number(this.totalScore)
+        };
+      } else {
+        entity = {
+          id: this.chapterInfo.id,
+          courseID: this.chapterInfo.courseID,
+          contentName: this.chapterInfo.contentName,
+          parentID: this.chapterInfo.parentID,
+          siblingID: this.chapterInfo.siblingID,
+          content:
+            this.chapterInfo.content === null
+              ? new String()
+              : this.chapterInfo.content,
+          exerciseTitle: this.chapterInfo.contentName + "[课前习题]",
+          exerciseVisible_1: true,
+          exerciseVisible_2: this.chapterInfo.exerciseVisible_2,
+          exerciseDeadline_1: deadline,
+          exerciseDeadline_2: this.chapterInfo.exerciseDeadline_2,
+          exerciseTotal_1: Number(this.totalScore),
+          exerciseTotal_2: this.chapterInfo.exerciseTotal_2
+        };
+      }
       this.$http
-        .post(
-          "/api/alertChapter",
-          {
-            id: this.chapterInfo.id,
-            courseID: this.chapterInfo.courseID,
-            contentName: this.chapterInfo.contentName,
-            parentID: this.chapterInfo.parentID,
-            siblingID: this.chapterInfo.siblingID,
-            content: this.chapterInfo.content === null? new String():this.chapterInfo.content,
-            exerciseTitle: this.chapterInfo.contentName + "练习题",
-            exerciseVisible_1: true,
-            //exerciseVisible_2: this.chapterInfo.exerciseVisible_2,
-            exerciseDeadline_1: deadline,
-            //exerciseDeadline_2: this.chapterInfo.exerciseDeadline_2,
-            exerciseTotal_1: Number(this.totalScore),
-            //exerciseTotal_2: this.chapterInfo.exerciseTotal_2
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token")
-            }
+        .post("/api/alertChapter", entity, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
+        })
         .then(
           response => {
             if (response.status === 200) {
@@ -896,6 +1066,60 @@ export default {
             return;
           }
         );
+    },
+    confirmImport() {
+      if (
+        this.importSettings === "暂无数据" ||
+        this.chapterSettings === "暂无数据"
+      ) {
+        this.$message({ type: "warning", message: "无法导入习题信息!" });
+        return;
+      }
+      this.$confirm("之前的习题信息将被覆盖，确认导入吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.importLoading = true;
+          this.$http
+            .post(
+              "/api/question/copyExercise",
+              {
+                sourceChapterId: this.chapterSettings,
+                aimChapterId: this.id,
+                type: "review"
+              },
+              {
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("token")
+                }
+              }
+            )
+            .then(
+              response => {
+                if (response.status === 200) {
+                  this.$message({
+                    type: "success",
+                    message: "习题导入成功!"
+                  });
+                  this.getPreExercises();
+                  this.importLoading = false;
+                  this.selectHistoryVisible = false;
+                } else {
+                  this.$message({ type: "error", message: "习题导入失败!" });
+                  this.importLoading = false;
+                  return;
+                }
+              },
+              response => {
+                this.$message({ type: "error", message: "习题导入失败!" });
+                this.importLoading = false;
+                return;
+              }
+            );
+        })
+        .catch(() => {});
     },
     // 深拷贝
     objDeepCopy(source) {
@@ -929,6 +1153,7 @@ export default {
     this.getParams();
     this.getPreExercises();
     this.getChapterInfo();
+    this.getCourses();
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
@@ -983,7 +1208,7 @@ export default {
 
 <style scoped>
 .main {
-  width: 700px;
+  width: 80%;
   margin: 0 auto;
 }
 

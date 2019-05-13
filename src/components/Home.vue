@@ -233,9 +233,11 @@
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }, {emulateJSON:false}).then(response => {
-                console.log(response.data)
                 localStorage.setItem('token', response.data.data.token.token);
-                localStorage.setItem('username', this.ruleForm.account);
+                localStorage.setItem('username', response.data.data.mail);
+                localStorage.setItem('userID', response.data.data.userID);
+                localStorage.setItem('name', response.data.data.name);
+                localStorage.setItem('workID', response.data.data.workID)
                 that.logining = false;
                 that.$notify({
                   title: '登录成功',

@@ -23,7 +23,9 @@
                   <span>{{studentName}}</span>
                 </div>
                 <el-row style="margin-top: 3px">
-                  <div style="padding-left: 11px; font-size: 12px; color: #8e8e8e">最近学习到 [{{currentName}}]</div>
+                  <div
+                    style="padding-left: 11px; font-size: 12px; color: #8e8e8e"
+                  >最近学习到 [{{currentName}}]</div>
                 </el-row>
               </div>
 
@@ -38,7 +40,7 @@
           <el-card class="select-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="center">
               <div style="width: 64%" align="start">
-                <el-row class="select-title">指标</el-row>
+                <el-row class="select-title">分析内容</el-row>
                 <el-row>
                   <el-select v-model="xy" @change="handleComparison" size="small">
                     <el-option
@@ -72,83 +74,29 @@
                     ></el-option>
                   </el-select>
                 </el-row>
-                <el-row
-                  v-if="comparison === 0 && gradeAttribute !== 3"
-                >
-                <el-row class="select-title">选择{{cOptions[comparison].label}}</el-row>
-                  <el-row>
-                    <el-select
-                      v-model="studentMap[0]"
-                      size="small"
-                      filterable
-                      clearable
-                      @change="handleStudent(0)"
-                    >
-                      <el-option
-                        v-for="item in studentOptions"
-                        :disabled="item.disabled"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                  <el-row class="select">
-                    <el-select
-                      v-model="studentMap[1]"
-                      size="small"
-                      filterable
-                      clearable
-                      @change="handleStudent(1)"
-                    >
-                      <el-option
-                        v-for="item in studentOptions"
-                        :disabled="item.disabled"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                  <el-row class="select">
-                    <el-select
-                      v-model="studentMap[2]"
-                      size="small"
-                      filterable
-                      clearable
-                      @change="handleStudent(2)"
-                    >
-                      <el-option
-                        v-for="item in studentOptions"
-                        :disabled="item.disabled"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                </el-row>
                 <el-row v-if="xy === 1">
                   <el-row class="select-title">选择章节</el-row>
-                <el-row>
                   <el-row>
-                    <el-select
-                      v-model="chapterSettings"
-                      size="small"
-                      filterable
-                    >
-                      <el-option
-                        v-for="item in chapterOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
+                    <el-row>
+                      <el-select v-model="chapterSettings" size="small" filterable>
+                        <el-option
+                          v-for="item in chapterOptions"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        ></el-option>
+                      </el-select>
+                    </el-row>
                   </el-row>
                 </el-row>
-                </el-row>
                 <el-row class="select">
-                  <el-button type="primary" @click="getCharts" class="select-button" size="small" :loading="drawLoading">确定</el-button>
+                  <el-button
+                    type="primary"
+                    @click="getCharts"
+                    class="select-button"
+                    size="small"
+                    :loading="drawLoading"
+                  >确定</el-button>
                 </el-row>
               </div>
             </div>
@@ -175,7 +123,7 @@
                         <div id="myChart" class="my-chart"></div>
                       </el-row>
                     </el-collapse-item>
-                    <el-collapse-item title="成绩与反馈" name="2">
+                    <el-collapse-item title="学习情况" name="2">
                       <div
                         align="start"
                         class="response"
@@ -230,25 +178,25 @@ export default {
   data() {
     return {
       // 传值
-      studentID: 1612345,
-      studentName: "学生姓名",
-      userID: 0,
+      studentID: localStorage.getItem("workID"),
+      studentName: localStorage.getItem("name"),
+      userID: 2, // localStorage.getItem('userID')
       courseIndex: 0,
       courseID: 0,
       classID: 0,
       //
-      currentName: '',
+      currentName: "暂无学习记录",
       activeNames: ["1"],
       xyOptions: [
         {
           value: 0,
-          label: "章节-平均成绩",
+          label: "学习成绩",
           xName: "章节",
-          yName: "平均成绩"
+          yName: "成绩"
         },
         {
           value: 1,
-          label: "分数段-人数",
+          label: "成绩分布",
           xName: "分数段",
           yName: "人数"
         }
@@ -276,19 +224,19 @@ export default {
       gradeOptions: [
         {
           value: 0,
-          label: "总平均成绩"
+          label: "平均成绩"
         },
         {
           value: 1,
-          label: "课前平均成绩"
+          label: "课前成绩"
         },
         {
           value: 2,
-          label: "课后平均成绩"
+          label: "课后成绩"
         },
         {
           value: 3,
-          label: "课前-课后平均成绩",
+          label: "课前-课后成绩",
           disabled: false
         }
       ],
@@ -299,9 +247,6 @@ export default {
       courseOptions: [],
       chapterSettings: 0,
       chapterOptions: [],
-      // 学生和成绩
-      studentOptions: [],
-      studentMap: [],
       studentInfo: [],
       // 班级平均分
       gradeClass: [83, 84, 85],
@@ -332,9 +277,8 @@ export default {
         .get(
           "/api/getCurrentProgress?courseClassID=" +
             this.classID +
-            "&studentID=2" 
-            //+ this.userID
-            ,
+            "&studentID=" +
+            this.userID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -368,7 +312,7 @@ export default {
             if (response.status === 200) {
               let courseList = JSON.parse(response.bodyText);
               let i = 0;
-              while (i <= courseList.data.length) {
+              while (i < courseList.data.length) {
                 this.chapterOptions.push({
                   value: i,
                   label: courseList.data[i].contentName,
@@ -376,6 +320,7 @@ export default {
                 });
                 i++;
               }
+              this.getStudentInfo(this.userID);
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -407,52 +352,10 @@ export default {
                     courseID: courseList.data[i].courseInfo.courseID,
                     classID: courseList.data[i].courseClass.id
                   });
-                  this.courseOptions.push({
-                    value: i + 1,
-                    label: courseList.data[i].courseInfo.courseName,
-                    courseID: courseList.data[i].courseInfo.courseID,
-                    classID: courseList.data[i].courseClass.id
-                  });
                   i++;
                 }
                 this.getChapterOptions();
-                this.getStudentData(this.userID, 0);
-                this.getStudentInfo(this.userID);
-                this.getStudentOptions();
                 this.getProcess();
-              }
-            } else {
-              this.$message({ type: "error", message: "加载失败!" });
-            }
-          },
-          response => {
-            this.$message({ type: "error", message: "加载失败!" });
-          }
-        );
-    },
-    getStudentOptions() {
-      this.studentOptions = [];
-      this.$http
-        .get("/api/getStudentsByClassID?courseClassID=" + this.classID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
-          }
-        })
-        .then(
-          response => {
-            if (response.status === 200) {
-              let studentList = JSON.parse(response.bodyText);
-              if (studentList.state === 1) {
-                let i = 0;
-                while (i < studentList.data.length) {
-                  this.studentOptions.push({
-                    id: studentList.data[i].userID,
-                    value: i,
-                    label: studentList.data[i].name,
-                    disabled: false
-                  });
-                  i++;
-                }
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -465,6 +368,7 @@ export default {
     },
     getStudentInfo(studentID) {
       this.studentInfo = [];
+      this.xData = [];
       this.$http
         .get(
           "/api/getCourseScoreAndComment?courseID=" +
@@ -498,8 +402,10 @@ export default {
                   chapter: res.data[i].chapterName,
                   chapterID: res.data[i].studentChapter.chapterID
                 });
+                this.xData.push(res.data[i].chapterName);
                 i++;
               }
+              this.getStudentData(this.userID, 0);
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -590,7 +496,7 @@ export default {
           this.xData = new Array();
           this.gradeAttribute = 0;
           this.cOptions[0].disabled = false;
-          this.studentMap = new Array(4);
+          this.gradeOptions[3].disabled = false;
           this.getCharts();
           break;
         }
@@ -609,13 +515,15 @@ export default {
           break;
       }
     },
-    handleStudent(index) {
-      // TODO: 禁用
-    },
     getGenderAndClassData(chapterID, index) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" + this.courseID + "&chapterID=" + chapterID + "&getDetail=0&courseClassID=" + this.classID,
+          "/api/getCourseScoreAndCommentByGender?courseID=" +
+            this.courseID +
+            "&chapterID=" +
+            chapterID +
+            "&getDetail=0&courseClassID=" +
+            this.classID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -632,28 +540,34 @@ export default {
                 switch (this.gradeAttribute) {
                   case 0: {
                     // 总
-                      let avgBoy = 
-                        Number(res.data[0].scoreInfo.boyAverage1) +
-                        Number(res.data[0].scoreInfo.boyAverage2) /
-                        2;
-                      let avgGirl =
-                        Number(res.data[0].scoreInfo.girlAverage1) +
-                          Number(res.data[0].scoreInfo.girlAverage2) /
-                        2;
-                      this.seriesData[0].data[index] = avgBoy.toFixed(2);
-                      this.seriesData[1].data[index] = avgGirl.toFixed(2);
+                    let avgBoy =
+                      Number(res.data[0].scoreInfo.boyAverage1) +
+                      Number(res.data[0].scoreInfo.boyAverage2) / 2;
+                    let avgGirl =
+                      Number(res.data[0].scoreInfo.girlAverage1) +
+                      Number(res.data[0].scoreInfo.girlAverage2) / 2;
+                    this.seriesData[0].data[index] = avgBoy.toFixed(2);
+                    this.seriesData[1].data[index] = avgGirl.toFixed(2);
                     break;
                   }
                   case 1: {
                     // 课前
-                      this.seriesData[0].data[index] = res.data[0].scoreInfo.boyAverage1.toFixed(2);
-                      this.seriesData[1].data[index] = res.data[0].scoreInfo.girlAverage1.toFixed(2);
+                    this.seriesData[0].data[
+                      index
+                    ] = res.data[0].scoreInfo.boyAverage1.toFixed(2);
+                    this.seriesData[1].data[
+                      index
+                    ] = res.data[0].scoreInfo.girlAverage1.toFixed(2);
                     break;
                   }
                   case 2: {
                     // 课后
-                      this.seriesData[0].data[index] = res.data[0].scoreInfo.boyAverage2.toFixed(2);
-                      this.seriesData[1].data[index] = res.data[0].scoreInfo.girlAverage2.toFixed(2);
+                    this.seriesData[0].data[
+                      index
+                    ] = res.data[0].scoreInfo.boyAverage2.toFixed(2);
+                    this.seriesData[1].data[
+                      index
+                    ] = res.data[0].scoreInfo.girlAverage2.toFixed(2);
                     break;
                   }
                   default: {
@@ -666,26 +580,28 @@ export default {
                 switch (this.gradeAttribute) {
                   case 0: {
                     // 总
-                      let avg =
-                        Number(res.data[0].scoreInfo.totalAverage1 +
-                          res.data[0].scoreInfo.totalAverage2) /
-                        2;
-                      this.seriesData[1].data[index] = avg.toFixed(2);
+                    let avg =
+                      Number(
+                        res.data[0].scoreInfo.totalAverage1 +
+                          res.data[0].scoreInfo.totalAverage2
+                      ) / 2;
+                    this.seriesData[1].data[index] = avg.toFixed(2);
                     break;
                   }
                   case 1: {
                     // 课前
-                      let avg = res.data[0].scoreInfo.totalAverage1;
-                      this.seriesData[1].data[index] = avg.toFixed(2);
+                    let avg = res.data[0].scoreInfo.totalAverage1;
+                    this.seriesData[1].data[index] = avg.toFixed(2);
                     break;
                   }
                   case 2: {
                     // 课后
-                      let avg = res.data[0].scoreInfo.totalAverage2;
-                        this.seriesData[1].data[index] = avg.toFixed(2);
+                    let avg = res.data[0].scoreInfo.totalAverage2;
+                    this.seriesData[1].data[index] = avg.toFixed(2);
                     break;
                   }
-                  default: break;
+                  default:
+                    break;
                 }
               }
               this.drawChart();
@@ -703,7 +619,12 @@ export default {
     getScoreDistributeData(chapterID) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" + this.courseID + "&chapterID=" + chapterID + "&getDetail=0&courseClassID=" + this.classID,
+          "/api/getCourseScoreAndCommentByGender?courseID=" +
+            this.courseID +
+            "&chapterID=" +
+            chapterID +
+            "&getDetail=0&courseClassID=" +
+            this.classID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -717,29 +638,28 @@ export default {
               let i = 0;
               if (this.comparison === 1) {
                 // 性别
-                 switch (this.gradeAttribute) {
+                switch (this.gradeAttribute) {
                   case 0: {
-                    // 总
-                    let sumGirl = new Array();
-                    let sumBoy = new Array();
-                    for (let i = 0;i < 5;i++) {
-                      sumGirl.push(Number(res.data[0].scoreInfo.girlScoreDistribute1[i] + res.data[0].scoreInfo.girlScoreDistribute2[i])/2);
-                      sumBoy.push(Number(res.data[0].scoreInfo.boyScoreDistribute1[i] + res.data[0].scoreInfo.boyScoreDistribute2[i])/2);
-                    }
-
-                    this.seriesData[0].data = sumBoy;
-                    this.seriesData[1].data = sumGirl;
+                    // 总;
+                    this.seriesData[0].data =
+                      res.data[0].scoreInfo.boyScoreAvgDistribute;
+                    this.seriesData[1].data =
+                      res.data[0].scoreInfo.girlScoreAvgDistribute;
                     break;
                   }
                   case 1: {
                     // 课前
-                    this.seriesData[0].data = res.data[0].scoreInfo.girlScoreDistribute1;
-                    this.seriesData[1].data = res.data[0].scoreInfo.boyScoreDistribute1;
+                    this.seriesData[1].data =
+                      res.data[0].scoreInfo.girlScoreDistribute1;
+                    this.seriesData[0].data =
+                      res.data[0].scoreInfo.boyScoreDistribute1;
                     break;
                   }
                   case 2: {
-                    this.seriesData[0].data = res.data[0].scoreInfo.girlScoreDistribute2;
-                    this.seriesData[1].data = res.data[0].scoreInfo.boyScoreDistribute2;
+                    this.seriesData[1].data =
+                      res.data[0].scoreInfo.girlScoreDistribute2;
+                    this.seriesData[0].data =
+                      res.data[0].scoreInfo.boyScoreDistribute2;
                     // 课后
                     break;
                   }
@@ -750,54 +670,41 @@ export default {
               }
               if (this.comparison === 2) {
                 // 班级平均
-                 switch (this.gradeAttribute) {
+                switch (this.gradeAttribute) {
                   case 0: {
                     // 总
-                    let sum = new Array();
-                    for (let i = 0;i < 5;i++) {
-                      sum.push(Number(res.data[0].scoreInfo.totalScoreDistribute1[i] + res.data[0].scoreInfo.totalScoreDistribute1[i]));
-                    }
-                    this.seriesData[0].data = sum;
+                    this.seriesData[0].data =
+                      res.data[0].scoreInfo.totalScoreAvgDistribute;
                     break;
                   }
                   case 1: {
                     // 课前
-                    let avg = new Array();
-                    for (let i = 0;i < 5;i++) {
-                      avg.push(Number(res.data[0].scoreInfo.girlScoreDistribute1[i] + res.data[0].scoreInfo.boyScoreDistribute1[i]));
-                    }
-                    this.seriesData[0].data = avg;
+                    this.seriesData[0].data =
+                      res.data[0].scoreInfo.totalScoreDistribute1;
                     break;
                   }
                   case 2: {
                     // 课后
-                    let avg = new Array();
-                    for (let i = 0;i < 5;i++) {
-                      avg.push(Number(res.data[0].scoreInfo.girlScoreDistribute2[i] + res.data[0].scoreInfo.boyScoreDistribute2[i]));
-                    }
-                    this.seriesData[0].data = avg;
+                    this.seriesData[0].data =
+                      res.data[0].scoreInfo.totalScoreDistribute2;
                     break;
                   }
                   case 3: {
                     this.seriesData.push({});
-                    this.seriesData[0].name = '班级课后';
-              this.seriesData[1] = {
-                name: '班级课前',
-                type: "bar",
-                barGap: 0,
-                data: new Array()
-              };            
-              this.colorOptions.push(this.colors[1]);
-              this.legendData[0] = '班级课前'
-              this.legendData.push('班级课后');          
-                    let avgPre = new Array();
-                    let avgRev = new Array();
-                    for (let i = 0;i < 5;i++) {
-                      avgPre.push(Number(res.data[0].scoreInfo.girlScoreDistribute1[i] + res.data[0].scoreInfo.boyScoreDistribute1[i]));
-                      avgRev.push(Number(res.data[0].scoreInfo.girlScoreDistribute2[i] + res.data[0].scoreInfo.boyScoreDistribute2[i]));
-                    }
-                    this.seriesData[0].data = avgPre;
-                    this.seriesData[1].data = avgRev;
+                    this.seriesData[0].name = "班级课后";
+                    this.seriesData[1] = {
+                      name: "班级课前",
+                      type: "bar",
+                      barGap: 0,
+                      data: new Array()
+                    };
+                    this.colorOptions.push(this.colors[1]);
+                    this.legendData[0] = "班级课前";
+                    this.legendData.push("班级课后");
+                    this.seriesData[0].data =
+                      res.data[0].scoreInfo.totalScoreDistribute1;
+                    this.seriesData[1].data =
+                      res.data[0].scoreInfo.totalScoreDistribute2;
                   }
                   default: {
                     break;
@@ -819,26 +726,28 @@ export default {
     handleGradeAttribute() {
       if (this.comparison !== 0 && this.xy !== 1) {
         this.gradeOptions[3].disabled = true;
-      }
-      else {
+      } else {
         this.gradeOptions[3].disabled = false;
       }
     },
-    handleStudent(index) {
-      // TODO: 禁用
-    },
     handleCourse(val) {
-      this.classID = this.courseOptions[val].classID;
-      this.courseID = this.courseOptions[val].courseID;
-      this.getChapterOptions();
-      this.getStudentInfo(this.userID);
-      this.getStudentOptions();
-      this.getProcess();
       this.xy = 0;
       this.gradeAttribute = 0;
       this.comparison = 0;
-      this.studentMap = new Array(4);
-      this.getCharts();
+      this.classID = this.courseOptions[val].classID;
+      this.courseID = this.courseOptions[val].courseID;
+      this.getChapterOptions();
+      this.getProcess();
+      this.seriesData = [
+        {
+          name: this.studentName,
+          type: "bar",
+          barGap: 0,
+          data: new Array()
+        }
+      ];
+      this.colorOptions = [this.colors[0]];
+      this.legendData = [this.studentName];
     },
     // 确认
     getCharts() {
@@ -851,11 +760,8 @@ export default {
       switch (this.xy) {
         // 章节-平均成绩
         case 0: {
-          for (let m = 0;m < this.studentInfo.length;m++) {
-            let end = this.studentInfo[m].chapter.indexOf("章");
-                  this.xData.push(
-                    this.studentInfo[m].chapter.substring(0, end + 1)
-                  );
+          for (let m = 0; m < this.studentInfo.length; m++) {
+            this.xData.push(this.studentInfo[m].chapter);
           }
           switch (this.comparison) {
             // 学生
@@ -871,27 +777,6 @@ export default {
                 this.colorOptions.push(this.colors[0]);
                 this.legendData.push(this.studentName.toString());
                 this.getStudentData(this.userID, 0);
-                let opIndex = 1;
-                for (let i = 0; i < this.studentMap.length; i++) {
-                  if (
-                    this.studentMap[i] !== undefined &&
-                    this.studentMap[i] !== ""
-                  ) {
-                    let index = this.studentMap[i];
-                    this.seriesData.push({
-                      name: this.studentOptions[index].label,
-                      type: "bar",
-                      barGap: 0,
-                      data: new Array()
-                    });
-                    this.colorOptions.push(this.colors[opIndex]);
-                    this.legendData.push(
-                      this.studentOptions[index].label.toString()
-                    );
-                    this.getStudentData(this.studentOptions[index].id, opIndex);
-                    opIndex += 1;
-                  }
-                }
               } else {
                 this.seriesData = new Array(2);
                 this.seriesData[0] = {
@@ -917,26 +802,26 @@ export default {
             // 性别
             case 1: {
               this.seriesData = new Array(2);
-                this.seriesData[0] = {
-                  name: "男生",
-                  type: "bar",
-                  barGap: 0,
-                  data: new Array()
-                };
-                this.seriesData[1] = {
-                  name: "女生",
-                  type: "bar",
-                  barGap: 0,
-                  data: new Array()
-                };
-                this.colorOptions.push(this.colors[0]);
-                this.colorOptions.push(this.colors[3]);
-                this.legendData.push("男生");
-                this.legendData.push("女生");
-              for (let i = 0; i< this.studentInfo.length;i++) {
+              this.seriesData[0] = {
+                name: "男生",
+                type: "bar",
+                barGap: 0,
+                data: new Array()
+              };
+              this.seriesData[1] = {
+                name: "女生",
+                type: "bar",
+                barGap: 0,
+                data: new Array()
+              };
+              this.colorOptions.push(this.colors[0]);
+              this.colorOptions.push(this.colors[3]);
+              this.legendData.push("男生");
+              this.legendData.push("女生");
+              for (let i = 0; i < this.studentInfo.length; i++) {
                 this.seriesData[0].data.push(0);
                 this.seriesData[1].data.push(0);
-                this.getGenderAndClassData(this.studentInfo[i].chapterID, i)
+                this.getGenderAndClassData(this.studentInfo[i].chapterID, i);
               }
               break;
             }
@@ -951,7 +836,7 @@ export default {
                 data: new Array()
               };
               this.seriesData[1] = {
-                name: '班级平均',
+                name: "班级平均",
                 type: "bar",
                 barGap: 0,
                 data: new Array()
@@ -959,12 +844,12 @@ export default {
               this.colorOptions.push(this.colors[0]);
               this.legendData.push(this.studentName.toString());
               this.getStudentData(this.userID, 0);
-              for (let i = 0; i< this.studentInfo.length;i++) {
+              for (let i = 0; i < this.studentInfo.length; i++) {
                 this.seriesData[1].data.push(0);
-                this.getGenderAndClassData(this.studentInfo[i].chapterID, i)
+                this.getGenderAndClassData(this.studentInfo[i].chapterID, i);
               }
               this.colorOptions.push(this.colors[2]);
-                this.legendData.push("班级平均");
+              this.legendData.push("班级平均");
               break;
             }
             default:
@@ -974,28 +859,30 @@ export default {
         }
         // 分数段-人数
         case 1: {
-          this.xData = ['90-100', '80-90', '70-80', '60-70', '0-60']
+          this.xData = ["60以下", "60-70", "70-80", "80-90", "90-100"];
           switch (this.comparison) {
             // 性别
             case 1: {
               this.seriesData = new Array(2);
-                this.seriesData[0] = {
-                  name: "男生",
-                  type: "bar",
-                  barGap: 0,
-                  data: new Array()
-                };
-                this.seriesData[1] = {
-                  name: "女生",
-                  type: "bar",
-                  barGap: 0,
-                  data: new Array()
-                };
-                this.colorOptions.push(this.colors[0]);
-                this.colorOptions.push(this.colors[3]);
-                this.legendData.push("男生");
-                this.legendData.push("女生");
-                this.getScoreDistributeData(this.chapterOptions[this.chapterSettings].id)
+              this.seriesData[0] = {
+                name: "男生",
+                type: "bar",
+                barGap: 0,
+                data: new Array()
+              };
+              this.seriesData[1] = {
+                name: "女生",
+                type: "bar",
+                barGap: 0,
+                data: new Array()
+              };
+              this.colorOptions.push(this.colors[0]);
+              this.colorOptions.push(this.colors[3]);
+              this.legendData.push("男生");
+              this.legendData.push("女生");
+              this.getScoreDistributeData(
+                this.chapterOptions[this.chapterSettings].id
+              );
               break;
             }
             // 班级平均分
@@ -1003,14 +890,16 @@ export default {
               // 获取自己的
               this.seriesData = new Array(1);
               this.seriesData[0] = {
-                name: '班级',
+                name: "班级",
                 type: "bar",
                 barGap: 0,
                 data: new Array()
-              };            
+              };
               this.colorOptions.push(this.colors[0]);
-              this.legendData.push('班级');            
-              this.getScoreDistributeData(this.chapterOptions[this.chapterSettings].id)
+              this.legendData.push("班级");
+              this.getScoreDistributeData(
+                this.chapterOptions[this.chapterSettings].id
+              );
               break;
             }
             default:
@@ -1059,7 +948,6 @@ export default {
           itemGap: 20,
           feature: {
             mark: { show: true },
-            //dataView: {show: true, readOnly: false},
             magicType: { show: true, type: ["line", "bar", "stack", "tiled"] },
             restore: { show: true },
             saveAsImage: { show: true }
@@ -1082,9 +970,7 @@ export default {
         ],
         series: this.seriesData
       });
-      if (this.comparison === 0 && this.drawCount >= Object.keys(this.studentMap).length || this.drawCount === this.studentInfo.length || (this.xy === 1) && this.drawCount === 1) {
-        this.drawLoading = false;
-      }
+      this.drawLoading = false;
     },
     // 深拷贝
     objDeepCopy(source) {
@@ -1098,15 +984,9 @@ export default {
         }
       }
       return sourceCopy;
-    },
-    getParams() {
-      this.studentID = this.$route.query.studentID;
-      this.studentName = this.$route.query.studentName;
-      this.userID = 2;//this.$route.query.userID;
     }
   },
   created() {
-    this.getParams();
     this.getCourses();
     this.seriesData.push({
       name: this.studentName,
@@ -1116,7 +996,7 @@ export default {
     });
     this.colorOptions.push(this.colors[0]);
     this.legendData.push(this.studentName);
-  },
+  }
 };
 </script>
 

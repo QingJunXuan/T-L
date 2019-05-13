@@ -190,7 +190,7 @@ export default {
       rate: 0,
       comment:'',
       sid: 0,
-      answer: {},
+      answer: [],
       score: {},
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
