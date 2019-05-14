@@ -76,7 +76,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 export default {
   name: "sCourseManage",
   data() {
@@ -103,34 +102,9 @@ export default {
       items: []
     };
   },
-  /*  var length = this.items.length;
-        var test=new Array()
-        for (var i = 0; i < length; i++) {
-          console.log(i, "in for");
-          var chapterNode = this.items[i].courseClass.currentExerciseChapter;
-          
-          axios
-            .get("/api/getChapterByID", {
-              headers: {
-                Authorization:
-                  "Bearer "+localStorage.getItem("token")
-              },
-              params: {
-                chapterID: chapterNode
-              }
-            })
-            .then(resp => {
-              console.log(resp.data.data,"in");
-              //test[i] =  resp.data.data.exerciseTitle;
-              
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        } */
   created() {
-    axios
-      .get("/api/getStuCourseList", {
+    this.$axios
+      .get("http://10.60.38.173:8765/getStuCourseList", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
         },
@@ -161,8 +135,8 @@ export default {
     },
     submit: function() {
       //获取课程信息，进行确认
-      axios
-        .get("/api/getCourseByCode", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getCourseByCode", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -184,8 +158,8 @@ export default {
       //确认添加课程
       this.isPlus = false;
       this.isConfirm = false;
-      axios
-        .get("/api/joinCourse", {
+      this.$axios
+        .get("http://10.60.38.173:8765/joinCourse", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -225,7 +199,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 #name {
   position: relative;
   top: 25%;

@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-row style="padding-top:20px">
-      <el-col :span="20" :offset="2">
+      <el-col :span="20" :offset="3">
         <el-row>
 		<!--列表-->
 		<el-table :data="teachers" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;text-align:center">
 			<el-table-column type="selection" width="50">
 			</el-table-column>
-			<el-table-column  prop="courseID" label="课程编号" width="100" sortable>
+			<el-table-column  prop="courseID" label="课程编号" width="120" sortable>
 			</el-table-column>
 			<el-table-column prop="courseName" label="课程名" width="180" sortable>
 			</el-table-column>
@@ -35,51 +35,20 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
 export default {
   name:'teacherList',
   data() {
     return {
       rate: null,
       textarea: "",
-      teachers:[{
-        teacherName:"李老师",
-        teacherID:'1001',
-        courseNum:2,
-        courseName:'软件项目与过程管理',
-        startTime:'2018-9-1',
-        endTime:'2019-2-1',
-      },{
-        teacherName:"王老师",
-        teacherID:'1002',
-        courseName:'JAVA',
-        startTime:'2018-9-1',
-        endTime:'2019-2-1',
-      },{
-        teacherName:"李老师",
-        teacherID:'1001',
-        courseName:'web系统与技术',
-        startTime:'2018-9-1',
-        endTime:'2019-2-1',
-      },{
-        teacherName:"张老师",
-        teacherID:'1004',
-        courseName:'软件测试',
-        startTime:'2018-9-1',
-        endTime:'2019-2-1',
-      },{
-        teacherName:"赵老师",
-        teacherID:'1005',
-        courseName:'安全体系结构与管理',
-        startTime:'2018-9-1',
-        endTime:'2019-2-1',
-      }],
+      teachers:[],
       sels:[], 
       listLoading:false,
     };
   },
   created(){
-     axios.get('/api/getAllCourses',{
+     this.$axios
+     .get('http://10.60.38.173:8765/getAllCourses',{
 headers: {
             'Authorization':
               "Bearer "+localStorage.getItem("token")
@@ -117,6 +86,9 @@ body {
   padding: 0;
   margin: 0;
 }
+</style>
+
+<style scoped>
 .header {
   height: 60px;
   background-color: cadetblue;

@@ -47,7 +47,6 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
 import store from '../../store/store.js';
 export default {
   data() {
@@ -75,8 +74,8 @@ export default {
     getPre() {
       const sid = this.$route.query.spreid;
       this.sid = sid;
-      axios
-        .get("/api/question/view", {
+      this.$axios
+        .get("http://10.60.38.173:8765/question/view", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },

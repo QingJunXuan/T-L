@@ -275,7 +275,7 @@ export default {
     getProcess() {
       this.$http
         .get(
-          "/api/getCurrentProgress?courseClassID=" +
+          "http://10.60.38.173:8765/getCurrentProgress?courseClassID=" +
             this.classID +
             "&studentID=" +
             this.userID,
@@ -304,7 +304,7 @@ export default {
     getChapterOptions() {
       this.chapterOptions = [];
       this.$http
-        .get("/api/getCourseCatalog?courseID=" + this.courseID, {
+        .get("http://10.60.38.173:8765/getCourseCatalog?courseID=" + this.courseID, {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
@@ -332,7 +332,7 @@ export default {
     },
     getCourses() {
       this.$http
-        .get("/api/getStuCourseList?studentID=" + this.userID, {
+        .get("http://10.60.38.173:8765/getStuCourseList?studentID=" + this.userID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -371,7 +371,7 @@ export default {
       this.xData = [];
       this.$http
         .get(
-          "/api/getCourseScoreAndComment?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndComment?courseID=" +
             this.courseID +
             "&studentID=" +
             studentID,
@@ -418,7 +418,7 @@ export default {
     getStudentData(studentID, index) {
       this.$http
         .get(
-          "/api/getCourseScoreAndComment?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndComment?courseID=" +
             this.courseID +
             "&studentID=" +
             studentID,
@@ -518,7 +518,7 @@ export default {
     getGenderAndClassData(chapterID, index) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndCommentByGender?courseID=" +
             this.courseID +
             "&chapterID=" +
             chapterID +
@@ -619,7 +619,7 @@ export default {
     getScoreDistributeData(chapterID) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndCommentByGender?courseID=" +
             this.courseID +
             "&chapterID=" +
             chapterID +

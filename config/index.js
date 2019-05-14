@@ -8,17 +8,9 @@ module.exports = {
   dev: {
 
     // Paths http://yapi.demo.qunar.com/mock/63359
-    assetsSubDirectory: 'static',
+    assetsSubDirectory: 'http://10.60.38.173:8765/static',
     assetsPublicPath: '/',
-    proxyTable: {
-      '/api':{
-        target:'http://10.60.38.173:8765',
-        changeOrigin:true,
-        pathRewrite:{
-          '^/api':''
-        }
-      },
-    },
+    proxyTable: {},
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
@@ -27,8 +19,6 @@ module.exports = {
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
-
-    
     /**
      * Source Maps
      */
@@ -51,7 +41,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: './',
 
     /**
      * Source Maps

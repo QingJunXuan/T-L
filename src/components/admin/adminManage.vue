@@ -27,7 +27,7 @@
       </el-col>
     </el-row>
     <el-row>
-      <router-view></router-view>
+      <router-view class="router-view"></router-view>
     </el-row>
   </div>
 </template>
@@ -43,6 +43,7 @@ export default {
   },
   methods: {
     chart() {
+      
       this.$router.push('/adminManage/courseAnalysis')
     },
     courseList() {
@@ -62,6 +63,9 @@ body {
   padding: 0;
   margin: 0;
 }
+</style>
+
+<style scoped>
 .header {
   height: 60px;
   background-color: cadetblue;

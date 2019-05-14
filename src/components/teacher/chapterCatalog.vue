@@ -282,7 +282,7 @@ export default {
       this.$http
         .get(
           // 传值课程号
-          "/api/getCourseCatalog?courseID=" + this.courseID,
+          "http://10.60.38.173:8765/getCourseCatalog?courseID=" + this.courseID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -361,7 +361,7 @@ export default {
       this.$http
         .get(
           // 传值课程号
-          "/api/getChapterRelationByCourseID?courseID=" + this.courseID,
+          "http://10.60.38.173:8765/getChapterRelationByCourseID?courseID=" + this.courseID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -421,7 +421,7 @@ export default {
       this.$http
         .get(
           // 传值课程号
-          "/api/question/sameCoursesById?courseId=" +
+          "http://10.60.38.173:8765/question/sameCoursesById?courseId=" +
             this.courseID +
             "&teacherId=" +
             this.teacherID,
@@ -540,7 +540,7 @@ export default {
     alterChapterOrder(chapter, name) {
       this.$http
         .post(
-          "/api/alertChapter",
+          "http://10.60.38.173:8765/alertChapter",
           {
             id: chapter.id,
             courseID: this.courseID,
@@ -574,7 +574,7 @@ export default {
     alterChapterSib(chapter, id) {
       this.$http
         .post(
-          "/api/alertChapter",
+          "http://10.60.38.173:8765/alertChapter",
           {
             id: chapter.id,
             courseID: this.courseID,
@@ -610,7 +610,7 @@ export default {
       if (this.catalog.length === 0) {
         this.$http
           .post(
-            "/api/addChapter",
+            "http://10.60.38.173:8765/addChapter",
             {
               courseID: this.courseID,
               contentName:
@@ -654,7 +654,7 @@ export default {
         let sibID = this.catalog[last].id;
         this.$http
           .post(
-            "/api/addChapter",
+            "http://10.60.38.173:8765/addChapter",
             {
               courseID: this.courseID,
               contentName:
@@ -719,7 +719,7 @@ export default {
         }
         this.$http
           .post(
-            "/api/addChapter",
+            "http://10.60.38.173:8765/addChapter",
             {
               courseID: this.courseID,
               contentName:
@@ -793,7 +793,7 @@ export default {
         }
         this.$http
           .post(
-            "/api/alertChapter",
+            "http://10.60.38.173:8765/alertChapter",
             {
               id: this.catalog[index + 1].id,
               courseID: this.courseID,
@@ -841,7 +841,7 @@ export default {
         }
         this.$http
           .post(
-            "/api/alertChapter",
+            "http://10.60.38.173:8765/alertChapter",
             {
               id: this.catalog[index + 1].id,
               courseID: this.courseID,
@@ -874,7 +874,7 @@ export default {
       }
       this.deleteChapterRelation(this.catalog[index]);
       this.$http
-        .get("/api/deleteChapter", {
+        .get("http://10.60.38.173:8765/deleteChapter", {
           params: {
             chapterID: this.catalog[index].id
           },
@@ -910,7 +910,7 @@ export default {
         }
         this.$http
           .post(
-            "/api/alertChapter",
+            "http://10.60.38.173:8765/alertChapter",
             {
               id: this.catalog[this.chapterForm.index].id,
               courseID: this.courseID,
@@ -971,7 +971,7 @@ export default {
           notEdited = false;
           // 删除
           this.$http
-            .get("/api/deleteChapterRelation", {
+            .get("http://10.60.38.173:8765/deleteChapterRelation", {
               params: {
                 chapterID: chapter.id,
                 preChapterID: chapter.predecessor[i]
@@ -1004,7 +1004,7 @@ export default {
           notEdited = false;
           // 添加
           this.$http
-            .get("/api/addChapterRelation", {
+            .get("http://10.60.38.173:8765/addChapterRelation", {
               params: {
                 chapterID: chapter.id,
                 preChapterID: this.chapterForm.predecessor[i]
@@ -1069,7 +1069,7 @@ export default {
             }
             this.$http
               .post(
-                "/api/alertChapter",
+                "http://10.60.38.173:8765/alertChapter",
                 {
                   id: this.catalog[index + 1].id,
                   courseID: this.courseID,
@@ -1117,7 +1117,7 @@ export default {
             }
             this.$http
               .post(
-                "/api/alertChapter",
+                "http://10.60.38.173:8765/alertChapter",
                 {
                   id: this.catalog[index + 1].id,
                   courseID: this.courseID,
@@ -1150,7 +1150,7 @@ export default {
           }
           this.deleteChapterRelation(this.catalog[index]);
           this.$http
-            .get("/api/deleteChapter", {
+            .get("http://10.60.38.173:8765/deleteChapter", {
               params: {
                 chapterID: this.catalog[index].id
               },
@@ -1190,7 +1190,7 @@ export default {
     deleteChapterRelation(chapter) {
       for (let i = 0; i < chapter.predecessor.length; i++) {
         this.$http
-          .get("/api/deleteChapterRelation", {
+          .get("http://10.60.38.173:8765/deleteChapterRelation", {
             params: {
               chapterID: chapter.id,
               preChapterID: chapter.predecessor[i]
@@ -1216,7 +1216,7 @@ export default {
       }
       for (let i = 0; i < chapter.descendant.length; i++) {
         this.$http
-          .get("/api/deleteChapterRelation", {
+          .get("http://10.60.38.173:8765/deleteChapterRelation", {
             params: {
               chapterID: chapter.descendant[i],
               preChapterID: chapter.id
@@ -1258,7 +1258,7 @@ export default {
           this.importLoading = true;
           this.$http
             .post(
-              "/api/question/copyNodes",
+              "http://10.60.38.173:8765/question/copyNodes",
               {
                 sourceCourseId: this.importData[this.importSettings].id,
                 aimCourseId: this.courseID
@@ -1306,7 +1306,7 @@ export default {
           if (index === 0 && index !== item.points.length - 1) {
             this.$http
               .post(
-                "/api/alertChapter",
+                "http://10.60.38.173:8765/alertChapter",
                 {
                   id: item.points[index + 1].id,
                   courseID: this.courseID,
@@ -1342,7 +1342,7 @@ export default {
           } else if (index < item.points.length - 1) {
             this.$http
               .post(
-                "/api/alertChapter",
+                "http://10.60.38.173:8765/alertChapter",
                 {
                   id: item.points[index + 1].id,
                   courseID: this.courseID,
@@ -1377,7 +1377,7 @@ export default {
               );
           }
           this.$http
-            .get("/api/deleteChapter", {
+            .get("http://10.60.38.173:8765/deleteChapter", {
               params: {
                 chapterID: item.points[index].id
               },
@@ -1438,7 +1438,7 @@ export default {
       if (item2.new) {
         this.$http
           .post(
-            "/api/addChapter",
+            "http://10.60.38.173:8765/addChapter",
             {
               courseID: this.courseID,
               contentName:
@@ -1482,7 +1482,7 @@ export default {
       } else {
         this.$http
           .post(
-            "/api/alertChapter",
+            "http://10.60.38.173:8765/alertChapter",
             {
               id: item2.id,
               courseID: this.courseID,
@@ -1559,7 +1559,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .el-submenu > .el-submenu__title {
   width: 300px;
   white-space: nowrap;

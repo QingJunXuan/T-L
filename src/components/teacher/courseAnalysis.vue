@@ -540,7 +540,7 @@ export default {
     // 获取列表
     getCourses() {
       this.$http
-        .get("/api/getCoursesByTeacherID?teacherID=" + this.teacherID, {
+        .get("http://10.60.38.173:8765/getCoursesByTeacherID?teacherID=" + this.teacherID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -604,7 +604,7 @@ export default {
     getStudentOptions(index) {
       this.$http
         .get(
-          "/api/getStudentsByClassID?courseClassID=" +
+          "http://10.60.38.173:8765/getStudentsByClassID?courseClassID=" +
             this.studentOptions[index].id,
           {
             headers: {
@@ -644,7 +644,7 @@ export default {
       this.genderOptions = [];
       // 登录时存teacherID
       this.$http
-        .get("/api/getClassesByCourseID?courseID=" + this.courseID, {
+        .get("http://10.60.38.173:8765/getClassesByCourseID?courseID=" + this.courseID, {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
@@ -703,7 +703,7 @@ export default {
     getBaseInfo() {
       this.courseLoading = true;
       this.$http
-        .get("/api/getCourseClassAvgScore?courseID=" + this.courseID, {
+        .get("http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" + this.courseID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -741,7 +741,7 @@ export default {
     getTeacherInfo() {
       this.teacherInfo = [];
       this.$http
-        .get("/api/getTeacherInfoByNID?courseNameID=" + this.courseNameID, {
+        .get("http://10.60.38.173:8765/getTeacherInfoByNID?courseNameID=" + this.courseNameID, {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
@@ -798,7 +798,7 @@ export default {
     getChapters() {
       this.chapterOptions = [];
       this.$http
-        .get("/api/getCourseCatalog?courseID=" + this.courseID, {
+        .get("http://10.60.38.173:8765/getCourseCatalog?courseID=" + this.courseID, {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") }
         })
         .then(
@@ -828,7 +828,7 @@ export default {
     getClassInfo() {
       this.commentLoading = true;
       this.$http
-        .get("/api/getCourseClassAvgScore?courseID=" + this.courseID, {
+        .get("http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" + this.courseID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -887,7 +887,7 @@ export default {
     },
     getClassNLP() {
       this.$http
-        .get("/api/getCourseClassNLPRateNum?courseID=" + this.courseID, {
+        .get("http://10.60.38.173:8765/getCourseClassNLPRateNum?courseID=" + this.courseID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -930,7 +930,7 @@ export default {
       this.commentLoading = true;
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?chapterID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndCommentByGender?chapterID=" +
             chapterID +
             "&getDetail=0",
           {
@@ -990,7 +990,7 @@ export default {
     },
     getChapterClassNLP(chapterID) {
       this.$http
-        .get("/api/getChapterNLPRateNum?chapterID=" + chapterID, {
+        .get("http://10.60.38.173:8765/getChapterNLPRateNum?chapterID=" + chapterID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -1031,7 +1031,7 @@ export default {
     getStudentScoreData(studentID, index, i) {
       this.$http
         .get(
-          "/api/getCourseScoreAndComment?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndComment?courseID=" +
             this.courseID +
             "&studentID=" +
             studentID,
@@ -1098,7 +1098,7 @@ export default {
     getOtherScoreData(chapterID, classID, index, seriesIndex) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndCommentByGender?courseID=" +
             this.courseID +
             "&chapterID=" +
             chapterID +
@@ -1200,7 +1200,7 @@ export default {
     getScoreDistributeData(chapterID, classID, seriesIndex, gender) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndCommentByGender?courseID=" +
             this.courseID +
             "&chapterID=" +
             chapterID +
@@ -1290,7 +1290,7 @@ export default {
     getClassRateData(chapterID, classID, index, seriesIndex) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndCommentByGender?courseID=" +
             this.courseID +
             "&chapterID=" +
             chapterID +
@@ -1325,7 +1325,7 @@ export default {
     },
     getRateDistribute(chapterID, seriesIndex) {
       this.$http
-        .get("/api/question/rateNumber?chapterId=" + chapterID, {
+        .get("http://10.60.38.173:8765/question/rateNumber?chapterId=" + chapterID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -1350,7 +1350,7 @@ export default {
     getTeacherYearRateData(teacherID, seriesIndex, self) {
       this.$http
         .get(
-          "/api/getCourseYearAvgScoreRate?courseNameID=" +
+          "http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" +
             this.courseNameID +
             "&teacherID=" +
             teacherID,
@@ -1399,7 +1399,7 @@ export default {
     getTeacherSemesterRateData(teacherID, seriesIndex, self) {
       this.$http
         .get(
-          "/api/getCourseYearAvgScoreRate?courseNameID=" +
+          "http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" +
             this.courseNameID +
             "&teacherID=" +
             teacherID,
@@ -1448,7 +1448,7 @@ export default {
     getTeacherYearScoreData(teacherID, seriesIndex, self) {
       this.$http
         .get(
-          "/api/getCourseYearAvgScoreRate?courseNameID=" +
+          "http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" +
             this.courseNameID +
             "&teacherID=" +
             teacherID,
@@ -1499,7 +1499,7 @@ export default {
     getTeacherSemesterScoreData(teacherID, seriesIndex, self) {
       this.$http
         .get(
-          "/api/getCourseYearAvgScoreRate?courseNameID=" +
+          "http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" +
             this.courseNameID +
             "&teacherID=" +
             teacherID,

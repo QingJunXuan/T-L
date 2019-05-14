@@ -72,7 +72,6 @@
 </template>
 <script>
 import store from '../../store/store.js';
-import axios from 'axios'
 export default {
     data(){
         return{
@@ -100,8 +99,8 @@ export default {
   },
 methods:{
   getScore(){
-    axios
-        .get("/api/question/exerciseScore", {
+    this.$axios
+        .get("http://10.60.38.173:8765/question/exerciseScore", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -146,8 +145,8 @@ methods:{
       const index = this.$route.query.index;
       this.rate=store.state.score[index].studentChapter.rate;
       this.comment=store.state.score[index].studentChapter.comment
-      axios
-        .get("/api/question/view", {
+      this.$axios
+        .get("http://10.60.38.173:8765/question/view", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },

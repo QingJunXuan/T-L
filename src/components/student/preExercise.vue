@@ -116,7 +116,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 export default {
   data() {
     return {
@@ -157,8 +156,8 @@ export default {
     getPre() {
       const sid = this.$route.query.spreid;
       this.sid = sid;
-      axios
-        .get("/api/question/view", {
+      this.$axios
+        .get("http://10.60.38.173:8765/question/view", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -253,8 +252,8 @@ export default {
           params.append("type", "preview");
           params.append("comment", 1);
           params.append("rate", 1);
-          axios
-            .post("/api/question/answerAll", params, {
+          this.$axios
+            .post("http://10.60.38.173:8765/question/answerAll", params, {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 Authorization: "Bearer " + localStorage.getItem("token")

@@ -29,7 +29,6 @@
   </el-row>
 </template>
 <script>
-import axios from 'axios';
 export default {
   name:'feedback',
   data() {
@@ -54,7 +53,8 @@ export default {
         params.append("studentId",1)
         params.append("comment",this.textarea)
         params.append('rate',this.rate)
-      axios.post('/api/addClassComment',params, {
+      this.$axios
+      .post('http://10.60.38.173:8765/addClassComment',params, {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 Authorization:
@@ -74,12 +74,16 @@ console.log(resp.data,"feedback");
 };
 </script>
 <style>
-html,body{
-padding:0;
-margin:0;
-width:100%;
-height: 100%;
+html,
+body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
+</style>
+
+<style scoped>
 .head {
   height: 60px;
   background-color:#292929;

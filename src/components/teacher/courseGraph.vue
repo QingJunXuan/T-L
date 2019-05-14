@@ -6,7 +6,6 @@
   </el-container>
 </template>
 <script>
-import axios from "axios";
 export default {
   name: "tCourseGraph",
   data() {
@@ -22,8 +21,8 @@ export default {
   },
   created() {
     //获取课程之间的关系，data[]，links[],设置参数
-    axios
-      .get("/api/getAllCoursesRelation", {
+    this.$axios
+      .get("http://10.60.38.173:8765/getAllCoursesRelation", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
         }
@@ -173,7 +172,6 @@ export default {
             itemStyle:{
               normal:{
                 color: "#ec7814",
-                opacity:0.8,
               }
             },
             lineStyle: {

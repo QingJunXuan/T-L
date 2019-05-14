@@ -33,13 +33,12 @@ import trevExercise from '../components/teacher/revExercise.vue'
 import scoredPre from '../components/student/scoredPre.vue'
 import scoredRev from '../components/student/scoredRev.vue'
 
-
 Vue.use(Router)
-Vue.prototype.$ajax=axios
+Vue.prototype.$axios = axios
 
 export default new Router({
   routes: [
-   {
+    {
       path: '/',
       redirect: '/home'
     },
@@ -47,9 +46,9 @@ export default new Router({
       path: '/',
       component: Header,
       name: '教与学',
-      iconCls: 'el-icon-message',//图标样式class
+      iconCls: 'el-icon-message', // 图标样式class
       children: [
-        { path: '/home', name: 'Home', component: Home },
+        { path: '/home', name: 'Home', component: Home }
       ]
     }, {
       path: '/student',
@@ -62,45 +61,45 @@ export default new Router({
         meta: {
           keepAlive: true // 需要缓存
         }
-      },{
+      }, {
         path: 'studentAnalysis',
         name: 'sStudentAnalysis',
-        component: sStudentAnalysis,
+        component: sStudentAnalysis
       }, {
         path: 'chapterDetail',
         name: 'sChapterDetail',
         component: sChapterDetail,
         children: [
           {
-            path:'point',
-            name:'point',
-            component:spoint,
+            path: 'point',
+            name: 'point',
+            component: spoint
           },
           {
-            path:'preExercise',
-            name:'preExercise',
-            component:preExercise,
+            path: 'preExercise',
+            name: 'preExercise',
+            component: preExercise
           },
           {
-            path:'revExercise',
-            name:'revExercise',
-            component:revExercise,
+            path: 'revExercise',
+            name: 'revExercise',
+            component: revExercise
           },
           {
             path: 'scoredPre',
             name: 'scoredPre',
-            component: scoredPre,
+            component: scoredPre
           },
           {
             path: 'scoredRev',
             name: 'scoredRev',
-            component: scoredRev,
+            component: scoredRev
           }
         ],
         meta: {
           keepAlive: true
-        },
-      }, ],
+        }
+      }]
     },
     {
       path: '/student/feedback',
@@ -110,7 +109,11 @@ export default new Router({
     {
       path: '/student/courseDetail',
       name: 'sCourseDetail',
-      component: sCourseDetail,
+      component: sCourseDetail
+    }, {
+      path: '/teacher/courseDetail',
+      name: 'tCourseDetail',
+      component: tCourseDetail
     }, {
       path: '/teacher',
       component: Header,
@@ -125,27 +128,27 @@ export default new Router({
           }
         },
         {
-          path:'chapterEdit',
-          name:'tChapterCatalog',
-          component:tChapterCatalog,
+          path: 'chapterEdit',
+          name: 'tChapterCatalog',
+          component: tChapterCatalog,
           children: [
             {
-              path:'pointEdit',
-              name:'pointEdit',
-              component:tPointEdit,
+              path: 'pointEdit',
+              name: 'pointEdit',
+              component: tPointEdit
             },
             {
-              path:'preEdit',
-              name:'preExerciseEdit',
-              component:preExerciseEdit,
+              path: 'preEdit',
+              name: 'preExerciseEdit',
+              component: preExerciseEdit
             },
             {
-              path:'revEdit',
-              name:'revExerciseEdit',
-              component:revExerciseEdit,
+              path: 'revEdit',
+              name: 'revExerciseEdit',
+              component: revExerciseEdit
             }
           ]
-        },{
+        }, {
           path: 'chapterDetail',
           name: 'tChapterDetail',
           component: tChapterDetail,
@@ -154,69 +157,67 @@ export default new Router({
           },
           children: [
             {
-              path:'point',
-              name:'tpoint',
-              component:tpoint,
+              path: 'point',
+              name: 'tpoint',
+              component: tpoint
             },
             {
-              path:'preExercise',
-              name:'tpreExercise',
-              component:tpreExercise,
+              path: 'preExercise',
+              name: 'tpreExercise',
+              component: tpreExercise
             },
             {
-              path:'revExercise',
-              name:'trevExercise',
-              component:trevExercise,
+              path: 'revExercise',
+              name: 'trevExercise',
+              component: trevExercise
             }
           ]
         },
         {
-          path:'mark',
-          name:'exerciseMark',
-          component:tExerciseMark,
+          path: 'mark',
+          name: 'exerciseMark',
+          component: tExerciseMark
         },
         {
-          path:'studentList',
-          name:'tStudentList',
-          component:tStudentList,
+          path: 'studentList',
+          name: 'tStudentList',
+          component: tStudentList
         },
         {
-          path:'studentAnalysis',
-          name:'tStudentAnalysis',
-          component:tStudentAnalysis,
+          path: 'studentAnalysis',
+          name: 'tStudentAnalysis',
+          component: tStudentAnalysis
         },
         {
           path: 'courseAnalysis',
           name: 'tCourseAnalysis',
           component: tCourseAnalysis
-        },
-        {
-          path: 'courseDetail',
-          name: 'tCourseDetail',
-          component: tCourseDetail,
-        },
+        }
       ]
-    }, 
+    },
     {
-      path:'/adminManage',
-      component:adminManage,
+      path: '/adminManage',
+      component: adminManage,
       redirect: '/adminManage/courseList',
-      name:'adminManage',
-      children:[
+      name: 'adminManage',
+      meta: {
+        keepAlive: true
+      },
+      children: [
         {
-          path:'courseList',
-          name:'courseList',
-          component:courseList,
+          path: 'courseList',
+          name: 'courseList',
+          component: courseList
         },
         {
-          path:'teacherList',
-          name:'teacherList',
-          component:teacherList,
+          path: 'teacherList',
+          name: 'teacherList',
+          component: teacherList
         },
         {
-          path:'courseAnalysis',
-          name:'aCourseAnalysis',
-          component:aCourseAnalysis,
+          path: 'courseAnalysis',
+          name: 'aCourseAnalysis',
+          component: aCourseAnalysis
         },
         {
           path: 'courseGraph',
@@ -224,13 +225,14 @@ export default new Router({
           component: aCourseGraph
         }
       ]
-    }],
-  mode: 'history',
-  scrollBehavior(to, from, savedPosition) {
+    }]
+
+  /* mode: 'history',
+  scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
     } else {
       return { x: 0, y: 0 }
     }
-  }
+  } */
 })

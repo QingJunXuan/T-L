@@ -60,7 +60,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   name: "tChapterDetail",
   data() {
@@ -102,8 +101,8 @@ export default {
        this.menuLoading = true;
        const routerParams = this.$route.query.courseIDt;
        this.courseID = routerParams;
-       axios
-        .get("/api/getCourseCatalog", {
+       this.$axios
+        .get("http://10.60.38.173:8765/getCourseCatalog", {
           headers: {
             Authorization:
               "Bearer "+localStorage.getItem("token")

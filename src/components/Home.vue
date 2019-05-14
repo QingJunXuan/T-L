@@ -6,7 +6,7 @@
           <div  id="top" class="callbacks_container">
             <div style="display: inline-block">
               <h6>中国领先的在线教育平台</h6>
-              <h3>教与学平台</h3>
+              <h3>课程教与学管理评价平台</h3>
               <div v-if="!getUser()">
                 <el-button @click="loginTableVisible = true">JOIN US!</el-button>
               </div>
@@ -229,7 +229,7 @@
             let that = this;
             if (valid) {
               that.logining = true;
-              that.$http.post('/api/auth', {
+              that.$http.post('http://10.60.38.173:8765/auth', {
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }, {emulateJSON:false}).then(response => {
@@ -267,7 +267,7 @@
             let that = this;
             if (valid) {
               that.registering = true;
-              that.$http.post('/api/register', {
+              that.$http.post('http://10.60.38.173:8765/register', {
                 mail: this.ruleForm1.email,
                 password: this.ruleForm1.password,
                 name: this.ruleForm1.name,

@@ -64,7 +64,7 @@ export default {
         content: ""
       };
       this.$http
-        .get("/api/getChapterByID?chapterID=" + this.item.id, {
+        .get("http://10.60.38.173:8765/getChapterByID?chapterID=" + this.item.id, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -101,7 +101,7 @@ export default {
       this.loading = true;
       this.$http
         .post(
-          "/api/alertChapter",
+          "http://10.60.38.173:8765/alertChapter",
           {
             id: this.item.id,
             courseID: this.item.courseID,

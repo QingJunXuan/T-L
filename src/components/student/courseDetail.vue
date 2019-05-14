@@ -65,7 +65,6 @@
 </template>
 <script>
 import store from '../../store/store.js'
-import axios from "axios";
 let  chapterNum = 0;
 //let  sectionNum=0;
 export default {
@@ -120,8 +119,8 @@ export default {
   },
   methods: {
     getScore(){
-      axios
-        .get("/api/getCourseScoreAndComment", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getCourseScoreAndComment", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -139,8 +138,8 @@ export default {
         });
     },
     getNotice() {
-      axios
-        .get("/api/getNoticeByCouID", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getNoticeByCouID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -159,8 +158,8 @@ export default {
         });
     },
     getLesson() {
-      axios
-        .get("/api/getCourseCatalog", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getCourseCatalog", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -314,7 +313,10 @@ export default {
       } */
     },
     courseBack() {
-      this.$router.push({ path: "/student/courseManagement" });
+      this.$router.push({ path: "/student/courseManagement" ,
+      query: {
+          courseClassID: this.classID
+        }});
     },
     feedback() {
       this.$router.push({
@@ -326,8 +328,8 @@ export default {
     },
     getChapterGraph() {
       console.log(this.courseID,"getgraph-courseid")
-      axios
-        .get("/api/getChapterRelationByCourseID", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getChapterRelationByCourseID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -551,6 +553,9 @@ body {
   padding: 0;
   margin: 0;
 }
+</style>
+
+<style scoped>
 .courseBack {
   height: 240px;
   /* background-color: cadetblue; */

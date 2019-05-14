@@ -68,7 +68,6 @@
 </template>
 <script>
 import graph from "./courseGraph.vue";
-import axios from 'axios'
 export default {
   name: "tCourseManage",
   components: {
@@ -84,8 +83,8 @@ export default {
     };
   },
   created() {
-    axios
-      .get("/api/getCoursesByTeacherID", {
+    this.$axios
+      .get("http://10.60.38.173:8765/getCoursesByTeacherID", {
         headers: {
           Authorization:
             "Bearer "+localStorage.getItem("token")
@@ -139,6 +138,16 @@ export default {
 };
 </script>
 <style>
+html,
+body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<style scoped>
 #name {
   position: relative;
   top: 25%;

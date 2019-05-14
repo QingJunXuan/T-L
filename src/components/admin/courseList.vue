@@ -39,7 +39,6 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
 export default {
   name:'courseList',
   data() {
@@ -110,7 +109,8 @@ export default {
     };
   },
   created(){
-    axios.get('/api/getAllCourses',{
+    this.$axios
+    .get('http://10.60.38.173:8765/getAllCourses',{
 headers: {
             'Authorization':
               "Bearer "+localStorage.getItem("token")
@@ -142,6 +142,9 @@ body {
   padding: 0;
   margin: 0;
 }
+</style>
+
+<style scoped>
 .top {
   /*   background-color: rgba(54, 88, 241, 0.808);*/
   background-image: url(../../assets/course/img-5.jpg);

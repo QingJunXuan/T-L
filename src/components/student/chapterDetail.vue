@@ -49,7 +49,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import store from '../../store/store.js';
 export default {
   name: "sChapterDetail",
@@ -94,8 +93,8 @@ export default {
       this.menuLoading = true;
        const routerParams = this.$route.query.courseIDs;
      this.courseID = routerParams;
-     axios
-        .get("/api/getCourseCatalog", {
+     this.$axios
+        .get("http://10.60.38.173:8765/getCourseCatalog", {
           headers: {
             Authorization:
               "Bearer "+localStorage.getItem("token")

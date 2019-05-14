@@ -57,7 +57,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 export default {
   data() {
     return {
@@ -77,8 +76,8 @@ export default {
      getPre() {
       const tid = this.$route.query.tpreid;
       this.tid=tid
-      axios
-        .get("/api/question/view", {
+      this.$axios
+        .get("http://10.60.38.173:8765/question/view", {
           headers: {
             Authorization:
               "Bearer "+localStorage.getItem("token")
@@ -109,7 +108,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 .test {
   color: #747a81;
 }

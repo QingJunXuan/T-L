@@ -245,7 +245,7 @@ export default {
     getProcess() {
       this.$http
         .get(
-          "/api/getCurrentProgress?courseClassID=" +
+          "http://10.60.38.173:8765/getCurrentProgress?courseClassID=" +
             this.classID +
             "&studentID=" +
             this.userID,
@@ -273,7 +273,7 @@ export default {
     },
     getStudentOptions() {
       this.$http
-        .get("/api/getStudentsByClassID?courseClassID=" + this.classID, {
+        .get("http://10.60.38.173:8765/getStudentsByClassID?courseClassID=" + this.classID, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -311,7 +311,7 @@ export default {
       this.xData = [];
       this.$http
         .get(
-          "/api/getCourseScoreAndComment?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndComment?courseID=" +
             this.courseID +
             "&studentID=" +
             studentID,
@@ -355,7 +355,7 @@ export default {
     getStudentData(studentID, index) {
       this.$http
         .get(
-          "/api/getCourseScoreAndComment?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndComment?courseID=" +
             this.courseID +
             "&studentID=" +
             studentID,
@@ -427,7 +427,7 @@ export default {
     getGenderAndClassData(chapterID, index) {
       this.$http
         .get(
-          "/api/getCourseScoreAndCommentByGender?courseID=" +
+          "http://10.60.38.173:8765/getCourseScoreAndCommentByGender?courseID=" +
             this.courseID +
             "&chapterID=" +
             chapterID +

@@ -109,7 +109,7 @@ export default {
       this.$http
         .get(
           // 传值班级号
-          "/api/getStudentsByClassID?courseClassID=" + this.classID,
+          "http://10.60.38.173:8765/getStudentsByClassID?courseClassID=" + this.classID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -165,7 +165,7 @@ export default {
       this.$http
         .get(
           // 传值班级号
-          "/api/getStudentsByClassID?courseClassID=" + this.classID,
+          "http://10.60.38.173:8765/getStudentsByClassID?courseClassID=" + this.classID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")

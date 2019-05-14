@@ -6,7 +6,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 export default {
   data() {
     return {
@@ -27,8 +26,8 @@ export default {
       const routerParams = this.$route.query.chapterID;
 
       this.chapterID = routerParams;
-      axios
-        .get("/api/getChapterByID", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getChapterByID", {
           headers: {
             Authorization:
               "Bearer "+localStorage.getItem("token")
@@ -59,7 +58,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 </style>
 
 

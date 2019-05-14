@@ -436,7 +436,7 @@ export default {
     },
     getChapterInfo() {
       this.$http
-        .get("/api/getChapterByID?chapterID=" + this.id, {
+        .get("http://10.60.38.173:8765/getChapterByID?chapterID=" + this.id, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -471,7 +471,7 @@ export default {
       this.$http
         .get(
           // 传值chapterid
-          "/api/question/view?chapterId=" + this.id + "&type=review",
+          "http://10.60.38.173:8765/question/view?chapterId=" + this.id + "&type=review",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -575,7 +575,7 @@ export default {
       this.$http
         .get(
           // 传值课程号
-          "/api/question/sameCoursesById?courseId=" +
+          "http://10.60.38.173:8765/question/sameCoursesById?courseId=" +
             this.courseID +
             "&teacherId=" +
             this.teacherID,
@@ -627,7 +627,7 @@ export default {
       this.$http
         .get(
           // 传值课程号
-          "/api/getCourseCatalog?courseID=" +
+          "http://10.60.38.173:8765/getCourseCatalog?courseID=" +
             this.importData[this.importSettings].id,
           {
             headers: {
@@ -1031,7 +1031,7 @@ export default {
         choice: this.exercisesObj[index].options[i].content
       };
       let promise = this.$http
-        .post("/api/question/addChoice", optionEntity, {
+        .post("http://10.60.38.173:8765/question/addChoice", optionEntity, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -1060,7 +1060,7 @@ export default {
     saveDeleteOption(index, i) {
       let promise = this.$http
         .put(
-          "/api/question/deleteChoice",
+          "http://10.60.38.173:8765/question/deleteChoice",
           {
             exerciseChoiceId: this.exercisesObj[index].oldOptions[i].id
           },
@@ -1099,7 +1099,7 @@ export default {
         choice: this.exercisesObj[index].options[i].content
       };
       this.$http
-        .post("/api/question/alterChoice", optionEntity, {
+        .post("http://10.60.38.173:8765/question/alterChoice", optionEntity, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -1138,7 +1138,7 @@ export default {
         exercisePoint: this.exercisesObj[index].score
       };
       this.$http
-        .post("/api/question/addExercise", exerciseEntity, {
+        .post("http://10.60.38.173:8765/question/addExercise", exerciseEntity, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
             "Content-Type": "application/json"
@@ -1175,7 +1175,7 @@ export default {
         exercisePoint: this.exercisesSub[index].score
       };
       this.$http
-        .post("/api/question/addExercise", exerciseEntity, {
+        .post("http://10.60.38.173:8765/question/addExercise", exerciseEntity, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
             "Content-Type": "application/json"
@@ -1196,7 +1196,7 @@ export default {
     saveDeleteObjExercise(index) {
       this.$http
         .put(
-          "/api/question/deleteExercise",
+          "http://10.60.38.173:8765/question/deleteExercise",
           {
             exerciseId: this.exercisesObj[index].exerciseID
           },
@@ -1228,7 +1228,7 @@ export default {
     saveDeleteSubExercise(index) {
       this.$http
         .put(
-          "/api/question/deleteExercise",
+          "http://10.60.38.173:8765/question/deleteExercise",
           {
             exerciseId: this.exercisesSub[index].exerciseID
           },
@@ -1267,7 +1267,7 @@ export default {
         exercisePoint: this.exercisesObj[index].score
       };
       this.$http
-        .post("/api/question/alterExercise", exerciseEntity, {
+        .post("http://10.60.38.173:8765/question/alterExercise", exerciseEntity, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -1297,7 +1297,7 @@ export default {
         exercisePoint: this.exercisesSub[index].score
       };
       this.$http
-        .post("/api/question/alterExercise", exerciseEntity, {
+        .post("http://10.60.38.173:8765/question/alterExercise", exerciseEntity, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -1461,7 +1461,7 @@ export default {
       }
       this.$http
         .post(
-          "/api/alertChapter",
+          "http://10.60.38.173:8765/alertChapter",
           entity,
           {
             headers: {
@@ -1511,7 +1511,7 @@ export default {
           this.importLoading = true;
           this.$http
             .post(
-              "/api/question/copyExercise",
+              "http://10.60.38.173:8765/question/copyExercise",
               {
                 sourceChapterId: this.chapterSettings,
                 aimChapterId: this.id,

@@ -424,7 +424,7 @@ export default {
   },
   created() {
     axios
-      .get("/api/getAllCoursesRelation", {
+      .get("http://10.60.38.173:8765/getAllCoursesRelation", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
         }
@@ -572,7 +572,7 @@ export default {
     },
     setAllCourse() {
       axios
-        .get("/api/getAllCoursesRelation", {
+        .get("http://10.60.38.173:8765/getAllCoursesRelation", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -635,7 +635,7 @@ export default {
     },
     getDupCourse() {
       axios
-        .get("/api/getAllCoursesByNameID", {
+        .get("http://10.60.38.173:8765/getAllCoursesByNameID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -721,7 +721,7 @@ export default {
             params.append("startTime", form.startTime),
             params.append("endTime", form.endTime),
             axios
-              .post("/api/addCourse", params, {
+              .post("http://10.60.38.173:8765/addCourse", params, {
                 headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
                   Authorization: "Bearer " + localStorage.getItem("token")
@@ -737,7 +737,7 @@ export default {
                     params.append("courseID", id);
                     params.append("classNum", i + 1);
                     axios
-                      .post("/api/addClass", params, {
+                      .post("http://10.60.38.173:8765/addClass", params, {
                         headers: {
                           Authorization:
                             "Bearer " + localStorage.getItem("token")
@@ -787,7 +787,7 @@ export default {
             params.append("startTime", form.startTime),
             params.append("endTime", form.endTime),
             axios
-              .post("/api/alterCourseInfo", params, {
+              .post("http://10.60.38.173:8765/alterCourseInfo", params, {
                 headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
                   Authorization: "Bearer " + localStorage.getItem("token")
@@ -896,7 +896,7 @@ export default {
       var params = new URLSearchParams();
       params.append("courseName", addCourse.courseName);
       axios
-        .post("/api/addCourseName", params, {
+        .post("http://10.60.38.173:8765/addCourseName", params, {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -913,7 +913,7 @@ export default {
                   this.allCourse[j].courseName.courseName
                 ) {
                   axios
-                    .get("/api/addCourseRelation", {
+                    .get("http://10.60.38.173:8765/addCourseRelation", {
                       params: {
                         courseNameID: id,
                         preCourseNameID: this.allCourse[j].courseName
@@ -1009,7 +1009,7 @@ export default {
         params.append("courseNameID", id);
         params.append("courseName", newName);
         axios
-          .post("/api/alertCourseName", params, {
+          .post("http://10.60.38.173:8765/alertCourseName", params, {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
             }
@@ -1116,7 +1116,7 @@ export default {
         }
         for (var p = 0; p < delLength; p++) {
           axios
-            .get("/api/deleteCourseRelation", {
+            .get("http://10.60.38.173:8765/deleteCourseRelation", {
               headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
               },
@@ -1134,7 +1134,7 @@ export default {
         }
         for (var q = 0; q < addLength; q++) {
           axios
-            .get("/api/addCourseRelation", {
+            .get("http://10.60.38.173:8765/addCourseRelation", {
               headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
               },
@@ -1222,7 +1222,7 @@ export default {
       params.append("courseID", this.rowIndex.courseInfo.courseID);
       params.append("classNum", this.rowIndex.courseClasses.length + 1);
       axios
-        .post("/api/addClass", params, {
+        .post("http://10.60.38.173:8765/addClass", params, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -1239,7 +1239,7 @@ export default {
       console.log(this.rowIndex, "rowindex2");
       console.log(data.$index);
      axios
-        .get("/api/deleteClass", {
+        .get("http://10.60.38.173:8765/deleteClass", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -1260,7 +1260,7 @@ export default {
       this.dialog2 = false;
       this.dupCourse.splice(this.rowIndex, 1);
       axios
-        .get("/api/deleteCourse", {
+        .get("http://10.60.38.173:8765/deleteCourse", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -1335,7 +1335,6 @@ export default {
             itemStyle:{
               normal:{
                 color: "#ec7814",
-                opacity:0.8,
               }
             },
             lineStyle: {

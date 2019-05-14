@@ -173,7 +173,6 @@
 </template>
 <script>
 import store from '../../store/store.js'
-import axios from "axios";
 export default {
   data() {
     return {
@@ -184,8 +183,6 @@ export default {
       after: false,
       isScored: false,
       isRated: false,
-      //beforeRate: true,
-      //afterRate: false,
       type: 0,
       rate: 0,
       comment:'',
@@ -197,21 +194,7 @@ export default {
       exercises: [],
     };
   },
-  create() {
-    /*  var sid = this.$route.query.sid + 1;
-    this.$axios.get("/api/question/view", {
-      params: {
-        chapterId: sid,
-        type: "preview"
-      }.then(resp => {
-        this.exercises = resp.data;
-      })
-    }); */
-    //进入界面确定界面状态  before after isScored 总得分
-    
-    //this.getRev();
-    //this.setTime()
-  },
+  create() {},
   mounted() {
     this.getRev();
     this.setTime();
@@ -237,8 +220,8 @@ export default {
       }
     },
     getTime(){
-      axios
-        .get("/api/getChapterByID", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getChapterByID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -267,8 +250,8 @@ export default {
       this.sid = sid;
       const index =this.$route.query.index
       var catalog = store.state.catalog
-      axios
-        .get("/api/question/view", {
+      this.$axios
+        .get("http://10.60.38.173:8765/question/view", {
           headers: {
             Authorization:
               "Bearer "+localStorage.getItem("token")
@@ -294,8 +277,8 @@ export default {
         });
 /*       if(catalog.length!=0 && catalog[index].exerciseVisible_2==true){
 				console.log("TCL: getRev -> exerciseVisible_2", catalog[index].exerciseVisible_2)
-         axios
-        .get("/api/question/view", {
+        this.$axios
+         .get("http://10.60.38.173:8765/question/view", {
           headers: {
             Authorization:
               "Bearer "+localStorage.getItem("token")
@@ -400,9 +383,9 @@ export default {
         params.append('type',"review")
         params.append('comment',this.comment)
         params.append('rate',this.rate)
-        axios
+        this.$axios
           .post(
-            "/api/question/answerAll",
+            "http://10.60.38.173:8765/question/answerAll",
            params,
             {
               headers: {
@@ -428,7 +411,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 .test {
   color: #747a81;
 }

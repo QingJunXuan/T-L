@@ -92,7 +92,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 let chapterNum = 0;
 let sectionNum = 0;
 export default {
@@ -141,8 +140,8 @@ export default {
   },
   methods: {
     getChapterGraph() {
-      axios
-        .get("/api/getChapterRelationByCourseID", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getChapterRelationByCourseID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -168,7 +167,7 @@ export default {
     },
     getNotice() {
       axios
-        .get("/api/getNoticeByCouID", {
+        .get("http://10.60.38.173:8765/getNoticeByCouID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -189,8 +188,8 @@ export default {
       var params = new URLSearchParams();
       params.append("courseID", this.courseID);
       params.append("courseNotice", this.textarea);
-      axios
-        .post("/api/addCourseNotice", params, {
+      this.$axios
+        .post("http://10.60.38.173:8765/addCourseNotice", params, {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -210,8 +209,8 @@ export default {
         });
     },
     getLesson() {
-      axios
-        .get("/api/getCourseCatalog", {
+      this.$axios
+        .get("http://10.60.38.173:8765/getCourseCatalog", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
@@ -579,6 +578,9 @@ body {
   padding: 0;
   margin: 0;
 }
+</style>
+
+<style scoped>
 .courseBack {
   height: 240px;
   /* background-color: cadetblue; */
