@@ -9,7 +9,7 @@
         label-width="100px"
         label-position="top"
         align="start"
-        style="width: 700px; margin: 0 auto"
+        style="width: 100%; padding-left: 20%"
       >
         <el-form-item label="标题" prop="title">
           <el-input v-model="pointForm.title"></el-input>
