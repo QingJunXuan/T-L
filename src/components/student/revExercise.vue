@@ -378,7 +378,7 @@ export default {
         this.isRated = true;
          var params = new URLSearchParams()
         params.append("answers",this.answer)
-        params.append("studentId",1)
+        params.append("studentId",localStorage.getItem('userID'))
         params.append("chapterId",this.sid)
         params.append('type',"review")
         params.append('comment',this.comment)

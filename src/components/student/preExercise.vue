@@ -247,7 +247,7 @@ export default {
 
           var params = new URLSearchParams();
           params.append("answers", this.answer);
-          params.append("studentId", 1);
+          params.append("studentId", localStorage.getItem('userID'));
           params.append("chapterId", this.sid);
           params.append("type", "preview");
           params.append("comment", 1);

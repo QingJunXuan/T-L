@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside style="width:340px">
+    <el-aside style="width:25%">
       <el-menu
         default-active="0-0"
         style="height: 778px"
@@ -11,7 +11,7 @@
         v-loading="menuLoading"
         element-loading-background="rgba(0, 0, 0, 0.8)"
       >
-      <el-menu-item>
+        <el-menu-item>
           <span>
             <el-button type="text" @click="goBack">
               <i class="el-icon-back" style="margin-right: 6px;color:#fff"></i><span style="color:#fff">返 回</span>
@@ -20,7 +20,7 @@
         </el-menu-item>
         <el-submenu v-for="(item1,index1) in tree" :index="index1.toString()" :key="index1">
           <template slot="title">
-            <span style="color:#ddd">{{item1.contentName}}</span>
+            <p class="contentName">{{item1.contentName}}</p>
           </template>
           <div>
             <div v-for="(item2, index2) in item1.subCatalog" :key="index1*10+index2">
@@ -179,11 +179,20 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 a {
   text-decoration: none;
 }
-
+.contentName{
+  color: #ddd;
+  width: 100%; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  padding:0;
+  margin:0;
+}
 .router-link-active {
   text-decoration: none;
 }

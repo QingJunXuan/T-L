@@ -1559,7 +1559,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .el-submenu > .el-submenu__title {
   width: 300px;
   white-space: nowrap;
@@ -1569,7 +1569,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style>
 a {
   text-decoration: none;
 }

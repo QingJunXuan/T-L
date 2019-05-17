@@ -50,7 +50,7 @@ export default {
        this.courseClassID=routerParams
        var params = new URLSearchParams()
         params.append("courseClassID",this.courseClassID)
-        params.append("studentId",1)
+        params.append("studentId",localStorage.getItem('userID'))
         params.append("comment",this.textarea)
         params.append('rate',this.rate)
       this.$axios

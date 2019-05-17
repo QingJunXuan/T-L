@@ -76,7 +76,7 @@ export default {
       isNotice: false,
       isLesson: true,
       isGraph:true,
-      notice: "Java是一门面向对象编程语言.",
+      notice: "无公告。",
       rate: 20,
       lesson: null,
       showButton: true,
@@ -124,12 +124,12 @@ export default {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
-          params: { courseID: this.courseID,studentID:localStorage.getItem('userid') }
+          params: { courseID: this.courseID,studentID:localStorage.getItem('userID') }
         })
         .then(resp => {
-          console.log(resp.data);
+          console.log(resp.data,"score-first-resp");
           if (resp.data.state == 1) {
-            console.log(resp.data,"score")
+            console.log(resp.data,"score-second-resp")
             store.commit("setScore",resp.data.data)
           }
         })
@@ -170,6 +170,7 @@ export default {
         .then(resp => {
           if (resp.data.state == 1) {
             this.tree = resp.data.data;
+						console.log("TCL: getLesson -> tree", this.tree)
             store.commit('setCatalog',this.tree)
           }
         })
@@ -336,7 +337,6 @@ export default {
           params: { courseID: this.courseID }
         })
         .then(resp => {
-          console.log(resp.data);
           if (resp.data.state == 1) {
             console.log(resp.data,"chapter-tree")
             this.graphTree = resp.data.data;
@@ -555,7 +555,7 @@ body {
 }
 </style>
 
-<style scoped>
+<style>
 .courseBack {
   height: 240px;
   /* background-color: cadetblue; */

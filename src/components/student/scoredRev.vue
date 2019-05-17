@@ -105,7 +105,7 @@ methods:{
             Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
-            studentId:localStorage.getItem('userid'),
+            studentId:localStorage.getItem('userID'),
             chapterId: this.sid,
             type: "review"
           }
@@ -152,7 +152,7 @@ methods:{
           },
           params: {
             chapterId: this.sid,
-            studentId:localStorage.getItem('userid'),
+            studentId:localStorage.getItem('userID'),
             type: "review"
           }
         })

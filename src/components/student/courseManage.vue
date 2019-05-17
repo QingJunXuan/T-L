@@ -53,7 +53,7 @@
       <el-dialog :visible.sync="isPlus" title="添加课程" width="30%" center>
         <el-form>
           <el-form-item label="邀请码" label-width="70px">
-            <el-input v-model="code" auto-complete="off" placeholder="请输入邀请码"></el-input>
+            <el-input v-model="code" auto-complete="off" placeholder="请输入邀请码" @keyup.native.enter="submit"></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -145,14 +145,19 @@ export default {
           }
         })
         .then(resp => {
-          console.log(resp.data);
-          this.courseConfirm = resp.data.data;
-          //this.items.push(resp.data);
+          console.log("TCL:submit - resp", resp)
+          if(resp.data.state==0){
+            alert('该课程不存在')
+          }else{
+            this.courseConfirm = resp.data.data;
+            //this.items.push(resp.data);
+            this.isConfirm = true;
+          }
         })
         .catch(err => {
           console.log(err);
         });
-      this.isConfirm = true;
+      
     },
     confirm() {
       //确认添加课程
@@ -164,15 +169,16 @@ export default {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
-            studentID: 1,
+            studentID: localStorage.getItem('userID'),
             courseClassID: this.courseConfirm.courseClass.id
           }
         })
         .then(resp => {
           //==============================将新获得的课程添加到当前列表
+          if(this.noCourse==true) this.noCourse=false
           this.items.push(this.courseConfirm);
           console.log(resp);
-          this.$message(resp.message);
+          this.$message('添加成功');
         })
         .catch(err => {
           console.log(err);

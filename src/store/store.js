@@ -3,24 +3,25 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+export default new Vuex.Store(
+  {
     state: {
-        data:[{
-              name:"start",
-              x:250,
-              y:50,
-          }],
-          links:[],
-          catalog:[],
-          score:[],
+      data: [{
+        name: 'start',
+        x: 250,
+        y: 50
+      }],
+      links: [],
+      catalog: [],
+      score: []
     },
     mutations: {
-        setCatalog(state,catalog){
-            state.catalog=catalog
-        },
-        setScore(state,score){
-            state.score = score
-			console.log("TCL: setScore -> score", score)
-        },
+      setCatalog (state, catalog) {
+        state.catalog = catalog
+      },
+      setScore (state, score) {
+        state.score = score
+      }
     }
-})
+  }
+)

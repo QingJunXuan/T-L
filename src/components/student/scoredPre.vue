@@ -81,7 +81,7 @@ export default {
           },
           params: {
             chapterId: this.sid,
-            studentId:localStorage.getItem('userid'),
+            studentId:localStorage.getItem('userID'),
             type: "preview"
           }
         })
