@@ -60,7 +60,7 @@
           <el-row>
             <el-col :span="12" :offset="6" style="margin-top:-80px;margin-bottom:40px">
               <div v-show="isGraph==true">
-                <div style="height:300px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
+                <div style="height:800px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
               </div>
               <div v-show="isGraph==false">
                 <el-tree
@@ -166,7 +166,7 @@ export default {
       this.getNotice();
     },
     getNotice() {
-      axios
+      this.$axios
         .get("http://10.60.38.173:8765/getNoticeByCouID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")

@@ -54,7 +54,7 @@ export default {
         params.append("comment",this.textarea)
         params.append('rate',this.rate)
       this.$axios
-      .post('http://10.60.38.173:8765/addClassComment',params, {
+        .post('http://10.60.38.173:8765/addClassComment',params, {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 Authorization:

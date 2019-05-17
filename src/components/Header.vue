@@ -77,12 +77,13 @@
           localStorage.removeItem('userID');
           localStorage.removeItem('name');
           localStorage.removeItem('workID')
-          location.reload();
+          //location.reload();
+          this.$router.push('/')
           this.isLogin = false;
         }).catch(() => {
 
         });
-        this.isLogin = false;
+        //this.isLogin = false;
       },
       showLogin: function() {
         this.loginVisible = true;

@@ -28,7 +28,7 @@
             <el-input type="text" v-model="ruleForm.account" auto-complete="off" placeholder="账号"></el-input>
           </el-form-item>
           <el-form-item prop="checkPass">
-            <el-input type="password" v-model="ruleForm.password" auto-complete="off" placeholder="密码"></el-input>
+            <el-input type="password" v-model="ruleForm.password" auto-complete="off" placeholder="密码" @keyup.native.enter="handleLogin"></el-input>
           </el-form-item>
           <div style="width:100%;" align="center">
             <el-button type="primary" class="form-button" @click="handleLogin" :loading="logining">登录</el-button>
@@ -233,6 +233,8 @@
                 username: this.ruleForm.account,
                 password: this.ruleForm.password
               }, {emulateJSON:false}).then(response => {
+								console.log("TCL: handleLogin -> response", response)
+                
                 localStorage.setItem('token', response.data.data.token.token);
                 localStorage.setItem('username', response.data.data.mail);
                 localStorage.setItem('userID', response.data.data.userID);

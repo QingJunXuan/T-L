@@ -109,7 +109,7 @@ export default {
           Authorization: "Bearer " + localStorage.getItem("token")
         },
         params: {
-          studentID: localStorage.getItem('userid')
+          studentID: localStorage.getItem('userID')
         }
       })
       .then(resp => {

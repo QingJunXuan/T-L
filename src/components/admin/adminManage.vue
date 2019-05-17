@@ -13,6 +13,20 @@
           </div>
         </div>
       </el-col>
+      <!-- 登出 -->
+      <el-col :span="1" class="icon-right">
+        <el-dropdown trigger="hover" v-show="isLogin">
+          <span class="el-dropdown-link" style="color:#fff;font-size:25px" >
+            <i class="el-icon-more"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-col>
+      <!--  <el-col :span="1" class="icon-right">
+        <i class="el-icon-more" @click="logout"></i>
+      </el-col> -->
       <!-- 点击跳转到分析页面 -->
       <el-col :span="1" class="icon-right">
         <i class="el-icon-share" @click="chart"></i>
@@ -38,7 +52,8 @@ export default {
     return {
       screenWidth:{
         width:window.screen.width,
-      }
+      },
+      isLogin:true,
     };
   },
   methods: {
@@ -52,6 +67,23 @@ export default {
     teacherList(){
       this.$router.push('/adminManage/teacherList')
     },
+    logout() {
+        this.$confirm('确认退出吗?', '提示', {
+          //type: 'warning'
+        }).then(() => {
+          localStorage.removeItem('username');
+          localStorage.removeItem('token');
+          localStorage.removeItem('userID');
+          localStorage.removeItem('name');
+          localStorage.removeItem('workID')
+          //location.reload();
+          this.$router.push('/')
+          this.isLogin = false;
+        }).catch(() => {
+
+        });
+        this.isLogin = false;
+      },
   }
 };
 </script>
