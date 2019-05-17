@@ -3,7 +3,7 @@
     <el-aside>
       <el-menu
         default-active="0-0"
-        style="height: 100%; min-height: 720px"
+        style="height: 100%; min-height: 700px"
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
@@ -21,7 +21,7 @@
         <el-scrollbar wrap-style="height: calc(100vh - 150px)" :native="false">
           <el-submenu v-for="(item1,index1) in catalog" :index="index1.toString()" :key="index1">
             <template slot="title">
-              <span>
+              <div style="float: left">
                 <el-button
                   type="text"
                   size="mini"
@@ -30,8 +30,8 @@
                   style="color: #fff;"
                   @click="handleEditChapter(index1)"
                 ></el-button>
-              </span>
-              <span>{{item1.chapterName}}</span>
+              </div>
+              <div align="start" class="chapter-name">{{item1.chapterName}}</div>
             </template>
             <div>
               <el-menu-item :index="index1.toString() + '001'">
@@ -1559,17 +1559,7 @@ export default {
 };
 </script>
 
-<style>
-.el-submenu > .el-submenu__title {
-  width: 300px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  text-align: start;
-}
-</style>
-
-<style>
+<style scoped>
 a {
   text-decoration: none;
 }
@@ -1593,8 +1583,15 @@ a {
 
 .router-view {
   width: 100%;
-  margin: 0 auto;
   padding-top: 20px;
+}
+
+.chapter-name {
+  width: 70%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: start;
 }
 
 .point-name {

@@ -634,7 +634,7 @@ export default {
       this.detail = [];
       switch (val) {
         case 0: {
-          if (this.xy === 3 || this.xy === 6) {
+          if (this.xy === 0 || this.xy === 3 || this.xy === 6) {
             this.setCourse = false;
           } else {
             this.setCourse = true;
@@ -657,9 +657,15 @@ export default {
     },
     getBaseData(courseID, courseIndex, teacherIndex, index) {
       this.$http
-        .get("http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" + courseID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" +
+            courseID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -694,22 +700,30 @@ export default {
     },
     getTeacherNumData(teacherID, seriesIndex) {
       this.$http
-        .get("http://10.60.38.173:8765/getStudentNumByTeacher?teacherID=" + teacherID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getStudentNumByTeacher?teacherID=" +
+            teacherID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data) {
-                  let index = this.xData.indexOf(key);
-                  if (index !== -1) {
-                    this.seriesData[seriesIndex].data[index] = res.data[key];
+              if (this.xy === 0 && this.comparison === 0) {
+                if (res.state === 1) {
+                  for (var key in res.data) {
+                    let index = this.xData.indexOf(key);
+                    if (index !== -1) {
+                      this.seriesData[seriesIndex].data[index] = res.data[key];
+                    }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -722,7 +736,7 @@ export default {
     getSemesterNumData(year, semester, seriesIndex) {
       this.$http
         .get(
-          "/http://10.60.38.173:8765/getStudentNumBySemesterAndYear?year=" +
+          "http://10.60.38.173:8765/getStudentNumBySemesterAndYear?year=" +
             year +
             "&semester=" +
             semester,
@@ -736,15 +750,17 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data) {
-                  let index = this.xData.indexOf(key);
-                  if (index !== -1) {
-                    this.seriesData[seriesIndex].data[index] = res.data[key];
+              if (this.xy === 0 && this.comparison === 2) {
+                if (res.state === 1) {
+                  for (var key in res.data) {
+                    let index = this.xData.indexOf(key);
+                    if (index !== -1) {
+                      this.seriesData[seriesIndex].data[index] = res.data[key];
+                    }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -763,15 +779,17 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data) {
-                  let index = this.xData.indexOf(key);
-                  if (index !== -1) {
-                    this.seriesData[seriesIndex].data[index] = res.data[key];
+              if (this.xy === 0 && this.comparison === 3) {
+                if (res.state === 1) {
+                  for (var key in res.data) {
+                    let index = this.xData.indexOf(key);
+                    if (index !== -1) {
+                      this.seriesData[seriesIndex].data[index] = res.data[key];
+                    }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -798,17 +816,19 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data.year) {
-                  let index = this.xData.indexOf(Number(key));
-                  if (index !== -1) {
-                    this.seriesData[seriesIndex].data[index] = Number(
-                      res.data.year[key].rate
-                    ).toFixed(1);
+              if (this.xy === 4 && this.comparison === 0) {
+                if (res.state === 1) {
+                  for (var key in res.data.year) {
+                    let index = this.xData.indexOf(Number(key));
+                    if (index !== -1) {
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        res.data.year[key].rate
+                      ).toFixed(1);
+                    }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -820,31 +840,39 @@ export default {
     },
     getYearRateData(courseNameID, seriesIndex, index, year) {
       this.$http
-        .get("http://10.60.38.173:8765/getRateBySemesterAndYear?courseNameID=" + courseNameID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getRateBySemesterAndYear?courseNameID=" +
+            courseNameID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                let i = 0;
-                let count = 0;
-                let rate = 0;
+              if (this.xy === 4 && this.comparison === 1 || (this.xy === 6 && this.comparison === 3)) {
+                if (res.state === 1) {
+                  let i = 0;
+                  let count = 0;
+                  let rate = 0;
 
-                while (i < res.data.length) {
-                  if (res.data[i].semesterAndYear.year == year) {
-                    rate += res.data[i].avgRate;
-                    count++;
+                  while (i < res.data.length) {
+                    if (res.data[i].semesterAndYear.year == year) {
+                      rate += res.data[i].avgRate;
+                      count++;
+                    }
+                    i++;
                   }
-                  i++;
+                  if (count !== 0) {
+                    rate = (rate / count).toFixed(1);
+                  }
+                  this.seriesData[seriesIndex].data[index] = rate;
                 }
-                if (count !== 0) {
-                  rate = (rate / count).toFixed(1);
-                }
-                this.seriesData[seriesIndex].data[index] = rate;
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -871,17 +899,19 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data.semester) {
-                  let index = this.xData.indexOf(key);
-                  if (index !== -1) {
-                    this.seriesData[seriesIndex].data[index] = Number(
-                      res.data.semester[key].rate
-                    ).toFixed(1);
+              if (this.xy === 5 && this.comparison === 0) {
+                if (res.state === 1) {
+                  for (var key in res.data.semester) {
+                    let index = this.xData.indexOf(key);
+                    if (index !== -1) {
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        res.data.semester[key].rate
+                      ).toFixed(1);
+                    }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -893,34 +923,42 @@ export default {
     },
     getSemesterRateData(courseNameID, seriesIndex, index, semester) {
       this.$http
-        .get("http://10.60.38.173:8765/getRateBySemesterAndYear?courseNameID=" + courseNameID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getRateBySemesterAndYear?courseNameID=" +
+            courseNameID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                let i = 0;
-                let count = 0;
-                let rate = 0;
-                while (i < res.data.length) {
-                  if (
-                    res.data[i].semesterAndYear.year +
-                      res.data[i].semesterAndYear.semester ===
-                    semester
-                  ) {
-                    rate += res.data[i].avgRate;
-                    count++;
+              if (this.xy === 6 && this.comparison === 2 || (this.xy === 5 && this.comparison === 1)) {
+                if (res.state === 1) {
+                  let i = 0;
+                  let count = 0;
+                  let rate = 0;
+                  while (i < res.data.length) {
+                    if (
+                      res.data[i].semesterAndYear.year +
+                        res.data[i].semesterAndYear.semester ===
+                      semester
+                    ) {
+                      rate += res.data[i].avgRate;
+                      count++;
+                    }
+                    i++;
                   }
-                  i++;
+                  if (count !== 0) {
+                    rate = (rate / count).toFixed(1);
+                  }
+                  this.seriesData[seriesIndex].data[index] = rate;
                 }
-                if (count !== 0) {
-                  rate = (rate / count).toFixed(1);
-                }
-                this.seriesData[seriesIndex].data[index] = rate;
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -947,17 +985,19 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data.year) {
-                  let index = this.xData.indexOf(Number(key));
-                  if (index !== -1) {
-                    this.seriesData[seriesIndex].data[index] = Number(
-                      res.data.year[key].score
-                    ).toFixed(2);
+              if (this.xy === 1 && this.comparison === 0) {
+                if (res.state === 1) {
+                  for (var key in res.data.year) {
+                    let index = this.xData.indexOf(Number(key));
+                    if (index !== -1) {
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        res.data.year[key].score
+                      ).toFixed(2);
+                    }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -969,39 +1009,51 @@ export default {
     },
     getYearScoreData(courseNameID, seriesIndex) {
       this.$http
-        .get("http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" + courseNameID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" +
+            courseNameID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data.year) {
-                  if (this.xy === 1) {
-                    let index = this.xData.indexOf(Number(key));
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = Number(
-                        res.data.year[key].score
-                      ).toFixed(2);
+              if (this.xy === 1 && this.comparison === 1 || (this.xy === 3 && this.comparison === 3)) {
+                if (res.state === 1) {
+                  for (var key in res.data.year) {
+                    if (this.xy === 1) {
+                      let index = this.xData.indexOf(Number(key));
+                      if (index !== -1) {
+                        this.seriesData[seriesIndex].data[index] = Number(
+                          res.data.year[key].score
+                        ).toFixed(2);
+                      }
                     }
-                  }
-                  if (this.xy === 3) {
-                    let index = this.search(
-                      this.courseOptions,
-                      courseNameID,
-                      "id"
-                    );
-                    let sIndex = this.search(this.detail, Number(key), "label");
-                    if (sIndex !== -1) {
-                      this.seriesData[sIndex].data[index] = Number(
-                        res.data.year[key].score
-                      ).toFixed(2);
+                    if (this.xy === 3) {
+                      let index = this.search(
+                        this.courseOptions,
+                        courseNameID,
+                        "id"
+                      );
+                      let sIndex = this.search(
+                        this.detail,
+                        Number(key),
+                        "label"
+                      );
+                      if (sIndex !== -1) {
+                        this.seriesData[sIndex].data[index] = Number(
+                          res.data.year[key].score
+                        ).toFixed(2);
+                      }
                     }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1028,17 +1080,19 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data.semester) {
-                  let index = this.xData.indexOf(key);
-                  if (index !== -1) {
-                    this.seriesData[seriesIndex].data[index] = Number(
-                      res.data.semester[key].score
-                    ).toFixed(2);
+              if (this.xy === 2 && this.comparison === 0) {
+                if (res.state === 1) {
+                  for (var key in res.data.semester) {
+                    let index = this.xData.indexOf(key);
+                    if (index !== -1) {
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        res.data.semester[key].score
+                      ).toFixed(2);
+                    }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1050,39 +1104,47 @@ export default {
     },
     getSemesterScoreData(courseNameID, seriesIndex) {
       this.$http
-        .get("http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" + courseNameID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getCourseYearAvgScoreRate?courseNameID=" +
+            courseNameID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.state === 1) {
-                for (var key in res.data.semester) {
-                  if (this.xy === 2) {
-                    let index = this.xData.indexOf(key);
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = Number(
-                        res.data.semester[key].score
-                      ).toFixed(2);
+              if (this.xy === 2 && this.comparison === 1 || (this.xy === 3 && this.comparison === 2)) {
+                if (res.state === 1) {
+                  for (var key in res.data.semester) {
+                    if (this.xy === 2) {
+                      let index = this.xData.indexOf(key);
+                      if (index !== -1) {
+                        this.seriesData[seriesIndex].data[index] = Number(
+                          res.data.semester[key].score
+                        ).toFixed(2);
+                      }
                     }
-                  }
-                  if (this.xy === 3) {
-                    let index = this.search(
-                      this.courseOptions,
-                      courseNameID,
-                      "id"
-                    );
-                    let sIndex = this.search(this.detail, key, "label");
-                    if (sIndex !== -1) {
-                      this.seriesData[sIndex].data[index] = Number(
-                        res.data.semester[key].score
-                      ).toFixed(2);
+                    if (this.xy === 3) {
+                      let index = this.search(
+                        this.courseOptions,
+                        courseNameID,
+                        "id"
+                      );
+                      let sIndex = this.search(this.detail, key, "label");
+                      if (sIndex !== -1) {
+                        this.seriesData[sIndex].data[index] = Number(
+                          res.data.semester[key].score
+                        ).toFixed(2);
+                      }
                     }
                   }
                 }
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
