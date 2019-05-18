@@ -20,27 +20,7 @@
           v-for="(item,index) in exercises"
           :key="index"
         >
-          <p style="margin-left:5px">
-            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
-            <span
-              v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
-            >
-              <span style="font-size:12px;color:rgb(100,100,100)">
-                你的选择:
-                <span style="color:red;">{{item.answer}}&nbsp;&nbsp;</span>
-              </span>
-              <span style="font-size:12px;color:rgb(100,100,100)">
-                得分:
-                <span style="color:red;">{{score[index]}}</span> 分
-              </span>
-            </span>
-            <span v-else-if="item.exercise.exerciseType===6 && isScored==true">
-              <span style="font-size:12px;color:rgb(100,100,100)">
-                得分:
-                <span style="color:red;">{{score[index]}}</span> 分
-              </span>
-            </span>
-          </p>
+          <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
           <span v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5">
             <span
               v-for="j in item.exerciseChoiceList.length"
@@ -52,21 +32,40 @@
               <span :class="setAnswerClass(item.exercise.exerciseAnswer, String.fromCharCode(j+64))">{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
             </span>
           </span>
+          <span v-else-if="item.exercise.exerciseType===6 && isScored==true">
+              <span style="font-size:12px;color:rgb(100,100,100)">
+                得分:
+                <span style="color:red;">{{score[index]}}</span> 分
+              </span>
+            </span>
           <div
             v-else-if="item.exercise.exerciseType===6"
             style="padding:10px;background-color:#ddd;height:50px"
           >你的答案：{{item.answer}}</div>
-
+          <p style="margin-left:5px">
+           <span
+              v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
+            >
+              <span style="font-size:12px;color:rgb(100,100,100)">
+                你的选择:
+                <span style="color:red;">{{item.answer}}&nbsp;&nbsp;</span>
+              </span>
+              <span style="font-size:12px;color:rgb(100,100,100)">
+                得分:
+                <span style="color:red;">{{score[index]}}</span> 分
+              </span>
+            </span>
+          </p>
           <div
             style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
           >解析：<pre>{{item.exercise.exerciseAnalysis}}</pre></div>
         </div>
       </div>
       <!-- 评分 -->
-      <div style="background-color:#545c64;height:120px">
+      <div style="background-color:#545c64;height:200px;border-radius:5px">
         <p style="padding-top:10px;color:#fff">评分</p>
-        <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}" :allow-half="false"></el-rate>
-        <p style="color:#fff">{{comment}}</p>
+        <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
+        <p style="color:#fff;width:80%;margin:auto;padding-top:10px">{{comment}}</p>
       </div>
     </div>
 </template>
@@ -90,6 +89,7 @@ export default {
         //判断是否评分，根据评分显示totalscore
         this.setTime()
         this.getRev()
+        this.initValue()
     },
     watch: {
     $route(to, from) {
@@ -98,6 +98,12 @@ export default {
     }
   },
 methods:{
+   initValue(){
+      this.rate = 0
+      this.comment=''
+      this.totalPoint=0;
+      this.score={};
+    },
   getScore(){
     this.$axios
         .get("http://10.60.38.173:8765/question/exerciseScore", {

@@ -7,7 +7,7 @@
         </el-col>
       </el-row>
       <el-row>
-        <div style="line-height:150px">JAVA</div>
+        <div style="line-height:150px">{{courseName}}</div>
       </el-row>
       <el-row>
         <el-col :span="2" :offset="22">
@@ -71,6 +71,7 @@ export default {
   name: "sCourseDetail",
   data() {
     return {
+      courseName:'',
       courseID: 1,
       classID: 1,
       isNotice: false,
@@ -101,14 +102,15 @@ export default {
   },
   created() {
     //获得课程目录
-    console.log(this.courseID,"courseid");
     const routerParams1 = this.$route.query.courseID;
     this.courseID = routerParams1;
     const routerParams2 = this.$route.query.classID;
     this.classID = routerParams2;
-    console.log(this.courseID,"courseid");
     chapterNum=0;
     //sectionNum=0;
+    //var currentTime = new Date();
+    //console.log("TCL: created -> currentTime", currentTime)
+    this.getCourseName();
     this.getChapterGraph();//图
     this.getNotice();
     this.getLesson();
@@ -118,6 +120,24 @@ export default {
     //this.draw();
   },
   methods: {
+    getCourseName(){///getCourseInfoByID
+      this.$axios
+        .get("http://10.60.38.173:8765/getCourseInfoByID", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          },
+          params: { courseID: this.courseID }
+        })
+        .then(resp => {
+          console.log(resp.data);
+          if (resp.data.state == 1) {
+            this.courseName = resp.data.data.courseName;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     getScore(){
       this.$axios
         .get("http://10.60.38.173:8765/getCourseScoreAndComment", {
@@ -201,9 +221,9 @@ export default {
       }
     },
     handleNodeClick(object,node,self) {
-			console.log("TCL: handleNodeClick -> self", self)
+/* 			console.log("TCL: handleNodeClick -> self", self)
 			console.log("TCL: handleNodeClick -> node", node)
-			console.log("TCL: handleNodeClick -> object", object)
+			console.log("TCL: handleNodeClick -> object", object) */
       if (object.parentID != 0) {
         this.$router.push({
           path: "chapterDetail/point",
@@ -263,18 +283,17 @@ export default {
           index:num-1
         }
       });
-     /*  var length = store.state.score.length
-			console.log("TCL: pre -> length", length)
-      if(num>length){
-      this.$router.push({
-        path: "chapterDetail/preExercise",
-        query: {
-          spreid: data.id,
-          courseIDs: this.courseID,
-          index:num-1
+     /* var tempScore = store.state.score
+     var length =tempScore.length
+     var name = tempScore[num-1].chapterName
+     var isExist = false
+      for(var i=0;i<length;i++){
+        if(name==tempScore[i].chapterName) {
+          isExist = true
+          break
         }
-      });
-      }else{
+      }
+      if(isExist && tempScore[num-1].studentChapter.totalScore_1 != null){
         this.$router.push({
         path: "chapterDetail/scoredPre",
         query: {
@@ -283,9 +302,19 @@ export default {
           index:num-1
         }
       });
+      }else{ 
+        this.$router.push({
+        path: "chapterDetail/preExercise",
+        query: {
+          spreid: data.id,
+          courseIDs: this.courseID,
+          index:num-1
+        }
+      });
+        
       } */
     },
-    rev(data,num) {
+    rev(data,num){
       this.$router.push({
         path: "chapterDetail/revExercise",
         query: {
@@ -294,27 +323,49 @@ export default {
           index:num-1
         }
       });
-    /*  var length = store.state.score.length
-      if(num>length){
-      this.$router.push({
+    },
+   /*  rev(data,num) {
+     var tempScore = store.state.score
+     var length =tempScore.length
+     var name = tempScore[num-1].chapterName
+     var isExist = false
+     for(var i=0;i<length;i++){
+        if(name==tempScore[i].chapterName) {
+          isExist = true
+          break
+        }
+      }
+      if(isExist && tempScore[num-1].studentChapter.totalScore_2 == null){
+        //学生尚未作答
+       this.$router.push({
         path: "chapterDetail/revExercise",
         query: {
           srevid: data.id,
           courseIDs: this.courseID,
           index:num-1
         }
-      });
-      }else{
+       });
+      }else if(isExist && tempScore[num-1].studentChapter.totalScore_2 != null){
         this.$router.push({
         path: "chapterDetail/scoredRev",
         query: {
           srevid: data.id,
           courseIDs: this.courseID,
+          index:num-1,
+          //scored:tempScore[num-1].studentChapter.scored
+        }
+      });
+      }else if(isExist == false){
+       this.$router.push({
+        path: "chapterDetail/revExercise",
+        query: {
+          srevid: data.id,
+          courseIDs: this.courseID,
           index:num-1
         }
       });
-      } */
-    },
+      }
+    },  */
     courseBack() {
       this.$router.push({ path: "/student/courseManagement" ,
       query: {

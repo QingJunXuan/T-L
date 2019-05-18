@@ -25,7 +25,7 @@
               <p
                 id="name"
                 style="cursor: pointer"
-                @click="courseDetail(item.courseInfo.courseID,item.courseClass.id)"
+                @click="courseDetail(item.courseInfo.courseID,item.courseClass.id,item.courseInfo.courseName)"
               >{{item.courseInfo.courseName}}</p>
               <el-col :span="5" :offset="18" style="margin-top:10px">
                 <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
@@ -186,12 +186,13 @@ export default {
         });
       this.code = "";
     },
-    courseDetail: function(courseID, classID) {
+    courseDetail: function(courseID, classID,courseName) {
       this.$router.push({
         path: "/student/courseDetail",
         query: {
           courseID: courseID,
-          classID: classID
+          classID: classID,
+          courseName:courseName
         }
       });
     },

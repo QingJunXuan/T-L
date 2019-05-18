@@ -22,7 +22,7 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. （{{item.exercise.exercisePoint}}分）{{item.exercise.exerciseContent}}</pre>
             <span
               v-if="item.exercise.exerciseType===5"
             >（多选）</span>
@@ -79,6 +79,7 @@
         </div>
         <el-form-item>
           <el-button type="primary" @click="submitForm('answer')" size="mini">保 存</el-button>
+          <p style="margin-top:0">*保存后不可更改*</p>
         </el-form-item>
       </el-form>
       <div v-show="after">
@@ -88,41 +89,7 @@
           v-for="(item,index) in exercises"
           :key="index"
         >
-          <p style="margin-left:5px;">
-            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
-            <span
-              v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
-            >
-           <!--  <span  style="font-size:12px;color:rgb(100,100,100)"
-            >答案：<span style="color:red;">
-              {{item.exercise.exerciseAnswer}}&nbsp;&nbsp;
-            </span>
-            </span> -->
-              <span style="font-size:12px;color:rgb(100,100,100)">
-                你的选择:
-                <span
-                  style="color:red;"
-                  v-if="item.exercise.exerciseType===4"
-                >{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
-                <span style="color:red;" v-else-if="item.exercise.exerciseType===5">
-                  <span
-                    v-for="(num,index) in answer[index]"
-                    :key="index"
-                  >{{String.fromCharCode(num+65)}}</span>
-                </span>
-              </span>
-              <span style="font-size:12px;color:rgb(100,100,100)" v-show="isRated">
-                得分:
-                <span style="color:red;">{{score[index]}}</span> 分
-              </span>
-            </span>
-            <span v-else-if="item.exercise.exerciseType===6 && isScored==true">
-              <span style="font-size:12px;color:rgb(100,100,100)">
-                得分:
-                <span style="color:red;">{{score[index]}}</span> 分
-              </span>
-            </span>
-          </p>
+          <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. （{{item.exercise.exercisePoint}}分）{{item.exercise.exerciseContent}}</pre>
           <span v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5">
             <span
               v-for="j in item.exerciseChoiceList.length"
@@ -135,18 +102,46 @@
               <span :class="setAnswerClass(item.exercise.exerciseAnswer, String.fromCharCode(j+64))" v-else>{{String.fromCharCode(j+64)}}. {{item.exerciseChoiceList[j-1].choice}}</span>
             </span>
           </span>
+            <span v-else-if="item.exercise.exerciseType===6 && isScored==true">
+              <span style="font-size:14px;color:rgb(100,100,100);font-weight:bold">
+                得分:
+                <span style="color:red;">{{score[index]}}</span> 分
+              </span>
+            </span>
           <div
             v-else-if="item.exercise.exerciseType===6"
             style="padding:10px;background-color:#ddd;height:50px"
           >你的答案：{{answer[index]}}</div>
-
+          <p style="margin-left:5px;">
+            <span
+              v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
+            >
+              <span style="font-size:14px;color:rgb(100,100,100);font-weight:bold">
+                你的选择:
+                <span
+                  style="color:red;"
+                  v-if="item.exercise.exerciseType===4"
+                >{{String.fromCharCode(answer[index]+65)}}&nbsp;&nbsp;</span>
+                <span style="color:red;" v-else-if="item.exercise.exerciseType===5">
+                  <span
+                    v-for="(num,index) in answer[index]"
+                    :key="index"
+                  >{{String.fromCharCode(num+65)}}</span>
+                </span>
+              </span>
+              <span style="font-size:14px;color:rgb(100,100,100);font-weight:bold" v-show="isRated">
+                得分:
+                <span style="color:red;">{{score[index]}}</span> 分
+              </span>
+            </span>
+          </p>
           <div
             v-show="isRated"
             style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
           >解析：<pre style="white-space: pre-wrap; word-wrap: break-word;">{{item.exercise.exerciseAnalysis}}</pre></div>
         </div>
       </div>
-      <div v-if="isRated==false" style="border:1px solid #ddd;height:200px">
+      <div v-if="isRated==false" style="border:1px solid #ddd;background-color:#fff;height:250px;border-radius:5px">
         <p style="padding-top:10px;color:#000">
           评分
           <span style="font-size:12px;">（评分后方可提交作业）</span>
@@ -154,16 +149,15 @@
         <el-rate
           v-model="rate"
           :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-          :allow-half="half"
           style="margin-top:-5px;padding-bottom:10px"
         ></el-rate>
-        <el-input type="textarea" placeholder="输入评价" v-model="comment" rows="2" resize="none" style="width:400px;padding-top:10px"></el-input>
-        <p><el-button size="mini" type="primary" @click="submit" round>提 交</el-button></p>
+        <el-input type="textarea" placeholder="输入评价" v-model="comment" rows="4" resize="none" style="width:480px;padding-top:10px" maxlength="100"></el-input>
+        <p><el-button size="mini" type="primary" @click="submit" round :disabled="isOver">提 交</el-button></p>
       </div>
-      <div v-else style="background-color:#545c64;height:120px">
+      <div v-else style="background-color:#545c64;height:200px;border-radius:5px">
         <p style="padding-top:10px;color:#fff">评分</p>
         <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
-        <p style="color:#fff">{{comment}}</p>
+        <p style="color:#fff;width:80%;margin:auto;padding-top:10px">{{comment}}</p>
       </div>
     </div>
     <div v-else>
@@ -172,29 +166,40 @@
   </div>
 </template>
 <script>
-import store from '../../store/store.js'
+import store from "../../store/store.js";
 export default {
   data() {
     return {
-      time:null,
+      isOver:false,//超出答题时间
+      time: null,
       haveRev: false,
-      half: true,
       before: true,
       after: false,
       isScored: false,
       isRated: false,
       type: 0,
       rate: 0,
-      comment:'',
+      comment: "",
       sid: 0,
-      answer: [],
+      answer: {},
       score: {},
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      exercises: [],
+      exercises: []
     };
   },
-  create() {},
+  create() {
+    //老师未发布习题 √
+    //发布之后：未做习题 √
+    //发布之后，已经做习题+未评分 
+    //已评分 
+    //作业截止时间到了-未做题
+
+
+    //const scored = this.$route.query.scored
+
+    //this.isScored
+  },
   mounted() {
     this.getRev();
     this.setTime();
@@ -202,24 +207,39 @@ export default {
   },
   watch: {
     $route(to, from) {
+      this.initValue();
       this.getRev();
       this.setTime();
       this.setAnswer();
     }
   },
   methods: {
+    initValue(){
+      this.rate = 0
+      this.comment=''
+      this.totalPoint=0;
+      this.score={};
+      this.answer={};
+    },
     setAnswerClass(item, j) {
-      if (item.indexOf(j) >= 0 ) return "answer";
+      if (item.indexOf(j) >= 0) return "answer";
       else return "";
     },
-    setTime(){
-      const index =this.$route.query.index
-      var catalog = store.state.catalog
-      if(catalog.length!=0 && catalog[index].exerciseDeadline_2!=null){
-      this.time = catalog[index].exerciseDeadline_2
+    setTime() {
+      //var currentTime = new Date();
+			//console.log("TCL: setTime -> currentTime", currentTime)
+      const index = this.$route.query.index;
+      var catalog = store.state.catalog;
+      if (catalog.length != 0 && catalog[index].exerciseDeadline_2 != null) {
+        this.time = catalog[index].exerciseDeadline_2;
+        //var currentTime = new Date();
+        //比较时间
+        /*  if(true){
+          this.isOver = true
+        } */
       }
     },
-    getTime(){
+    getTime() {
       this.$axios
         .get("http://10.60.38.173:8765/getChapterByID", {
           headers: {
@@ -232,13 +252,12 @@ export default {
         .then(resp => {
           console.log("pre", resp.data);
           if (resp.data.state == 1) {
-            console.log(resp.data.data,"time")
+            console.log(resp.data.data, "time");
           }
         })
         .catch(err => {
           console.log(err);
         });
-
     },
     setTotalPoint() {
       for (var i = 0; i < this.exercises.length; i++) {
@@ -248,13 +267,14 @@ export default {
     getRev() {
       const sid = this.$route.query.srevid;
       this.sid = sid;
-      const index =this.$route.query.index
-      var catalog = store.state.catalog
+      //判断是否发布
+      const index = this.$route.query.index;
+      var catalog = store.state.catalog;
+      if(catalog.length!=0 && catalog[index].exerciseVisible_2==true)
       this.$axios
         .get("http://10.60.38.173:8765/question/view", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             chapterId: sid,
@@ -263,62 +283,35 @@ export default {
         })
         .then(resp => {
           console.log("rev", resp.data);
-          if(resp.data.state==1){
-          this.exercises = resp.data.data;
-          var length = this.exercises.length;
-          if (length != 0) {
-             this.haveRev=true
-          }
-          this.setTotalPoint();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
-/*       if(catalog.length!=0 && catalog[index].exerciseVisible_2==true){
-				console.log("TCL: getRev -> exerciseVisible_2", catalog[index].exerciseVisible_2)
-        this.$axios
-         .get("http://10.60.38.173:8765/question/view", {
-          headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
-          },
-          params: {
-            chapterId: sid,
-            type: "review"
-          }
-        })
-        .then(resp => {
-          console.log("rev", resp.data);
-          if(resp.data.state==1){
-          this.exercises = resp.data.data;
-          var length = this.exercises.length;
-          if (length != 0) {
-             this.haveRev=true
-          }
-          this.setTotalPoint();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
-     } */
-      
-    },
-    setAnswer(){   
-       var length = this.exercises.length;
-       for(var i=0;i<length;i++){
-              if(this.exercises[i].exercise.exerciseType==4){
-                this.answer[i.toString()]=null
-              }else if(this.exercises[i].exercise.exerciseType==5){
-                this.answer[i.toString()]=[]
-              }else if(this.exercises[i].exercise.exerciseType==6){
-                this.answer[i.toString()]=''
-              }
-              this.score[i]=''
+          if (resp.data.state == 1) {
+            this.exercises = resp.data.data;
+            var length = this.exercises.length;
+            if (length != 0) {
+              this.haveRev = true;
+              this.setTotalPoint();
             }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
-    submitForm(formname) {//暂存
+    setAnswer() {
+      var length = this.exercises.length;
+      for (var i = 0; i < length; i++) {
+        var string = i.toString();
+        if (this.exercises[i].exercise.exerciseType == 4) {
+          this.answer.string = null;
+        } else if (this.exercises[i].exercise.exerciseType == 5) {
+          this.answer.string = [];
+        } else if (this.exercises[i].exercise.exerciseType == 6) {
+          this.answer.string = "";
+        }
+        this.score[i] = "";
+      }
+    },
+    submitForm(formname) {
+      //暂存
       var length = Object.keys(this.answer).length;
       this.$refs[formname].validate(valid => {
         if (valid) {
@@ -343,14 +336,14 @@ export default {
               var ansArray = this.exercises[i].exercise.exerciseAnswer;
               var ansNum = ansArray.length;
               var try1 = array.join("");
-              var isEqual = (try1 === ansArray);
+              var isEqual = try1 === ansArray;
 
               if (isEqual) {
                 this.score[i] = this.exercises[i].exercise.exercisePoint;
               } else {
                 this.score[i] = 0;
               }
-            } else{
+            } else {
               this.score[i] = 0;
             }
           }
@@ -363,43 +356,39 @@ export default {
 
         console.log(this.score, "score");
       });
-       for (var i = 0; i < this.exercises.length; i++) {
+      for (var i = 0; i < this.exercises.length; i++) {
         //total += this.score[i];
         this.totalScore += this.score[i];
       }
       //var total = 0
     },
-    submit() {//提交
+    submit() {
+      //提交
       if (this.before == true) {
-        alert("请先完成题目");
-      } else if (this.rate == 0) {
-        alert("评分不可为0");
+        alert("请先完成题目");//表单判断
+      } else if (this.rate == 0 || this.comment == '') {
+        alert("请填写评分及评价");
       } else {
         this.isRated = true;
-         var params = new URLSearchParams()
-        params.append("answers",this.answer)
-        params.append("studentId",localStorage.getItem('userID'))
-        params.append("chapterId",this.sid)
-        params.append('type',"review")
-        params.append('comment',this.comment)
-        params.append('rate',this.rate)
+        var params = new URLSearchParams();
+        params.append("answers", this.answer);
+        params.append("studentId", localStorage.getItem("userID"));
+        params.append("chapterId", this.sid);
+        params.append("type", "review");
+        params.append("comment", this.comment);
+        params.append("rate", this.rate);
         this.$axios
-          .post(
-            "http://10.60.38.173:8765/question/answerAll",
-           params,
-            {
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization:
-                  "Bearer "+localStorage.getItem("token")
-              }
+          .post("http://10.60.38.173:8765/question/answerAll", params, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: "Bearer " + localStorage.getItem("token")
             }
-          )
+          })
           .then(resp => {
             console.log(resp.data);
             console.log("rev submit success");
-            if(resp.data.state==1){
-              this.$message("提交成功")
+            if (resp.data.state == 1) {
+              this.$message("提交成功");
             }
           })
           .catch(err => {
@@ -415,7 +404,7 @@ export default {
 .test {
   color: #747a81;
 }
-.answer{
+.answer {
   color: red;
 }
 </style>

@@ -116,30 +116,40 @@ export default {
        this.$router.push({
         path: "preExercise",
         query: {
-          spevid: id,
-          courseIDs: this.courseID,
-          index:num
-        }
-      });
-      /* var length = store.state.score.length
-      if(num>length){
-      this.$router.push({
-        path: "preExercise",
-        query: {
           spreid: id,
           courseIDs: this.courseID,
           index:num
         }
       });
-      }else{
+    /*  var tempScore = store.state.score
+     var length =tempScore.length
+     var name = tempScore[num].chapterName
+     var isExist = false
+      for(var i=0;i<length;i++){
+        if(name==tempScore[i].chapterName) {
+          isExist = true
+          break
+        }
+      }
+      if(isExist && tempScore[num].studentChapter.totalScore_1 != null){
         this.$router.push({
-        path: "scoredPre",
+        path: "chapterDetail/scoredPre",
         query: {
           spreid: id,
           courseIDs: this.courseID,
           index:num
         }
       });
+      }else{ 
+        this.$router.push({
+        path: "chapterDetail/preExercise",
+        query: {
+          spreid: id,
+          courseIDs: this.courseID,
+          index:num
+        }
+      });
+        
       } */
     },
     rev(id,num) {

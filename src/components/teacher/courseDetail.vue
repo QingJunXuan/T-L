@@ -7,7 +7,7 @@
         </el-col>
       </el-row>
       <el-row>
-        <div style="line-height:150px">JAVA</div>
+        <div style="line-height:150px">{{courseName}}</div>
       </el-row>
       <el-row>
         <el-col :span="1" :offset="21">
@@ -92,12 +92,11 @@
   </div>
 </template>
 <script>
-let chapterNum = 0;
-let sectionNum = 0;
 export default {
   name: "tCourseDetail",
   data() {
     return {
+      courseName:'',
       number: 0, //章节号
       courseID: 1,
       classID: 1,
@@ -129,16 +128,34 @@ export default {
   created() {
     //获得课程目录
     this.getParams();
-    console.log(this.courseID);
-    const routerParams = this.$route.query.courseID;
-    this.courseID = routerParams;
-    console.log(this.courseID);
-
+    const routerParams1 = this.$route.query.courseID;
+    this.courseID = routerParams1;
+    //const routerParams2 = this.$route.query.courseName;
+    //this.courseName = routerParams2;
+    this.getCourseName();
     this.getChapterGraph();
     this.getNotice();
     this.getLesson();
   },
   methods: {
+    getCourseName(){///getCourseInfoByID
+    this.$axios
+        .get("http://10.60.38.173:8765/getCourseInfoByID", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          },
+          params: { courseID: this.courseID }
+        })
+        .then(resp => {
+          console.log(resp.data);
+          if (resp.data.state == 1) {
+            this.courseName = resp.data.data.courseName;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     getChapterGraph() {
       this.$axios
         .get("http://10.60.38.173:8765/getChapterRelationByCourseID", {
@@ -495,14 +512,9 @@ export default {
     },
     renderContent(h, { node, data, store }) {
       if (data.parentID == 0) {
-        chapterNum = chapterNum + 1;
-        sectionNum = 0;
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-              <span style="color:#000;font-size:15px">
-                {"第 " + chapterNum + " 章 "}&nbsp;
-              </span>
               <span>{node.label}</span>
             </span>
             <span>
@@ -527,11 +539,9 @@ export default {
           </span>
         );
       } else {
-        sectionNum = sectionNum + 1;
         return (
           <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
             <span>
-              <span>{chapterNum + "." + sectionNum}&nbsp;</span>
               <span>{node.label}</span>
             </span>
           </span>
@@ -580,7 +590,7 @@ body {
 }
 </style>
 
-<style scoped>
+<style>
 .courseBack {
   height: 240px;
   /* background-color: cadetblue; */

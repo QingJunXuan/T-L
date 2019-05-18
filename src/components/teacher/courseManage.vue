@@ -26,7 +26,7 @@
             <el-row class="top">
               <p
                 id="name"
-                @click="courseDetail(item.courseInfo.courseID, item.courseClass.id)"
+                @click="courseDetail(item.courseInfo.courseID, item.courseClass.id,item.courseInfo.courseName)"
                 style="cursor: pointer"
               >{{item.courseInfo.courseName+'('+item.courseClass.classNum+')'}}</p>
               <el-row>
@@ -118,12 +118,13 @@ export default {
         }
       });
     },
-    courseDetail: function(courseID, classID) {
+    courseDetail: function(courseID, classID,courseName) {
       this.$router.push({
         path: "/teacher/courseDetail",
         query: {
           courseID: courseID,
-          classID: classID
+          classID: classID,
+          courseName:courseName
         }
       });
     },

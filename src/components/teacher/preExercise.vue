@@ -60,8 +60,8 @@
 export default {
   data() {
     return {
-      tid:0,
-      havePre:false,
+      tid: 0,
+      havePre: false,
       type: 0,
       rate: 0,
       totalPoint: 0, //题目总分数
@@ -69,18 +69,17 @@ export default {
       exercises: []
     };
   },
-  mounted(){
-   this.getPre()
+  mounted() {
+    this.getPre();
   },
   methods: {
-     getPre() {
+    getPre() {
       const tid = this.$route.query.tpreid;
-      this.tid=tid
+      this.tid = tid;
       this.$axios
         .get("http://10.60.38.173:8765/question/view", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             chapterId: this.tid,
@@ -89,22 +88,24 @@ export default {
         })
         .then(resp => {
           console.log("pre", resp.data);
-          this.exercises = resp.data.data;
-          var length = this.exercises.length
-      if(length!=0){
-        this.havePre=true
-      }
-          this.setTotalPoint()
+          if (resp.data.state == 1) {
+            this.exercises = resp.data.data;
+            var length = this.exercises.length;
+            if (length != 0) {
+              this.havePre = true;
+              this.setTotalPoint();
+            }
+          }
         })
         .catch(err => {
           console.log(err);
         });
     },
-    setTotalPoint(){
-       for(var i=0;i<this.exercises.length;i++){
-        this.totalPoint += this.exercises[i].exercise.exercisePoint
+    setTotalPoint() {
+      for (var i = 0; i < this.exercises.length; i++) {
+        this.totalPoint += this.exercises[i].exercise.exercisePoint;
       }
-    },
+    }
   }
 };
 </script>

@@ -59,7 +59,6 @@
       <el-rate
         v-model="rate"
         :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-        :allow-half="half"
         style="margin-top:-5px;padding-bottom:10px"
       ></el-rate>
       <el-button size="mini" type="primary" @click="submit" round disabled>提 交</el-button>
@@ -71,13 +70,13 @@
   </div>
 </template>
 <script>
+import store from '../../store/store.js'
 export default {
   data() {
     return {
       time:null,
       haveRev:false,
       tid:0,
-      half: true,
       type: 0,
       rate: 0,
       totalPoint: 0, //题目总分数
@@ -121,7 +120,7 @@ export default {
           },
           params: {
             chapterId: tid,
-            type: "preview"
+            type: "review"
           }
         })
         .then(resp => {
@@ -130,9 +129,8 @@ export default {
           var length = this.exercises.length;
           if (length != 0) {
             this.haveRev = true;
+            this.setTotalPoint();
           }
-
-          this.setTotalPoint();
         })
         .catch(err => {
           console.log(err);
@@ -141,8 +139,4 @@ export default {
   }
 };
 </script>
-<style scoped>
-.test {
-  color: #747a81;
-}
-</style>
+

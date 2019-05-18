@@ -11,8 +11,20 @@
       v-for="(item, index) in exercises"
       :key="index"
     >
+      <pre>{{ index + 1 }}. {{ item.exercise.exerciseContent }}（{{item.exercise.exercisePoint}}分）</pre>
+      <span
+          v-for="j in item.exerciseChoiceList.length"
+          :key="j"
+          :value="j - 1"
+          :label="j - 1"
+          style="margin-left:10px"
+      >
+      <span :class="setAnswerClass(item.exercise.exerciseAnswer,String.fromCharCode(j + 64))">
+            {{ String.fromCharCode(j + 64) }}.
+            {{ item.exerciseChoiceList[j - 1].choice }}
+          </span>
+      </span>
       <p style="margin-left:5px">
-        <pre>{{ index + 1 }}. {{ item.exercise.exerciseContent }}（{{item.exercise.exercisePoint}}分）</pre>
         <span v-if="item.exercise.exerciseType === 1 || item.exercise.exerciseType === 2">
           <span style="font-size:12px;color:rgb(100,100,100)">
             你的选择：
@@ -26,18 +38,6 @@
           </span>
         </span>
       </p>
-        <span
-          v-for="j in item.exerciseChoiceList.length"
-          :key="j"
-          :value="j - 1"
-          :label="j - 1"
-          style="margin-left:10px"
-        >
-          <span :class="setAnswerClass(item.exercise.exerciseAnswer,String.fromCharCode(j + 64))">
-            {{ String.fromCharCode(j + 64) }}.
-            {{ item.exerciseChoiceList[j - 1].choice }}
-          </span>
-        </span>
       <div
         style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
       >
