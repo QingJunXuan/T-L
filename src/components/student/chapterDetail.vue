@@ -2,9 +2,8 @@
   <el-container>
     <el-aside style="width:25%">
       <el-menu
-        default-active="0-0"
+        default-active="1-1"
         style="height: 778px"
-        unique-opened
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
@@ -114,7 +113,15 @@ export default {
         });
     },
     pre(id,num) {
-      var length = store.state.score.length
+       this.$router.push({
+        path: "preExercise",
+        query: {
+          spevid: id,
+          courseIDs: this.courseID,
+          index:num
+        }
+      });
+      /* var length = store.state.score.length
       if(num>length){
       this.$router.push({
         path: "preExercise",
@@ -133,10 +140,18 @@ export default {
           index:num
         }
       });
-      }
+      } */
     },
     rev(id,num) {
-     var length = store.state.score.length
+       this.$router.push({
+        path: "revExercise",
+        query: {
+          srevid: id,
+          courseIDs: this.courseID,
+          index:num
+        }
+      });
+    /*  var length = store.state.score.length
       if(num>length){
       this.$router.push({
         path: "revExercise",
@@ -155,26 +170,19 @@ export default {
           index:num
         }
       });
-      }
+      } */
     },
   },
   watch: {
   '$route' (to,from) {
-      //对路由变化做出响应
-      console.log('有变化了') //测试点击路由的反应
-      //页面需要重新加载的地方
+      
+      console.log('有变化了') 
+      
+
   }
 },
   created() {
-    /* for (let i = 0; i < this.catalog.length; i++) {
-      this.chapterData.push({
-        key: i,
-        label: this.catalog[i].chapterName,
-        disabled: false
-      });
-    } */
     this.getCatalog();
-    //this.link()
   },
 };
 </script>

@@ -645,10 +645,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log(
-            this.allCourse[this.dataIndex - 1].courseName.courseNameID,
-            "nameid"
-          );
           console.log(resp.data, "resp.data");
           if (resp.data.state == 1) {
             this.dupCourse = resp.data.data;
@@ -1401,5 +1397,3 @@ export default {
   }
 };
 </script>
-<style scoped>
-</style>

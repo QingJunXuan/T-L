@@ -200,8 +200,10 @@ export default {
         //this.draw()
       }
     },
-    handleNodeClick(object) {
-      console.log(object, "node-object");
+    handleNodeClick(object,node,self) {
+			console.log("TCL: handleNodeClick -> self", self)
+			console.log("TCL: handleNodeClick -> node", node)
+			console.log("TCL: handleNodeClick -> object", object)
       if (object.parentID != 0) {
         this.$router.push({
           path: "chapterDetail/point",

@@ -1,9 +1,9 @@
 <template>
   <el-container>
-    <el-aside>
+    <el-aside style="width:25%">
       <el-menu
         default-active="0-0"
-        style="height: 100%; min-height: 700px"
+        style="height: 778px"
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
@@ -18,7 +18,7 @@
             <el-button type="text" @click="handleAddChapter" style="color: #fff">添加章节</el-button>
           </span>
         </el-menu-item>
-        <el-scrollbar wrap-style="height: calc(100vh - 150px)" :native="false">
+        <el-scrollbar wrap-style="height: calc(100vh - 150px);overflow-x: hidden;" :native="false">
           <el-submenu v-for="(item1,index1) in catalog" :index="index1.toString()" :key="index1">
             <template slot="title">
               <div style="float: left">
@@ -139,7 +139,7 @@
       </el-menu>
     </el-aside>
     <el-main>
-      <el-scrollbar wrap-style="height: calc(100vh - 150px)" :native="false">
+      <el-scrollbar wrap-style="height: calc(100vh - 150px);overflow-x: hidden;" :native="false">
         <router-view class="router-view"></router-view>
       </el-scrollbar>
       <el-dialog

@@ -37,7 +37,6 @@ export default {
           }
         })
         .then(resp => {
-          //this.tree = resp.data.data;
           console.log(this.chapterID, "chapterid");
           console.log(resp.data, "chapter content");
           if(resp.data.state==1){
@@ -50,15 +49,9 @@ export default {
   },
   watch: {
     $route(to, from) {
-      //对路由变化做出响应
-      console.log("有变化了");
-      //页面需要重新加载的地方
       this.getContent();
     }
   }
 };
 </script>
-<style scoped>
-</style>
-
 
