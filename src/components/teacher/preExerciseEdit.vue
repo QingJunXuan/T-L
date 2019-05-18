@@ -47,8 +47,8 @@
       <div v-for="(item1, i) in exercises" :key="i" align="start" class="exercises">
         <!-- 正常显示 -->
         <div v-if="item1.edit === false" :class="item1.delete? 'is-deleted' : ''">
-          <div style="margin-top: 8px">
-            <span style="font-size: 15px">{{item1.order}}. {{item1.question}}（{{item1.score}}分）</span>
+          <div class="title">
+            <pre>{{item1.order}}.（{{item1.score}}分）{{item1.question}}</pre>
           </div>
           <div
             class="betweenspace"
@@ -58,7 +58,7 @@
               <div :class="setAnswerClass(item1, j)">{{String.fromCharCode(j+65)}}.{{item2.content}}</div>
             </div>
           </div>
-          <div class="detail">{{item1.detail}}</div>
+          <div class="detail"><pre>{{item1.detail}}</pre></div>
           <div style="margin-top: 15px;" v-if="!item1.delete">
             <span>
               <!-- 进入编辑模式 -->
@@ -268,7 +268,7 @@ export default {
       id: 0,
       chapterInfo: {},
       courseID: 0,
-      teacherID: 202,
+      teacherID: localStorage.getItem('userID'),
       // 课前习题
       exercises: [
         {
@@ -1002,7 +1002,7 @@ export default {
         deadline = this.time;
       }
       let entity = {};
-      if (this.chapterInfo.exerciseVisible_2 === null) {
+      if (this.chapterInfo.exerciseVisible_2 === false) {
         entity = {
           id: this.chapterInfo.id,
           courseID: this.chapterInfo.courseID,
@@ -1217,12 +1217,32 @@ export default {
   padding: 10px 0 10px 0;
 }
 
+.exercises .title pre {
+  padding: 0;
+  margin: 0;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+}
+
 .exercises .detail {
   margin-top: 15px;
   background-color: #fcfcfc;
   min-height: 80px;
-  padding: 10px 15px 10px 15px;
+  padding: 15px 20px 15px 20px;
   font-size: 14px;
+}
+
+.exercises .detail pre {
+  padding: 0;
+  margin: 0;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
 }
 
 .is-deleted {

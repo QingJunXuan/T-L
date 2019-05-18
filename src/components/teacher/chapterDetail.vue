@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside  style="width:340px">
+    <el-aside style="width:340px">
       <el-menu
         default-active="0-0"
         style="height: 778px"
@@ -11,10 +11,11 @@
         v-loading="menuLoading"
         element-loading-background="rgba(0, 0, 0, 0.8)"
       >
-      <el-menu-item>
+        <el-menu-item>
           <span>
             <el-button type="text" @click="goBack">
-              <i class="el-icon-back" aria-setsize="100px" style="color:#fff"></i><span style="color:#fff">返 回</span>
+              <i class="el-icon-back" aria-setsize="100px" style="color:#fff"></i>
+              <span style="color:#fff">返 回</span>
             </el-button>
           </span>
         </el-menu-item>
@@ -31,7 +32,9 @@
                     class="router-link-active"
                   >
                     <el-menu-item :index="index1.toString() + index2">
-                      <span style="color:#ddd">{{(index1+1)+'.'+(index2+1)}}</span>&nbsp;<span>{{item2.contentName}}</span></el-menu-item>
+                      <span style="color:#ddd">{{(index1+1)+'.'+(index2+1)}}</span>&nbsp;
+                      <span>{{item2.contentName}}</span>
+                    </el-menu-item>
                   </router-link>
                 </el-col>
               </el-row>
@@ -67,9 +70,9 @@ export default {
       // 章节知识点列表
       catalog: [],
       chapterData: [],
-      courseID:0,
+      courseID: 0,
       updateChapterVisible: false,
-      tree:[],
+      tree: [],
       typeOptions: [],
       menuLoading: false
     };
@@ -77,11 +80,12 @@ export default {
   methods: {
     goBack() {
       this.$router.push({
-          path:"/teacher/courseDetail",
-          query:{
-            courseID:this.courseID}
-          });
-     /*  if (window.history.length <= 1) {
+        path: "/teacher/courseDetail",
+        query: {
+          courseID: this.courseID
+        }
+      });
+      /*  if (window.history.length <= 1) {
         this.$router.push({ path: "/" });
         return false;
       } else {
@@ -97,15 +101,14 @@ export default {
         this.chapterData[i].disabled = false;
       }
     },
-     getCatalog(){
-       this.menuLoading = true;
-       const routerParams = this.$route.query.courseIDt;
-       this.courseID = routerParams;
-       this.$axios
+    getCatalog() {
+      this.menuLoading = true;
+      const routerParams = this.$route.query.courseIDt;
+      this.courseID = routerParams;
+      this.$axios
         .get("http://10.60.38.173:8765/getCourseCatalog", {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
             courseID: this.courseID
@@ -114,20 +117,20 @@ export default {
         .then(resp => {
           this.tree = resp.data.data;
           this.menuLoading = false;
-          console.log(resp.data,"resp.data");
-          console.log(this.courseID,"courseID");
+          console.log(resp.data, "resp.data");
+          console.log(this.courseID, "courseID");
         })
         .catch(err => {
           console.log(err);
         });
-    }, 
+    }
   },
   watch: {
-  '$route' (to,from) {
+    $route(to, from) {
       //对路由变化做出响应
-      console.log('有变化了') //测试点击路由的反应
+      console.log("有变化了"); //测试点击路由的反应
       //页面需要重新加载的地方
-  }
+    }
   },
   created() {
     /* for (let i = 0; i < this.catalog.length; i++) {
@@ -137,7 +140,7 @@ export default {
         disabled: false
       });
     } */
-    this.getCatalog()
+    this.getCatalog();
   }
 };
 </script>

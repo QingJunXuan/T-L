@@ -308,7 +308,7 @@
                               <div class="notice">{{item.positive}}人赞赏</div>
                             </el-col>
                             <el-col :span="14" align="center">
-                              <vs-bar :percentage="item.percentage" :width="90"></vs-bar>
+                              <vs-bar :percentage="item.percentage" :studentNum="item.num" :width="90"></vs-bar>
                             </el-col>
                             <el-col :span="5" align="start">
                               <div class="notice">{{item.negative}}人吐槽</div>
@@ -340,9 +340,8 @@ export default {
     return {
       // 传值
       courseID: 0,
-      // TODO: 本地存teacherID
-      teacherID: 203,
-      teacherName: "古唏",
+      teacherID: localStorage.getItem("userID"),
+      teacherName: localStorage.getItem("name"),
       activeNames: ["1"],
       courseGrade: 0,
       courseAmountBoy: 0,
@@ -506,7 +505,8 @@ export default {
           rate: 0,
           positive: "-",
           negative: "-",
-          percentage: 0
+          percentage: 0,
+          num: 0
         }
       ],
       commentLoading: false,
@@ -875,7 +875,8 @@ export default {
                     ),
                     percentage: 0,
                     positive: "-",
-                    negative: "-"
+                    negative: "-",
+                    num: 0
                   });
                   i++;
                 }
@@ -930,11 +931,19 @@ export default {
                     this.classInfo[j].classNum ===
                     classList.data.classInfo[i].classNum
                   ) {
-                    this.classInfo[j].percentage = Math.round(
-                      (Number(classList.data.classInfo[i].classPositiveNum) /
-                        Number(classList.data.classInfo[i].classStudentNum)) *
-                        100
-                    );
+                    this.classInfo[j].num = Number(
+                        classList.data.classInfo[i].classPositiveNum +
+                          classList.data.classInfo[i].classNegativeNum
+                      );
+                    if ( this.classInfo[j].num
+                       !== 0
+                    ) {
+                      this.classInfo[j].percentage = Math.round(
+                        Number(classList.data.classInfo[i].classPositiveNum) /
+                          this.classInfo[j].num *
+                          100
+                      );
+                    }
                     this.classInfo[j].positive =
                       classList.data.classInfo[i].classPositiveNum;
                     this.classInfo[j].negative =
@@ -983,7 +992,8 @@ export default {
                     ),
                     percentage: 0,
                     positive: "-",
-                    negative: "-"
+                    negative: "-",
+                    num: 0
                   });
                   i++;
                 }
@@ -1037,11 +1047,19 @@ export default {
                     this.classInfo[j].classNum ===
                     classList.data.classInfo[i].classNum
                   ) {
-                    this.classInfo[j].percentage = Math.round(
-                      (Number(classList.data.classInfo[i].classPositiveNum) /
-                        Number(classList.data.classInfo[i].classStudentNum)) *
-                        100
-                    );
+                    this.classInfo[j].num = Number(
+                        classList.data.classInfo[i].classPositiveNum +
+                          classList.data.classInfo[i].classNegativeNum
+                      )
+                    if (this.classInfo[j].num
+                       !== 0
+                    ) {
+                      this.classInfo[j].percentage = Math.round(
+                        Number(classList.data.classInfo[i].classPositiveNum) /
+                          this.classInfo[j].num *
+                          100
+                      );
+                    }
                     this.classInfo[j].positive =
                       classList.data.classInfo[i].classPositiveNum;
                     this.classInfo[j].negative =
@@ -1792,7 +1810,8 @@ export default {
             rate: 0,
             positive: "-",
             negative: "-",
-            percentage: 0
+            percentage: 0,
+            num: 0
           }
         ];
         this.getClassInfo();
@@ -1804,7 +1823,8 @@ export default {
             rate: 0,
             positive: "-",
             negative: "-",
-            percentage: 0
+            percentage: 0,
+            num: 0
           }
         ];
         this.getChapterClassInfo(this.chapterOptions[this.chapterSettings].id);

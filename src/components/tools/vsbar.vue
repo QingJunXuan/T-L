@@ -15,6 +15,12 @@ export default {
       default: 100,
       validator: val => val >= 0
     },
+    studentNum: {
+      type: Number,
+      defalut: 0,
+      required: true,
+      validator: val => val >= 0
+    },
     color: {
       type: String,
       default: "#FF99EB"
@@ -42,7 +48,7 @@ export default {
     minusStyle() {
       const style = {};
       style.backgroundColor = "#adecfc";
-      if (this.percentage === 0) {
+      if (this.studentNum === 0) {
         style.width = "0";
       } else {
         var negativePercentage = 100 - this.percentage;

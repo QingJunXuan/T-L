@@ -19,7 +19,7 @@
             <el-button type="text" @click="handleAddChapter" style="color: #fff">添加章节</el-button>
           </span>
         </el-menu-item>
-        <el-scrollbar wrap-style="height: calc(100vh - 150px);overflow-x: hidden;" :native="false">
+        <el-scrollbar wrap-style="height: calc(76vh);overflow-x: hidden;" :native="false">
           <el-submenu v-for="(item1,index1) in catalog" :index="index1.toString()" :key="index1">
             <template slot="title">
               <div style="float: left">
@@ -37,7 +37,12 @@
             <div>
               <el-menu-item :index="index1.toString() + '001'">
                 <span>
-                  <el-button type="text" @click="handleAddPoint(index1)" style="color: #fff" :disabled="pointButton">添加知识点</el-button>
+                  <el-button
+                    type="text"
+                    @click="handleAddPoint(index1)"
+                    style="color: #fff"
+                    :disabled="pointButton"
+                  >添加知识点</el-button>
                 </span>
               </el-menu-item>
               <div v-for="(item2, index2) in item1.points" :key="index1*10+index2">
@@ -85,12 +90,7 @@
                     ></el-button>
                   </el-col>
                   <el-col :span="5">
-                    <el-input
-                      v-model="newPoint.order"
-                      size="small"
-                      style="width: 100%"
-                      type="number"
-                    ></el-input>
+                    <el-input v-model="newPoint.order" size="small" style="width: 100%"></el-input>
                   </el-col>
                   <el-col :span="13">
                     <el-input v-model="newPoint.name" size="small" style="width: 90%"></el-input>
@@ -126,22 +126,19 @@
             </div>
           </el-submenu>
         </el-scrollbar>
-        <div class="exit">
-          <span>
-            <el-button
-              type="primary"
-              style="background-color: #545c64;border-color: #545c64;width: 100%"
-              @click="goBack"
-            >
-              <i class="el-icon-arrow-left" style="margin-right: 6px"></i>退出编辑
+        <el-menu-item index="888">
+          <div>
+            <el-button type="text" style="color: #fff" @click="goBack">
+              <i class="el-icon-arrow-left" style="margin-right: 6px"></i>
+              <span style="margin-top: 2px">退出编辑</span>
             </el-button>
-          </span>
-        </div>
+          </div>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-main>
-      <el-scrollbar wrap-style="height: calc(100vh - 150px);overflow-x: hidden;" :native="false">
-        <router-view class="router-view"></router-view>
+      <el-scrollbar wrap-style="height: calc(76vh);overflow-x: hidden;" :native="false">
+        <router-view class="router-view" :key="activeDate"></router-view>
       </el-scrollbar>
       <el-dialog
         :visible.sync="updateChapterVisible"
@@ -221,7 +218,7 @@ export default {
   data() {
     return {
       courseID: 0,
-      teacherID: 203,
+      teacherID: localStorage.getItem('userID'),
       classID: 0,
       // 章节知识点列表
       catalog: [
@@ -260,6 +257,8 @@ export default {
       importLoading: false,
       menuLoading: false,
       pointButton: false,
+      activeDate: "",
+      activeIndex: "0-0"
     };
   },
   methods: {
@@ -347,6 +346,16 @@ export default {
               if (alter === true) {
                 this.insertChapter();
               }
+              this.activeIndex = "0-0";
+              this.$router.push({
+                path: "/teacher/chapterEdit",
+                query: {
+                  id: this.courseID,
+                  classID: this.classID
+                }
+              });
+              let date = new Date();
+              this.activeDate = date.getTime().toString();
               this.getRelation();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -522,30 +531,31 @@ export default {
     resetEdit() {
       if (this.chapterForm.new) {
         this.chapterForm = {
-        index: this.catalog.length,
-        order: '0',
-        name: '',
-        predecessor: [],
-        descendant: [],
-        new: true
-        }
-      }
-      else {
-        let end = this.catalog[this.chapterForm.index].chapterName.indexOf("章");
+          index: this.catalog.length,
+          order: "0",
+          name: "",
+          predecessor: [],
+          descendant: [],
+          new: true
+        };
+      } else {
+        let end = this.catalog[this.chapterForm.index].chapterName.indexOf(
+          "章"
+        );
         let temp = {
-        index: this.chapterForm.index,
-        order: this.catalog[this.chapterForm.index].chapterName.substring(
-          1,
-          end
-        ),
-        name: this.catalog[this.chapterForm.index].chapterName.substring(
-          end + 2
-        ),
-        predecessor: this.catalog[this.chapterForm.index].predecessor,
-        descendant: this.catalog[this.chapterForm.index].descendant,
-        new: false
-      };
-      this.chapterForm = temp;
+          index: this.chapterForm.index,
+          order: this.catalog[this.chapterForm.index].chapterName.substring(
+            1,
+            end
+          ),
+          name: this.catalog[this.chapterForm.index].chapterName.substring(
+            end + 2
+          ),
+          predecessor: this.catalog[this.chapterForm.index].predecessor,
+          descendant: this.catalog[this.chapterForm.index].descendant,
+          new: false
+        };
+        this.chapterForm = temp;
       }
     },
     handleChapterClose() {
@@ -1165,7 +1175,7 @@ export default {
                   this.submitLoading = false;
                   return;
                 }
-              ); 
+              );
           }
           this.deleteChapterRelation(this.catalog[index]);
           this.$http
@@ -1185,7 +1195,7 @@ export default {
                     message: "已删除章节!"
                   });
                   this.menuLoading = false;
-                  location.reload();
+                  this.getCatalog();
                 } else {
                   this.$message({ type: "error", message: "删除失败!" });
                   this.menuLoading = false;
@@ -1442,10 +1452,8 @@ export default {
       this.pointButton = false;
     },
     submitEdit(item1, item2, index) {
-      if (
-        Number(this.newPoint.order) <= 0 ||
-        Number(this.newPoint.order) === NaN
-      ) {
+      let reg = /^([1-9][0-9]*)+(\.[0-9]*)*(\*)?$/;
+      if (!reg.test(this.newPoint.order)) {
         this.$message({ type: "warning", message: "请正确填写知识点序号!" });
         return;
       }
@@ -1569,6 +1577,8 @@ export default {
   created() {
     this.courseID = this.$route.query.id;
     this.classID = this.$route.query.classID;
+    let date = new Date();
+    this.activeDate = date.getTime().toString();
     this.getCatalog();
     this.getCourses();
     bus.$on("reloadCatalog", val => this.getData(val));
@@ -1593,9 +1603,6 @@ a {
 }
 
 .exit {
-  position: absolute;
-  bottom: 5px;
-  left: 0;
   width: 100%;
 }
 

@@ -282,14 +282,17 @@ export default {
                 setTimeout(function() {
                   switch (response.data.data.role) {
                     case "学生": {
+                      localStorage.setItem("role", 0);
                       that.$router.push("/student");
                       break;
                     }
                     case "教师": {
+                      localStorage.setItem("role", 1);
                       that.$router.push("/teacher");
                       break;
                     }
                     case "管理员": {
+                      localStorage.setItem("role", 777);
                       that.$router.push("/adminManage");
                       break;
                     }

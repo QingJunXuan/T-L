@@ -14,10 +14,8 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
-            <span
-              v-if="item.exercise.exerciseType===2"
-            >（多选）</span>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. <span v-if="item.exercise.exerciseType===2">（多选）</span>（{{item.exercise.exercisePoint}}分）{{item.exercise.exerciseContent}}
+            </pre>
           </p>
           <!-- 单选 -->
           <el-form-item
@@ -30,12 +28,13 @@
     ]"
           >
             <el-radio-group v-model="answer[index]">
-              <el-radio
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+              <div 
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              style="margin-top: 10px"
+              >
+                <el-radio :value="i - 1" :label="i - 1">{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+              </div>
             </el-radio-group>
           </el-form-item>
           <!-- 多选 -->
@@ -48,12 +47,12 @@
     ]"
           >
             <el-checkbox-group v-model="answer[index]">
-              <el-checkbox
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+              <div 
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              >
+                <el-checkbox :value="i - 1" :label="i - 1">{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+              </div>
             </el-checkbox-group>
           </el-form-item>
         </div>

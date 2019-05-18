@@ -64,12 +64,12 @@
               </div>
               <div v-show="isGraph==false">
                 <el-tree
-                :data="tree"
-                :props="defaultProps"
-                @node-click="handleNodeClick"
-                default-expand-all
-                :expand-on-click-node="false"
-                :render-content="renderContent"
+                  :data="tree"
+                  :props="defaultProps"
+                  @node-click="handleNodeClick"
+                  default-expand-all
+                  :expand-on-click-node="false"
+                  :render-content="renderContent"
                 ></el-tree>
               </div>
             </el-col>
@@ -103,7 +103,7 @@ export default {
       isNotice: false,
       isLesson: true,
       isGrade: false,
-      isGraph:true,
+      isGraph: true,
       notice: "Java是一门面向对象编程语言.",
       textarea: "添加/修改课程介绍",
       //data: null,
@@ -122,7 +122,7 @@ export default {
         label: "contentName"
       },
       graphTree: [],
-      tree:[],
+      tree: []
     };
   },
   created() {
@@ -246,10 +246,10 @@ export default {
           console.log(err);
         });
     },
-    changeLesson(){
-      if(this.isGraph==true) this.isGraph=false
+    changeLesson() {
+      if (this.isGraph == true) this.isGraph = false;
       else {
-        this.isGraph=true
+        this.isGraph = true;
         //this.draw()
       }
     },
@@ -317,13 +317,13 @@ export default {
     courseBack() {
       this.$router.push({ path: "/teacher/courseManagement" });
     },
-   init() {
+    init() {
       // 计算节点位置
       let nodes = this.graphTree.map(i => [
         i.chapterNode.contentName,
         { level: 0, subChapter: i.subChapterNodes.map(k => k.contentName) }
       ]);
-			console.log("TCL: init -> nodes", this.graphTree, nodes)
+      console.log("TCL: init -> nodes", this.graphTree, nodes);
       for (let j = 0; j < nodes.length; j++) {
         let curr = nodes[j][1];
         if (curr.subChapter.length) {
@@ -331,7 +331,12 @@ export default {
             let findIndex = nodes.findIndex(node => node[0] === p);
             nodes[findIndex] = [
               nodes[findIndex][0],
-              Object.assign({}, nodes[findIndex][1], { level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1 })
+              Object.assign({}, nodes[findIndex][1], {
+                level:
+                  nodes[findIndex][1].level > curr.level
+                    ? nodes[findIndex][1].level
+                    : curr.level + 1
+              })
             ];
           });
         }
@@ -346,16 +351,16 @@ export default {
       });
 
       let data = [];
-      var width=3600;
-      var init=0;
+      var width = 3600;
+      var init = 0;
 
       for (let item of tempData.entries()) {
-        var num=item[1].length
-        init=1800/num
+        var num = item[1].length;
+        init = 1800 / num;
         item[1].forEach((value, index) => {
           let addData = {
             name: value,
-            x: Math.round(init+(width / num) * index),
+            x: Math.round(init + (width / num) * index),
             y: (parseInt(item[0]) + 1) * 350
           };
           data.push(addData);
@@ -430,24 +435,25 @@ export default {
           {
             type: "graph",
             layout: "none",
-            top:30,
+            top: 30,
             symbolSize: 20,
             color: "#ec7814",
             roam: true,
-            itemStyle:{
-              normal:{
+            itemStyle: {
+              normal: {
                 color: "#ec7814",
                 //opacity:0.8,
-                label:{
-                  show:true,
-                  fontSize:12,
+                label: {
+                  show: true,
+                  fontSize: 12,
                   //color: '#000',
-                  formatter:function(val){   
+                  formatter: function(val) {
                     //让series 中的文字进行换行
-                    if(val.name.indexOf("、")!= -1)
-                      return val.name.split("、").join("\n")
-                    else  return val.name.split(" ").join("\n");}
+                    if (val.name.indexOf("、") != -1)
+                      return val.name.split("、").join("\n");
+                    else return val.name.split(" ").join("\n");
                   }
+                }
               }
             },
             edgeSymbol: ["circle", "arrow"],
@@ -474,34 +480,35 @@ export default {
       };
       myChart.setOption(option);
       var that = this;
-      let focusNum=0;
+      let focusNum = 0;
       myChart.on("click", function(params) {
-
         focusNum++;
         if (params.dataType == "edge") {
           that.dataIndex = params.dataIndex;
           //显示边
-          var value = that.links[that.dataIndex].label.normal.show
-            if (value == false) {
-                that.links[that.dataIndex].label.normal.show = true
-            } else {
-                that.links[that.dataIndex].label.normal.show = false
-            }
+          var value = that.links[that.dataIndex].label.normal.show;
+          if (value == false) {
+            that.links[that.dataIndex].label.normal.show = true;
+          } else {
+            that.links[that.dataIndex].label.normal.show = false;
+          }
           myChart.setOption(option);
         } else if (params.dataType == "node") {
-           if(focusNum%2==1){//点击高亮
+          if (focusNum % 2 == 1) {
+            //点击高亮
             that.myChart.dispatchAction({
               type: "focusNodeAdjacency",
               // 使用 dataIndex 来定位节点。
               dataIndex: params.dataIndex
-              });
-          }else if(focusNum%2==0){//再次点击取消高亮
-            that.myChart.dispatchAction({
-            type: "unfocusNodeAdjacency",
-            // 使用 seriesId 或 seriesIndex 或 seriesName 来定位 series.
-            seriesIndex: params.seriesIndex
             });
-          } 
+          } else if (focusNum % 2 == 0) {
+            //再次点击取消高亮
+            that.myChart.dispatchAction({
+              type: "unfocusNodeAdjacency",
+              // 使用 seriesId 或 seriesIndex 或 seriesName 来定位 series.
+              seriesIndex: params.seriesIndex
+            });
+          }
         }
       });
       //取消右键的弹出菜单

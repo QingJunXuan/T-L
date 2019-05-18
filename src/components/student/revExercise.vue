@@ -38,12 +38,13 @@
     ]"
           >
             <el-radio-group v-model="answer[index]">
-              <el-radio
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+              <div 
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              style="margin-top: 10px"
+              >
+                <el-radio :label="i - 1" :value="i - 1">{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+              </div>
             </el-radio-group>
           </el-form-item>
           <!-- 多选 -->
@@ -56,12 +57,12 @@
     ]"
           >
             <el-checkbox-group v-model="answer[index]">
-              <el-checkbox
-                v-for="i in item.exerciseChoiceList.length"
-                :key="i"
-                :value="i - 1"
-                :label="i - 1"
-              >{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+              <div 
+              v-for="i in item.exerciseChoiceList.length"
+              :key="i"
+              >
+                <el-checkbox :value="i - 1" :label="i - 1">{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+              </div>
             </el-checkbox-group>
           </el-form-item>
           <!-- 主观 -->

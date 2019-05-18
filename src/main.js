@@ -16,15 +16,36 @@ Vue.prototype.$axios = axios
 Vue.prototype.$echarts = echarts
 Vue.config.productionTip = false
 
-/* router.beforeEach((to, from, next) => {
+router.beforeEach((to, from, next) => {
   let user = localStorage.getItem('username')
   if (!user && to.path !== '/home') {
-    next({path: '/home'})
+    next({ path: '/home' })
+  }
+  else if (user && to.path === '/home') {
+    let role = localStorage.getItem('role')
+    switch (role) {
+      case '0': {
+        next({ path: '/student' });
+        break;
+      }
+      case '1': {
+        next({ path: '/teacher' });
+        break;
+      }
+      case '777': {
+        next({ path: '/adminManage' });
+        break;
+      }
+      default: {
+        next();
+        break;
+      }
+    }
   }
   else {
     next()
   }
-}) */
+})
 Vue.http.options.emulateJSON = true
 
 // Vue.http.options.emulateHTTP = true

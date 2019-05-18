@@ -12,7 +12,7 @@
           <el-col :span="4">
             <el-form-item>
               <span>{{chapterOrder}}</span>
-              <el-input v-model="pointForm.order" style="width: 70%" type="number"></el-input>
+              <el-input v-model="pointForm.order" style="width: 70%"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="20">
@@ -61,10 +61,12 @@ export default {
   methods: {
     getParams() {
       this.item = this.$route.query.item;
+      this.getContents();
     },
     getContents() {
       this.pointContent = "";
       this.pointForm = {
+        order: "0",
         title: "",
         content: ""
       };
@@ -118,7 +120,8 @@ export default {
       }
     },
     save() {
-      if (Number(this.pointForm.order) === NaN || Number(this.pointForm.order) < 1) {
+      let reg = /^([1-9][0-9]*)+(\.[0-9]*)*(\*)?$/;
+      if (!reg.test(this.pointForm.order)) {
         this.$message({type: 'warning', message: '请输入正确的知识点序号!'});
         return;
       }
@@ -166,7 +169,6 @@ export default {
   },
   created() {
     this.getParams();
-    this.getContents();
   },
   mounted() {
     this.editor.customConfig.menus = [

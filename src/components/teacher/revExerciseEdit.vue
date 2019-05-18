@@ -48,8 +48,8 @@
       <div v-for="(item1, i) in exercisesObj" :key="100+i" align="start" class="exercises">
         <!-- 正常显示 -->
         <div v-if="item1.edit === false" :class="item1.delete? 'is-deleted' : ''">
-          <div>
-            <span style="font-size: 15px">{{item1.order}}. {{item1.question}}（{{item1.score}}分）</span>
+          <div class="title">
+            <pre>{{item1.order}}.（{{item1.score}}分）{{item1.question}}</pre>
           </div>
           <div
             class="betweenspace"
@@ -59,7 +59,7 @@
               <div :class="setAnswerClass(item1, j)">{{String.fromCharCode(j+65)}}.{{item2.content}}</div>
             </div>
           </div>
-          <div class="detail">{{item1.detail}}</div>
+          <div class="detail"><pre>{{item1.detail}}</pre></div>
           <div style="margin-top: 15px;" v-if="!item1.delete">
             <span>
               <!-- 进入编辑模式 -->
@@ -199,9 +199,23 @@
           </div>
           <!-- 按键 -->
           <div style="margin-top: 20px">
-            <el-button size="mini" @click="saveObject(i)">确认</el-button>
-            <el-button size="mini" style="margin-left: 10px" @click="resetObject(i)">重置</el-button>
-            <el-button size="mini" style="margin-left: 10px" @click="cancelObj(i)">取消</el-button>
+            <el-button size="mini" @click="saveObject(i)" type="primary" round plain>确认</el-button>
+            <el-button
+              size="mini"
+              style="margin-left: 10px"
+              @click="resetObject(i)"
+              type="primary"
+              round
+              plain
+            >重置</el-button>
+            <el-button
+              size="mini"
+              style="margin-left: 10px"
+              @click="cancelObj(i)"
+              type="primary"
+              round
+              plain
+            >取消</el-button>
           </div>
         </div>
       </div>
@@ -228,11 +242,11 @@
         class="exercises"
       >
         <div v-if="item.edit === false" :class="item.delete? 'is-deleted' : ''">
-          <div>
-            <span style="font-size: 15px">{{item.order}}.{{item.question}}（{{item.score}}分）</span>
+          <div class="title">
+            <pre>{{item.order}}.（{{item.score}}分）{{item.question}}</pre>
           </div>
-          <div class="answer-text">{{item.answer}}</div>
-          <div class="detail">{{item.detail}}</div>
+          <div class="answer-text"><pre>{{item.answer}}</pre></div>
+          <div class="detail"><pre>{{item.detail}}</pre></div>
           <div style="margin-top: 15px;" v-if="!item.delete">
             <span>
               <!-- 进入编辑模式 -->
@@ -321,9 +335,15 @@
             ></el-input>
           </div>
           <div style="margin-top: 20px">
-            <el-button size="mini" @click="saveSubject(i)">确认</el-button>
-            <el-button size="mini" style="margin-left: 10px" @click="resetSubject(i)">重置</el-button>
-            <el-button size="mini" style="margin-left: 10px" @click="cancelSub(i)">取消</el-button>
+            <el-button size="mini" @click="saveSubject(i)" type="primary"
+              round
+              plain>确认</el-button>
+            <el-button size="mini" style="margin-left: 10px" @click="resetSubject(i)" type="primary"
+              round
+              plain>重置</el-button>
+            <el-button size="mini" style="margin-left: 10px" @click="cancelSub(i)" type="primary"
+              round
+              plain>取消</el-button>
           </div>
         </div>
       </div>
@@ -340,9 +360,13 @@
         </el-button>
       </div>
       <div align="center" style="margin-top: 20px">
-        <el-button type="success"
+        <el-button
+          type="success"
           plain
-          class="edit-button" @click="selectHistoryVisible = true" size="small">导入</el-button>
+          class="edit-button"
+          @click="selectHistoryVisible = true"
+          size="small"
+        >导入</el-button>
         <el-button
           type="success"
           plain
@@ -352,7 +376,12 @@
           :disabled="funcButton"
           size="small"
         >保存</el-button>
-        <el-button type="success" @click="dialogTableVisible = true" :disabled="funcButton" size="small">发布</el-button>
+        <el-button
+          type="success"
+          @click="dialogTableVisible = true"
+          :disabled="funcButton"
+          size="small"
+        >发布</el-button>
         <el-button type="info" @click="getRevExercises" :disabled="funcButton" size="small">重置</el-button>
       </div>
     </div>
@@ -367,7 +396,7 @@ export default {
       id: 0,
       chapterInfo: {},
       courseID: 0,
-      teacherID: 202,
+      teacherID: localStorage.getItem('userID'),
       // 课后习题
       exercisesObj: [
         {
@@ -471,7 +500,9 @@ export default {
       this.$http
         .get(
           // 传值chapterid
-          "http://10.60.38.173:8765/question/view?chapterId=" + this.id + "&type=review",
+          "http://10.60.38.173:8765/question/view?chapterId=" +
+            this.id +
+            "&type=review",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -1132,9 +1163,9 @@ export default {
         chapterId: this.id,
         exerciseType: this.exercisesObj[index].type,
         exerciseNumber: this.exercisesObj[index].order,
-        exerciseContent: this.exercisesObj[index].question,
+        exerciseContent: this.exercisesObj[index].question.replace(/<br\/>/g, '\n'),
         exerciseAnswer: ans,
-        exerciseAnalysis: this.exercisesObj[index].detail,
+        exerciseAnalysis: this.exercisesObj[index].detail.replace(/<br\/>/g, '\n'),
         exercisePoint: this.exercisesObj[index].score
       };
       this.$http
@@ -1169,9 +1200,9 @@ export default {
         chapterId: this.id,
         exerciseType: 6,
         exerciseNumber: this.exercisesSub[index].order,
-        exerciseContent: this.exercisesSub[index].question,
-        exerciseAnswer: this.exercisesSub[index].answer,
-        exerciseAnalysis: this.exercisesSub[index].detail,
+        exerciseContent: this.exercisesSub[index].question.replace(/<br\/>/g, '\n'),
+        exerciseAnswer: this.exercisesSub[index].answer.replace(/<br\/>/g, '\n'),
+        exerciseAnalysis: this.exercisesSub[index].detail.replace(/<br\/>/g, '\n'),
         exercisePoint: this.exercisesSub[index].score
       };
       this.$http
@@ -1267,11 +1298,15 @@ export default {
         exercisePoint: this.exercisesObj[index].score
       };
       this.$http
-        .post("http://10.60.38.173:8765/question/alterExercise", exerciseEntity, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .post(
+          "http://10.60.38.173:8765/question/alterExercise",
+          exerciseEntity,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -1297,11 +1332,15 @@ export default {
         exercisePoint: this.exercisesSub[index].score
       };
       this.$http
-        .post("http://10.60.38.173:8765/question/alterExercise", exerciseEntity, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .post(
+          "http://10.60.38.173:8765/question/alterExercise",
+          exerciseEntity,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -1423,7 +1462,7 @@ export default {
         deadline = this.time;
       }
       let entity = {};
-      if (this.chapterInfo.exerciseVisible_1 === null) {
+      if (this.chapterInfo.exerciseVisible_1 === false) {
         entity = {
           id: this.chapterInfo.id,
           courseID: this.chapterInfo.courseID,
@@ -1460,15 +1499,11 @@ export default {
         };
       }
       this.$http
-        .post(
-          "http://10.60.38.173:8765/alertChapter",
-          entity,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token")
-            }
+        .post("http://10.60.38.173:8765/alertChapter", entity, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
+        })
         .then(
           response => {
             if (response.status === 200) {
@@ -1677,6 +1712,16 @@ export default {
   padding: 10px 0 10px 0;
 }
 
+.exercises .title pre {
+  padding: 0;
+  margin: 0;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+}
+
 .exercises .answer-text {
   border: 1px solid #dcdcdc;
   min-height: 80px;
@@ -1685,12 +1730,32 @@ export default {
   font-size: 14px;
 }
 
+.exercises .answer-text pre {
+  padding: 0;
+  margin: 0;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+}
+
 .exercises .detail {
   margin-top: 15px;
   background-color: #fcfcfc;
   min-height: 80px;
-  padding: 10px 15px 10px 15px;
+  padding: 15px 20px 15px 20px;
   font-size: 14px;
+}
+
+.exercises .detail pre {
+  padding: 0;
+  margin: 0;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
 }
 
 .is-deleted {

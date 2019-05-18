@@ -75,6 +75,7 @@ export default {
           localStorage.removeItem("userID");
           localStorage.removeItem("name");
           localStorage.removeItem("workID");
+          localStorage.removeItem("role");
           this.isLogin = false;
           let date = new Date();
           this.activeDate = date.getTime().toString();

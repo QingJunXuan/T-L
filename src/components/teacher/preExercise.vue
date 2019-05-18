@@ -14,7 +14,8 @@
         <p
           style="margin-left:5px"
         >
-        <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. <span v-if="item.exercise.exerciseType===2">（多选）</span>（{{item.exercise.exercisePoint}}分）{{item.exercise.exerciseContent}}
+        </pre>
         </p>
         <!-- 单选 -->
         <el-form-item
@@ -22,23 +23,24 @@
           v-if="item.exercise.exerciseType===1"
         >
           <el-radio-group>
-            <el-radio
+            <div 
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
-              :value="i - 1"
-              :label="i - 1"
-            >{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+              style="margin-top: 10px"
+              >
+              <el-radio :value="i - 1" :label="i - 1">{{String.fromCharCode(i+64)}}. {{item.exerciseChoiceList[i-1].choice}}</el-radio>
+            </div>
           </el-radio-group>
         </el-form-item>
         <!-- 多选 -->
         <el-form-item style="margin-left: 10px" v-else-if="item.exercise.exerciseType===2">
           <el-checkbox-group>
-            <el-checkbox
+            <div 
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
-              :value="i - 1"
-              :label="i - 1"
-            >{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+              >
+              <el-checkbox :value="i - 1" :label="i - 1">{{String.fromCharCode(i+64)}}.{{item.exerciseChoiceList[i-1].choice}}</el-checkbox>
+            </div>
           </el-checkbox-group>
         </el-form-item>
          <!-- 主观 -->
