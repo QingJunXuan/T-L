@@ -27,6 +27,7 @@
               <p
                 id="name"
                 @click="courseDetail(item.courseInfo.courseID, item.courseClass.id)"
+                style="cursor: pointer"
               >{{item.courseInfo.courseName+'('+item.courseClass.classNum+')'}}</p>
               <el-row>
                 <el-col :span="5" :offset="18" style="margin-top:0px">

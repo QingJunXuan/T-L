@@ -22,7 +22,7 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===5"
             >（多选）</span>
@@ -66,7 +66,7 @@
           </el-form-item>
           <!-- 主观 -->
           <el-form-item
-            style="margin-left: 10px"
+            style="margin-left: 10px;"
             v-else-if="item.exercise.exerciseType===6"
             :prop="index.toString()"
             :rules="[
@@ -83,13 +83,13 @@
       </el-form>
       <div v-show="after">
         <div
-          style="margin-top:15px;font-size:14px;padding-bottom:10px"
+          style="margin-top:15px;font-size:14px;padding-bottom:10px;"
           align="start"
           v-for="(item,index) in exercises"
           :key="index"
         >
-          <p style="margin-left:5px">
-            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
+          <p style="margin-left:5px;">
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===4 || item.exercise.exerciseType ===5"
             >
@@ -143,7 +143,7 @@
           <div
             v-show="isRated"
             style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-          >解析：<pre>{{item.exercise.exerciseAnalysis}}</pre></div>
+          >解析：<pre style="white-space: pre-wrap; word-wrap: break-word;">{{item.exercise.exerciseAnalysis}}</pre></div>
         </div>
       </div>
       <div v-if="isRated==false" style="border:1px solid #ddd;height:200px">

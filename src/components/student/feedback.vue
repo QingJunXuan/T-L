@@ -36,7 +36,7 @@ export default {
       courseClassID:0,
       rate: null,
       textarea: "",
-      half:true,
+      half:false,
     };
   },
   methods: {

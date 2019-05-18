@@ -4,17 +4,26 @@
       <el-form
         :model="pointForm"
         status-icon
-        :rules="pointRules"
-        ref="pointForm"
-        label-width="100px"
-        label-position="top"
+        label-width="0"
         align="start"
-        style="width: 100%; padding-left: 20%"
+        style="width: 100%; padding-left: 20%; padding-top: 40px"
       >
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="pointForm.title"></el-input>
-        </el-form-item>
-        <el-form-item label="内容" prop="content">
+        <el-row :gutter="10">
+          <el-col :span="4">
+            <el-form-item>
+              <span>{{chapterOrder}}</span>
+              <el-input v-model="pointForm.order" style="width: 70%" type="number"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="20">
+            <el-row>
+              <el-form-item>
+                <el-input v-model="pointForm.title"></el-input>
+              </el-form-item>
+            </el-row>
+          </el-col>
+        </el-row>
+        <el-form-item>
           <!----- 编辑器 ----->
           <div id="editor"></div>
         </el-form-item>
@@ -34,20 +43,17 @@ export default {
   name: "chapterEdit",
   data() {
     return {
-      item: 0,
+      item: {},
+      chapterOrder: 0,
+      pointOrder: 0,
       pointName: "",
       pointContent: "",
       editor: new WangEditor("#editor"),
       // 知识点
       pointForm: {
+        order: '0',
         title: "",
         content: ""
-      },
-      pointRules: {
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        content: [
-          { required: true, message: "请输入知识点内容", trigger: "blur" }
-        ]
       },
       loading: false
     };
@@ -57,26 +63,33 @@ export default {
       this.item = this.$route.query.item;
     },
     getContents() {
-      this.pointName = "";
       this.pointContent = "";
       this.pointForm = {
         title: "",
         content: ""
       };
       this.$http
-        .get("http://10.60.38.173:8765/getChapterByID?chapterID=" + this.item.id, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/getChapterByID?chapterID=" + this.item.id,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
               let content = JSON.parse(response.bodyText);
+              let dot = this.item.name.indexOf(".") + 1;
+              let index = this.item.name.indexOf(" ");
               if (content.state === 1) {
+                this.chapterOrder = content.data.contentName.substring(0, dot);
+                this.pointOrder = content.data.contentName.substring(dot, index);
                 this.pointName = content.data.contentName;
                 this.pointContent = content.data.content;
-                this.pointForm.title = this.pointName;
+                this.pointForm.order = this.pointOrder;
+                this.pointForm.title = this.pointName.substring(index + 1);
                 this.pointForm.content = this.pointContent;
                 if (content.data.content !== null) {
                   this.editor.txt.html(content.data.content);
@@ -94,10 +107,21 @@ export default {
         );
     },
     reset() {
-      this.pointForm.title = this.pointName;
-      this.pointForm.content = this.pointContent;
+      this.pointForm.order = this.pointOrder;
+      let index = this.item.name.indexOf(" ");
+      this.pointForm.title = this.pointName.substring(index + 1);
+      if (this.pointContent === null) {
+        this.editor.txt.html("");
+      } else {
+        this.pointForm.content = this.pointContent;
+        this.editor.txt.html(this.pointForm.content);
+      }
     },
     save() {
+      if (Number(this.pointForm.order) === NaN || Number(this.pointForm.order) < 1) {
+        this.$message({type: 'warning', message: '请输入正确的知识点序号!'});
+        return;
+      }
       this.loading = true;
       this.$http
         .post(
@@ -105,7 +129,11 @@ export default {
           {
             id: this.item.id,
             courseID: this.item.courseID,
-            contentName: this.pointForm.title,
+            contentName:
+              this.chapterOrder +
+              this.pointForm.order +
+              " " +
+              this.pointForm.title,
             parentID: this.item.parentID,
             siblingID: this.item.siblingID,
             content: this.pointForm.content
@@ -164,20 +192,20 @@ export default {
     };
     this.editor.customConfig.debug =
       location.href.indexOf("wangeditor_debug_mode=1") > 0; // 开启debug模式
-      this.editor.customConfig.zIndex = 10;
+    this.editor.customConfig.zIndex = 10;
     this.editor.create();
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
     $route(val) {
       this.getParams();
-      this.getContents();
     }
   },
   beforeRouteUpdate(to, from, next) {
     if (
-      this.item.name !== this.pointForm.title ||
-      this.item.content !== this.pointForm.content
+      this.pointName !==
+        this.chapterOrder + this.pointForm.order + " " + this.pointForm.title ||
+      this.pointContent !== this.pointForm.content
     ) {
       const answer = window.confirm("更改尚未保存，确认离开吗？");
       if (answer) {
@@ -192,8 +220,9 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     if (
-      this.item.name !== this.pointForm.title ||
-      this.item.content !== this.pointForm.content
+      this.pointName !==
+        this.chapterOrder + this.pointForm.order + " " + this.pointForm.title ||
+      this.pointContent !== this.pointForm.content
     ) {
       const answer = window.confirm("更改尚未保存，确认离开吗？");
       if (answer) {

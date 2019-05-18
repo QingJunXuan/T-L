@@ -40,13 +40,10 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/home'
-    },
-    {
-      path: '/',
       component: Header,
       name: '教与学',
       iconCls: 'el-icon-message', // 图标样式class
+      redirect: '/home',
       children: [
         { path: '/home', name: 'Home', component: Home }
       ]

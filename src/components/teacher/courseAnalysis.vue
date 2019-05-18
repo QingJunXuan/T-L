@@ -18,9 +18,19 @@
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="start">
               <div class="course-info">
-                <div class="name">
-                  <span>{{courseName}}</span>
-                </div>
+                <el-dropdown @command="handleCourse" trigger="click">
+                  <div class="name">
+                    <span>{{courseName}}</span>
+                    <i class="el-icon-arrow-down el-icon--right"></i>
+                  </div>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="item in courseOptions"
+                      :key="item.value"
+                      :command="item.value"
+                    >{{item.label}}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
                 <div class="grade" v-loading="courseLoading">
                   <el-row>
                     <el-col :span="6" class="text">课程评分</el-col>
@@ -212,23 +222,8 @@
             <div class="cardbody">
               <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
                 <div>
-                  <el-collapse v-model="activeNames" class="collapse">
+                  <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="数据分析" name="1">
-                      <el-row type="flex" justify="start" style="padding: 10px 20px 0 50px">
-                        <el-select
-                          v-model="courseIndex"
-                          size="small"
-                          @change="handleCourse"
-                          filterable
-                        >
-                          <el-option
-                            v-for="item in courseOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          ></el-option>
-                        </el-select>
-                      </el-row>
                       <el-row>
                         <div id="myChart" class="my-chart"></div>
                       </el-row>
@@ -540,11 +535,15 @@ export default {
     // 获取列表
     getCourses() {
       this.$http
-        .get("http://10.60.38.173:8765/getCoursesByTeacherID?teacherID=" + this.teacherID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/getCoursesByTeacherID?teacherID=" +
+            this.teacherID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -644,9 +643,15 @@ export default {
       this.genderOptions = [];
       // 登录时存teacherID
       this.$http
-        .get("http://10.60.38.173:8765/getClassesByCourseID?courseID=" + this.courseID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getClassesByCourseID?courseID=" +
+            this.courseID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -703,11 +708,15 @@ export default {
     getBaseInfo() {
       this.courseLoading = true;
       this.$http
-        .get("http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" + this.courseID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" +
+            this.courseID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -741,9 +750,15 @@ export default {
     getTeacherInfo() {
       this.teacherInfo = [];
       this.$http
-        .get("http://10.60.38.173:8765/getTeacherInfoByNID?courseNameID=" + this.courseNameID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getTeacherInfoByNID?courseNameID=" +
+            this.courseNameID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -798,15 +813,19 @@ export default {
     getChapters() {
       this.chapterOptions = [];
       this.$http
-        .get("http://10.60.38.173:8765/getCourseCatalog?courseID=" + this.courseID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getCourseCatalog?courseID=" + this.courseID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
               let courseList = JSON.parse(response.bodyText);
               let i = 0;
-              this.chapterSettings = courseList.data[i].id;
               while (i < courseList.data.length) {
                 this.chapterOptions.push({
                   value: i,
@@ -828,11 +847,15 @@ export default {
     getClassInfo() {
       this.commentLoading = true;
       this.$http
-        .get("http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" + this.courseID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/getCourseClassAvgScore?courseID=" +
+            this.courseID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -887,11 +910,15 @@ export default {
     },
     getClassNLP() {
       this.$http
-        .get("http://10.60.38.173:8765/getCourseClassNLPRateNum?courseID=" + this.courseID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/getCourseClassNLPRateNum?courseID=" +
+            this.courseID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -990,11 +1017,15 @@ export default {
     },
     getChapterClassNLP(chapterID) {
       this.$http
-        .get("http://10.60.38.173:8765/getChapterNLPRateNum?chapterID=" + chapterID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/getChapterNLPRateNum?chapterID=" +
+            chapterID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -1325,11 +1356,14 @@ export default {
     },
     getRateDistribute(chapterID, seriesIndex) {
       this.$http
-        .get("http://10.60.38.173:8765/question/rateNumber?chapterId=" + chapterID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/question/rateNumber?chapterId=" + chapterID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -1573,7 +1607,7 @@ export default {
         case 0: {
           this.comparison = 0;
           this.gradeAttribute = 0;
-          this.chapterSettings = this.chapterOptions[0].id;
+          this.chapterSettings = 0;
           this.detail = [];
           this.detailValue = [];
           this.setGradeAttribute = true;
@@ -1590,7 +1624,7 @@ export default {
         case 1: {
           this.comparison = 1;
           this.gradeAttribute = 0;
-          this.chapterSettings = this.chapterOptions[0].id;
+          this.chapterSettings = 0;
           this.detail = [];
           this.detailValue = [];
           this.setGradeAttribute = true;
@@ -1773,7 +1807,7 @@ export default {
             percentage: 0
           }
         ];
-        this.getChapterClassInfo(this.chapterSettings);
+        this.getChapterClassInfo(this.chapterOptions[this.chapterSettings].id);
       }
     },
     // 按键事件
@@ -2397,6 +2431,7 @@ export default {
   height: 40px;
   padding: 15px 10px 15px 20px;
   border-bottom: 1px solid #e7edf5;
+  cursor: pointer;
 }
 
 .course-info .name span {
