@@ -14,7 +14,7 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===2"
             >（多选）</span>
@@ -70,7 +70,7 @@
           :key="index"
         >
           <p style="margin-left:5px">
-            <pre>{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{index+1}}. {{item.exercise.exerciseContent}}（{{item.exercise.exercisePoint}}分）</pre>
             <span
               v-if="item.exercise.exerciseType===1 || item.exercise.exerciseType ===2"
             >
@@ -106,7 +106,7 @@
           </span>
           <div
             style="margin-top: 10px; background-color: rgb(240,240,240); min-height: 80px; padding: 10px 10px 10px 10px"
-          >解析：<pre>{{item.exercise.exerciseAnalysis}}</pre></div>
+          >解析：<pre style="white-space: pre-wrap; word-wrap: break-word;">{{item.exercise.exerciseAnalysis}}</pre></div>
         </div>
       </div>
     </div>

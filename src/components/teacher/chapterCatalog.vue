@@ -9,6 +9,7 @@
         active-text-color="#ffd04b"
         v-loading="menuLoading"
         element-loading-background="rgba(0, 0, 0, 0.8)"
+        class="menu"
       >
         <el-menu-item index="101">
           <span>
@@ -18,7 +19,7 @@
             <el-button type="text" @click="handleAddChapter" style="color: #fff">添加章节</el-button>
           </span>
         </el-menu-item>
-        <el-scrollbar wrap-style="height: calc(100vh - 150px)" :native="false">
+        <el-scrollbar wrap-style="height: calc(100vh - 150px);overflow-x: hidden;" :native="false">
           <el-submenu v-for="(item1,index1) in catalog" :index="index1.toString()" :key="index1">
             <template slot="title">
               <div style="float: left">
@@ -36,7 +37,7 @@
             <div>
               <el-menu-item :index="index1.toString() + '001'">
                 <span>
-                  <el-button type="text" @click="handleAddPoint(index1)" style="color: #fff">添加知识点</el-button>
+                  <el-button type="text" @click="handleAddPoint(index1)" style="color: #fff" :disabled="pointButton">添加知识点</el-button>
                 </span>
               </el-menu-item>
               <div v-for="(item2, index2) in item1.points" :key="index1*10+index2">
@@ -139,7 +140,7 @@
       </el-menu>
     </el-aside>
     <el-main>
-      <el-scrollbar wrap-style="height: calc(100vh - 150px)" :native="false">
+      <el-scrollbar wrap-style="height: calc(100vh - 150px);overflow-x: hidden;" :native="false">
         <router-view class="router-view"></router-view>
       </el-scrollbar>
       <el-dialog
@@ -220,7 +221,7 @@ export default {
   data() {
     return {
       courseID: 0,
-      teacherID: 202,
+      teacherID: 203,
       classID: 0,
       // 章节知识点列表
       catalog: [
@@ -257,7 +258,8 @@ export default {
       reloadCatalog: false,
       submitLoading: false,
       importLoading: false,
-      menuLoading: false
+      menuLoading: false,
+      pointButton: false,
     };
   },
   methods: {
@@ -361,7 +363,8 @@ export default {
       this.$http
         .get(
           // 传值课程号
-          "http://10.60.38.173:8765/getChapterRelationByCourseID?courseID=" + this.courseID,
+          "http://10.60.38.173:8765/getChapterRelationByCourseID?courseID=" +
+            this.courseID,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -495,6 +498,7 @@ export default {
         edit: true,
         new: true
       };
+      this.pointButton = true;
     },
     handleEditPoint(item) {
       item.edit = true;
@@ -516,8 +520,19 @@ export default {
       this.chapterData[index].disabled = true;
     },
     resetEdit() {
-      let end = this.catalog[this.chapterForm.index].chapterName.indexOf("章");
-      let temp = {
+      if (this.chapterForm.new) {
+        this.chapterForm = {
+        index: this.catalog.length,
+        order: '0',
+        name: '',
+        predecessor: [],
+        descendant: [],
+        new: true
+        }
+      }
+      else {
+        let end = this.catalog[this.chapterForm.index].chapterName.indexOf("章");
+        let temp = {
         index: this.chapterForm.index,
         order: this.catalog[this.chapterForm.index].chapterName.substring(
           1,
@@ -531,6 +546,7 @@ export default {
         new: false
       };
       this.chapterForm = temp;
+      }
     },
     handleChapterClose() {
       for (let i = 0; i < this.chapterData.length; i++) {
@@ -953,7 +969,10 @@ export default {
     },
     // chapter
     confirmEdit() {
-      if (Number(this.chapterForm.order) < 0) {
+      if (
+        Number(this.chapterForm.order) < 0 ||
+        Number(this.chapterForm.order) === NaN
+      ) {
         this.$message({ type: "warning", message: "请正确填写章节号!" });
       }
       let sibID = 0;
@@ -1146,7 +1165,7 @@ export default {
                   this.submitLoading = false;
                   return;
                 }
-              );
+              ); 
           }
           this.deleteChapterRelation(this.catalog[index]);
           this.$http
@@ -1166,7 +1185,7 @@ export default {
                     message: "已删除章节!"
                   });
                   this.menuLoading = false;
-                  this.getCatalog();
+                  location.reload();
                 } else {
                   this.$message({ type: "error", message: "删除失败!" });
                   this.menuLoading = false;
@@ -1420,9 +1439,13 @@ export default {
         item2.edit = false;
       }
       this.newPoint = {};
+      this.pointButton = false;
     },
     submitEdit(item1, item2, index) {
-      if (this.newPoint.order <= 0 || this.newPoint.order === "") {
+      if (
+        Number(this.newPoint.order) <= 0 ||
+        Number(this.newPoint.order) === NaN
+      ) {
         this.$message({ type: "warning", message: "请正确填写知识点序号!" });
         return;
       }
@@ -1430,6 +1453,7 @@ export default {
         this.$message({ type: "warning", message: "请填写知识点名称!" });
         return;
       }
+      this.pointButton = false;
       let sibID = 0;
       if (index > 0) {
         sibID = item1.points[index - 1].id;
@@ -1600,5 +1624,11 @@ a {
   text-overflow: ellipsis;
   overflow: hidden;
   text-align: start;
+}
+
+@media screen and (max-width: 300px) {
+  .menu {
+    display: none;
+  }
 }
 </style>

@@ -130,7 +130,7 @@
             <div class="cardbody">
               <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
                 <div>
-                  <el-collapse v-model="activeNames" class="collapse">
+                  <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="数据分析" name="1">
                       <el-row>
                         <div id="myChart" class="my-chart"></div>

@@ -39,7 +39,18 @@
           </el-card>
           <el-card class="select-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="center">
-              <div style="width: 64%" align="start">
+              <div style="width: 64%; margin-top: 30px" align="start">
+                <el-row class="select-title">选择课程</el-row>
+                <el-row>
+                  <el-select v-model="courseIndex" size="small" @change="handleCourse">
+                    <el-option
+                      v-for="item in courseOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-row>
                 <el-row class="select-title">分析内容</el-row>
                 <el-row>
                   <el-select v-model="xy" @change="handleComparison" size="small">
@@ -107,23 +118,44 @@
             <div class="cardbody">
               <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
                 <div>
-                  <el-collapse v-model="activeNames" class="collapse">
+                  <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="成绩分析" name="1">
-                      <el-row type="flex" justify="start" style="padding: 10px 20px 0 50px">
-                        <el-select v-model="courseIndex" size="small" @change="handleCourse">
-                          <el-option
-                            v-for="item in courseOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          ></el-option>
-                        </el-select>
-                      </el-row>
                       <el-row>
                         <div id="myChart" class="my-chart"></div>
                       </el-row>
                     </el-collapse-item>
                     <el-collapse-item title="学习情况" name="2">
+                      <el-row class="response" style="padding-top: 25px">
+                        <div align="start">
+                          <i
+                            class="el-icon-warning"
+                            v-if="suggestion[4] === '不'"
+                            style="color: #F9B34B; margin-right: 5px"
+                          ></i>
+                          <i
+                            class="el-icon-success"
+                            v-else
+                            style="color: #33CC33; margin-right: 5px"
+                          ></i>
+                          <span>{{suggestion}}</span>
+                          <span v-if="suggestion[4] === '不'">
+                            <el-dropdown :hide-on-click="false">
+                              <span class="el-dropdown-link">其他课程</span>
+                              <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item
+                                  v-for="(item, index) in suggestCourses[0]"
+                                  :key="index"
+                                >{{item}}</el-dropdown-item>
+                                <el-dropdown-item
+                                  v-for="(item, index) in suggestCourses[1]"
+                                  :key="'1' + index"
+                                  :divided="index === 0"
+                                >{{item}}</el-dropdown-item>
+                              </el-dropdown-menu>
+                            </el-dropdown>
+                          </span>
+                        </div>
+                      </el-row>
                       <div
                         align="start"
                         class="response"
@@ -132,19 +164,6 @@
                       >
                         <el-row>
                           <div class="title">{{item.chapter}}</div>
-                        </el-row>
-                        <el-row :gutter="10">
-                          <el-col :span="6">
-                            <span class="grade">课前成绩：{{item.scorePre}}</span>
-                          </el-col>
-                          <el-col :span="6">
-                            <span class="grade">课后成绩：{{item.scoreRev}}</span>
-                          </el-col>
-                          <el-col :span="6">
-                            <span class="grade">平均成绩：{{item.scoreAvg}}</span>
-                          </el-col>
-                        </el-row>
-                        <el-row>
                           <div>
                             <el-rate
                               v-model="item.rate"
@@ -156,7 +175,19 @@
                             ></el-rate>
                           </div>
                         </el-row>
-                        <el-row style="margin-top: 13px">
+
+                        <el-row :gutter="10" style="margin-top: 7px">
+                          <el-col :span="6">
+                            <span class="grade">课前成绩：{{item.scorePre}}</span>
+                          </el-col>
+                          <el-col :span="6">
+                            <span class="grade">课后成绩：{{item.scoreRev}}</span>
+                          </el-col>
+                          <el-col :span="6">
+                            <span class="grade">平均成绩：{{item.scoreAvg}}</span>
+                          </el-col>
+                        </el-row>
+                        <el-row style="margin-top: 7px">
                           <div class="text">{{item.comments}}</div>
                         </el-row>
                       </div>
@@ -180,7 +211,7 @@ export default {
       // 传值
       studentID: localStorage.getItem("workID"),
       studentName: localStorage.getItem("name"),
-      userID: 2, // localStorage.getItem('userID')
+      userID: localStorage.getItem("userID"),
       courseIndex: 0,
       courseID: 0,
       classID: 0,
@@ -248,12 +279,8 @@ export default {
       chapterSettings: 0,
       chapterOptions: [],
       studentInfo: [],
-      // 班级平均分
-      gradeClass: [83, 84, 85],
-      // 成绩阶段
-      gradeEnumList: [60, 70, 80, 90],
-      // 人数 只能数字
-      amountList: [[8, 17, 29, 18], [7, 19, 22, 24], [12, 16, 31, 13]],
+      suggestion: "",
+      suggestCourses: [],
       colors: ["#0997F7", "#92DD22", "#FFFF33", "#FFAAEE"],
       seriesData: [],
       colorOptions: [],
@@ -304,9 +331,14 @@ export default {
     getChapterOptions() {
       this.chapterOptions = [];
       this.$http
-        .get("http://10.60.38.173:8765/getCourseCatalog?courseID=" + this.courseID, {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-        })
+        .get(
+          "http://10.60.38.173:8765/getCourseCatalog?courseID=" + this.courseID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -332,11 +364,14 @@ export default {
     },
     getCourses() {
       this.$http
-        .get("http://10.60.38.173:8765/getStuCourseList?studentID=" + this.userID, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .get(
+          "http://10.60.38.173:8765/getStuCourseList?studentID=" + this.userID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -345,10 +380,15 @@ export default {
                 let i = 0;
                 this.courseID = courseList.data[i].courseInfo.courseID;
                 this.classID = courseList.data[i].courseClass.id;
+                this.getSuggestion();
                 while (i < courseList.data.length) {
                   this.courseOptions.push({
                     value: i,
-                    label: courseList.data[i].courseInfo.courseName,
+                    label:
+                      courseList.data[i].courseInfo.courseName +
+                      "[" +
+                      courseList.data[i].courseClass.classNum +
+                      "班]",
                     courseID: courseList.data[i].courseInfo.courseID,
                     classID: courseList.data[i].courseClass.id
                   });
@@ -723,6 +763,42 @@ export default {
           }
         );
     },
+    getSuggestion() {
+      this.$http
+        .get(
+          "http://10.60.38.173:8765/question/getPrecourse?courseId=" +
+            this.courseID +
+            "&studentId=" +
+            this.userID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let res = JSON.parse(response.bodyText);
+              if (res.state === 1) {
+                if (res.message[1] === "需") {
+                  this.suggestion = "最近成绩不太理想哦，你可能需要学习一些";
+                  this.suggestCourses = res.data;
+                } else {
+                  this.suggestion = "最近学习状况不错，继续努力！";
+                }
+              }
+            } else {
+              this.drawLoading = false;
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.drawLoading = false;
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
     handleGradeAttribute() {
       if (this.comparison !== 0 && this.xy !== 1) {
         this.gradeOptions[3].disabled = true;
@@ -1076,8 +1152,19 @@ export default {
 }
 
 .cardbody {
-  height: 680px;
+  height: 100%;
   position: relative;
+}
+
+.el-dropdown-link {
+  cursor: pointer;
+  color: #41abf1;
+  font-size: 13px;
+  border-bottom: 1px dashed #41abf1;
+  font-weight: 450;
+}
+.el-icon-arrow-down {
+  font-size: 12px;
 }
 
 .response {
@@ -1092,12 +1179,13 @@ export default {
   color: #41abf1;
   padding-top: 15px;
   padding-bottom: 2px;
+  float: left;
+  margin-right: 10px;
 }
 
 .response .rate {
   zoom: 90%;
-  margin-top: 4px;
-  margin-bottom: 3px;
+  padding: 19px 10px 2px;
 }
 
 .response .grade {
@@ -1108,6 +1196,6 @@ export default {
 .response .text {
   min-height: 100px;
   background-color: #fafafa;
-  padding: 5px 10px 5px 10px;
+  padding: 15px 20px 15px 20px;
 }
 </style>

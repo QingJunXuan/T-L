@@ -36,7 +36,7 @@ export default {
       courseClassID:0,
       rate: null,
       textarea: "",
-      half:true,
+      half:false,
     };
   },
   methods: {
@@ -48,11 +48,19 @@ export default {
     submit(){
        const routerParams = this.$route.query.courseClassID
        this.courseClassID=routerParams
+<<<<<<< Updated upstream
        var params = new URLSearchParams()
         params.append("courseClassID",this.courseClassID)
         params.append("studentId",localStorage.getItem('userID'))
         params.append("comment",this.textarea)
         params.append('rate',this.rate)
+=======
+       var params = new URLSearchParams();
+        params.append("courseClassID",this.courseClassID);
+        params.append("studentID", localStorage.getItem('userID'));
+        params.append("comment",this.textarea);
+        params.append('rate',this.rate);
+>>>>>>> Stashed changes
       this.$axios
         .post('http://10.60.38.173:8765/addClassComment',params, {
               headers: {

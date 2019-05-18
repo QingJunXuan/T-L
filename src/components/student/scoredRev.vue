@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="margin:0 auto;width:778px">
         <h3 align="start">
         作业题（
         <span>{{totalPoint}}</span>分）
@@ -65,7 +65,7 @@
       <!-- 评分 -->
       <div style="background-color:#545c64;height:120px">
         <p style="padding-top:10px;color:#fff">评分</p>
-        <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
+        <el-rate v-model="rate" disabled show-score text-color="#ff9900" score-template="{value}" :allow-half="false"></el-rate>
         <p style="color:#fff">{{comment}}</p>
       </div>
     </div>

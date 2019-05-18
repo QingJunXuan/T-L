@@ -24,6 +24,7 @@
             <el-row class="top">
               <p
                 id="name"
+                style="cursor: pointer"
                 @click="courseDetail(item.courseInfo.courseID,item.courseClass.id)"
               >{{item.courseInfo.courseName}}</p>
               <el-col :span="5" :offset="18" style="margin-top:10px">
