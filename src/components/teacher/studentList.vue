@@ -223,7 +223,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .background {
   background-image: url("../../assets/background.jpg"); /*背景图片地址*/
   background-repeat: no-repeat; /*背景图片不重复*/

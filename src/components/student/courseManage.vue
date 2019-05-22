@@ -35,7 +35,7 @@
               <el-row>
                 <el-col :span="16" :offset="1" style="text-align:left">
                   <p style="font-size:13px;color:#000">近期作业</p>
-                  <p
+                  <p v-if="item.courseClass.currentExerciseChapter != -1"
                     id="newest"
                     @click="homework(item.courseClass.currentExerciseChapter)"
                   >第 {{item.courseClass.currentExerciseChapter}} 章课后习题</p>
@@ -207,7 +207,7 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style>
 #name {
   position: relative;
   top: 25%;

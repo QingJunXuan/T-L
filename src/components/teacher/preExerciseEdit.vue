@@ -1206,7 +1206,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .main {
   width: 80%;
   margin: 0 auto;

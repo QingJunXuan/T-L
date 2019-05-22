@@ -111,8 +111,3 @@ export default {
   }
 };
 </script>
-<style scoped>
-.test {
-  color: #747a81;
-}
-</style>

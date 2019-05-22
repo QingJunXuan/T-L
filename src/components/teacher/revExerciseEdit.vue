@@ -1701,7 +1701,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .main {
   width: 700px;
   margin: 0 auto;

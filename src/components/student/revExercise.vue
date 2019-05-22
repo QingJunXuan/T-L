@@ -79,7 +79,7 @@
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('answer')" size="mini">保 存</el-button>
+          <el-button type="primary" @click="submitForm('answer')" size="mini" :disabled="isOver">保 存</el-button>
           <p style="margin-top:0">*保存后不可更改*</p>
         </el-form-item>
       </el-form>
@@ -189,29 +189,15 @@ export default {
       exercises: []
     };
   },
-  create() {
-    //老师未发布习题 √
-    //发布之后：未做习题 √
-    //发布之后，已经做习题+未评分 
-    //已评分 
-    //作业截止时间到了-未做题
-
-
-    //const scored = this.$route.query.scored
-
-    //this.isScored
-  },
   mounted() {
     this.getRev();
     this.setTime();
-    this.setAnswer();
   },
   watch: {
     $route(to, from) {
       this.initValue();
       this.getRev();
       this.setTime();
-      this.setAnswer();
     }
   },
   methods: {
@@ -227,38 +213,14 @@ export default {
       else return "";
     },
     setTime() {
-      //var currentTime = new Date();
-			//console.log("TCL: setTime -> currentTime", currentTime)
       const index = this.$route.query.index;
       var catalog = store.state.catalog;
+      if(catalog.length!=0 ){
+      this.totalPoint = catalog[index].exerciseTotal_2
+      }
       if (catalog.length != 0 && catalog[index].exerciseDeadline_2 != null) {
         this.time = catalog[index].exerciseDeadline_2;
-        //var currentTime = new Date();
-        //比较时间
-        /*  if(true){
-          this.isOver = true
-        } */
       }
-    },
-    getTime() {
-      this.$axios
-        .get("http://10.60.38.173:8765/getChapterByID", {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
-          },
-          params: {
-            chapterId: this.sid
-          }
-        })
-        .then(resp => {
-          console.log("pre", resp.data);
-          if (resp.data.state == 1) {
-            console.log(resp.data.data, "time");
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
     },
     setTotalPoint() {
       for (var i = 0; i < this.exercises.length; i++) {
@@ -283,13 +245,22 @@ export default {
           }
         })
         .then(resp => {
-          console.log("rev", resp.data);
+          //1->有且发布；2->有但未发布；3->无；->超出截止时间未做题
           if (resp.data.state == 1) {
             this.exercises = resp.data.data;
             var length = this.exercises.length;
             if (length != 0) {
               this.haveRev = true;
-              this.setTotalPoint();
+              //this.setTotalPoint();
+              this.setAnswer();
+            }
+          }
+          else if (resp.data.state == 4) {
+            this.exercises = resp.data.data;
+            var length = this.exercises.length;
+            if (length != 0) {
+              this.haveRev = true;
+              this.isOver=true
             }
           }
         })
@@ -299,17 +270,18 @@ export default {
     },
     setAnswer() {
       var length = this.exercises.length;
+      var temp=new Object()
       for (var i = 0; i < length; i++) {
-        var string = i.toString();
         if (this.exercises[i].exercise.exerciseType == 4) {
-          this.answer.string = null;
+          temp[i.toString()] = null
         } else if (this.exercises[i].exercise.exerciseType == 5) {
-          this.answer.string = [];
+          temp[i.toString()] = [];
         } else if (this.exercises[i].exercise.exerciseType == 6) {
-          this.answer.string = "";
+          temp[i.toString()] = "";          
         }
         this.score[i] = "";
       }
+      this.answer=Object.assign({},temp)
     },
     submitForm(formname) {
       //暂存
@@ -318,7 +290,6 @@ export default {
         if (valid) {
           for (var i = 0; i < length; i++) {
             var type = typeof this.answer[i];
-            console.log(type, "type");
             if (type == "number") {
               var resp = String.fromCharCode(this.answer[i] + 65);
               var ans = this.exercises[i].exercise.exerciseAnswer;
@@ -352,16 +323,11 @@ export default {
           this.after = true;
         } else {
           alert("有习题未完成");
-          //break;
         }
-
-        console.log(this.score, "score");
       });
       for (var i = 0; i < this.exercises.length; i++) {
-        //total += this.score[i];
         this.totalScore += this.score[i];
       }
-      //var total = 0
     },
     submit() {
       //提交
@@ -386,8 +352,6 @@ export default {
             }
           })
           .then(resp => {
-            console.log(resp.data);
-            console.log("rev submit success");
             if (resp.data.state == 1) {
               this.$message("提交成功");
             }
@@ -401,7 +365,7 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style>
 .test {
   color: #747a81;
 }

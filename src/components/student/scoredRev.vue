@@ -137,6 +137,9 @@ methods:{
     setTime(){
       const index =this.$route.query.index
       var catalog = store.state.catalog
+      if(catalog.length!=0 ){
+      this.totalPoint = catalog[index].exerciseTotal_2
+      }
       if(catalog.length!=0 && catalog[index].exerciseDeadline_2!=null){
       this.time = catalog[index].exerciseDeadline_2
       }
@@ -167,7 +170,7 @@ methods:{
           if (resp.data.state == 1) {
             this.exercises = resp.data.data;
             this.getScore();
-            this.setTotalPoint();
+            //this.setTotalPoint();
           }
         })
         .catch(err => {
@@ -196,7 +199,4 @@ methods:{
   }
 }
 </script>
-<style scoped>
-
-</style>
 

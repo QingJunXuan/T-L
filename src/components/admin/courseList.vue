@@ -144,7 +144,7 @@ body {
 }
 </style>
 
-<style scoped>
+<style>
 .top {
   /*   background-color: rgba(54, 88, 241, 0.808);*/
   background-image: url(../../assets/course/img-5.jpg);

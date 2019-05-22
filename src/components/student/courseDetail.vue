@@ -37,17 +37,22 @@
           </el-col>
         </div>
         <div v-show="isLesson">
-          <el-col :span="12" :offset="6" style="margin-bottom:40px;margin-top:80px">
-            <div style="padding-bottom:20px">
+          <el-col style="margin-bottom:40px;margin-top:80px">
+            <el-col :span="18" :offset="3" v-show="isGraph==true">
+              <div style="padding-bottom:20px">
               <el-col :span="3"><el-button type="success" size="small" @click="changeLesson">
                 <span v-if="isGraph==true">查看章节目录</span>
-                <span v-else>查看关系图</span>
+              </el-button></el-col>
+              </div>
+              <div style="height:800px;border:1px solid #ddd;margin-bottom:20px;margin-top:40px" ref="graph"></div>
+            </el-col>
+
+            <el-col :span="12" :offset="6" v-show="isGraph==false">
+              <div style="padding-bottom:60px">
+              <el-col :span="3"><el-button type="success" size="small" @click="changeLesson">
+                <span v-if="isGraph==false">查看关系图</span>
               </el-button></el-col>
             </div>
-            <div v-show="isGraph==true">
-              <div style="height:800px;border:1px solid #ddd;margin-bottom:20px;margin-top:40px" ref="graph"></div>
-            </div>
-            <div v-show="isGraph==false" style="margin-top:40px">
              <el-tree
               :data="tree"
               :props="defaultProps"
@@ -56,7 +61,7 @@
               :expand-on-click-node="false"
               :render-content="renderContent"
              ></el-tree>
-            </div>
+            </el-col>
           </el-col>
         </div>
       </div>
@@ -221,9 +226,6 @@ export default {
       }
     },
     handleNodeClick(object,node,self) {
-/* 			console.log("TCL: handleNodeClick -> self", self)
-			console.log("TCL: handleNodeClick -> node", node)
-			console.log("TCL: handleNodeClick -> object", object) */
       if (object.parentID != 0) {
         this.$router.push({
           path: "chapterDetail/point",
@@ -294,6 +296,7 @@ export default {
         }
       }
       if(isExist && tempScore[num-1].studentChapter.totalScore_1 != null){
+        //已做题
         this.$router.push({
         path: "chapterDetail/scoredPre",
         query: {
@@ -302,7 +305,8 @@ export default {
           index:num-1
         }
       });
-      }else{ 
+      }else{
+        //其他
         this.$router.push({
         path: "chapterDetail/preExercise",
         query: {
@@ -346,6 +350,7 @@ export default {
         }
        });
       }else if(isExist && tempScore[num-1].studentChapter.totalScore_2 != null){
+        //已作答，根据scored值判断老师是否已批改作业
         this.$router.push({
         path: "chapterDetail/scoredRev",
         query: {
@@ -356,6 +361,7 @@ export default {
         }
       });
       }else if(isExist == false){
+        //判断截至时间与当前时间
        this.$router.push({
         path: "chapterDetail/revExercise",
         query: {
@@ -429,24 +435,24 @@ export default {
       });
 
       let data = [];
-      var width=3800;
+      var width=4800;
       var init=0;
 
       for (let item of tempData.entries()) {
         var num=item[1].length
-        init=1900/num
+        init=2400/num
         item[1].forEach((value, index) => {
           let addData = {
             name: value,
             x: Math.round(init+(width / num) * index),
-            y: (parseInt(item[0]) + 1) * 350
+            y: (parseInt(item[0]) + 1) * 400
           };
           data.push(addData);
         });
-      }
+      } 
       data.push({
         name: "start",
-        x: 1900,
+        x: 2400,
         y: 0
       });
       this.data = data;

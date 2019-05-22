@@ -83,7 +83,7 @@ body {
 }
 </style>
 
-<style scoped>
+<style>
 .head {
   height: 60px;
   background-color:#292929;

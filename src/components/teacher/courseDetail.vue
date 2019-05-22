@@ -9,15 +9,15 @@
       <el-row>
         <div style="line-height:150px">{{courseName}}</div>
       </el-row>
-      <el-row>
+      <!-- <el-row>
         <el-col :span="1" :offset="21">
           <el-button type="text" @click="stuDetail">学生</el-button>
         </el-col>
-      </el-row>
+      </el-row> -->
     </el-row>
     <el-row>
       <div class="tabs">
-        <el-col :span="4" :offset="6">
+        <el-col :span="4" :offset="4">
           <div @click="showNotice" class="tabBack" :class="{'clickDiv':isNotice}">
             <el-button
               @click="getNotice"
@@ -29,12 +29,17 @@
         </el-col>
         <el-col :span="4">
           <div @click="showLesson" class="tabBack" :class="{'clickDiv':isLesson}">
-            <el-button type="text" class="tab" :class="{'clickButton':isLesson}">课程及练习</el-button>
+            <el-button type="text" class="tab" :class="{'clickButton':isLesson}">编辑课程</el-button>
           </div>
         </el-col>
         <el-col :span="4">
           <div @click="getGrade" class="tabBack" :class="{'clickDiv':isGrade}">
-            <el-button type="text" class="tab" :class="{'clickButton':isGrade}">评分</el-button>
+            <el-button type="text" class="tab" :class="{'clickButton':isGrade}">作业评分</el-button>
+          </div>
+        </el-col>
+        <el-col :span="4">
+          <div @click="stuDetail" class="tabBack" :class="{'clickDiv':isList}">
+            <el-button type="text" class="tab" :class="{'clickButton':isList}">学生列表</el-button>
           </div>
         </el-col>
       </div>
@@ -51,17 +56,22 @@
           </el-col>
         </div>
         <div v-show="isLesson" class="noticeBack">
-          <el-row>
-            <el-col :span="2" :offset="16" style="margin-top:-130px">
-              <el-button type="text" @click="changeLesson">切换</el-button>
-              <el-button type="text" @click="editChapter">编辑章节</el-button>
+          <el-row style="margin-bottom:20px">
+            <el-col :span="4" :offset="17" style="margin-top:-120px">
+              <el-button type="success" size="small" @click="changeLesson">
+                <span v-if="isGraph==true">查看章节目录</span>
+                <span v-else>查看关系图</span>
+              </el-button>
+              <el-button type="primary" size="small" @click="editChapter">编辑章节及练习</el-button>
             </el-col>
           </el-row>
           <el-row>
-            <el-col :span="12" :offset="6" style="margin-top:-80px;margin-bottom:40px">
+            <el-col :span="18" :offset="3" style="margin-top:-60px;margin-bottom:40px">
               <div v-show="isGraph==true">
-                <div style="height:800px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
+                <div style="height:1000px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
               </div>
+            </el-col>
+            <el-col  :span="12" :offset="6" style="margin-top:-80px;margin-bottom:40px">
               <div v-show="isGraph==false">
                 <el-tree
                   :data="tree"
@@ -104,6 +114,7 @@ export default {
       isLesson: true,
       isGrade: false,
       isGraph: true,
+      isList:false,
       notice: "Java是一门面向对象编程语言.",
       textarea: "添加/修改课程介绍",
       //data: null,
@@ -351,24 +362,24 @@ export default {
       });
 
       let data = [];
-      var width = 3600;
+      var width = 6000;
       var init = 0;
 
       for (let item of tempData.entries()) {
         var num = item[1].length;
-        init = 1800 / num;
+        init = 3000 / num;
         item[1].forEach((value, index) => {
           let addData = {
             name: value,
             x: Math.round(init + (width / num) * index),
-            y: (parseInt(item[0]) + 1) * 350
+            y: (parseInt(item[0]) + 1) * 450
           };
           data.push(addData);
         });
       }
       data.push({
         name: "start",
-        x: 1800,
+        x: 3000,
         y: 0
       });
       this.data = data;
@@ -605,7 +616,7 @@ body {
   font-size: 25px;
   font-weight: 700;
   color: rgb(235, 235, 235);
-  background-image: url("../../assets/about.jpg");
+  background-image: url("../../assets/img2.jpg");
   background-size: cover;
 }
 .tabs {

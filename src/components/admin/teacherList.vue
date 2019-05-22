@@ -88,7 +88,7 @@ body {
 }
 </style>
 
-<style scoped>
+<style>
 .header {
   height: 60px;
   background-color: cadetblue;

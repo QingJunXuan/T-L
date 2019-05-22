@@ -955,7 +955,7 @@ export default {
       this.isEditClass = false;
       this.editClassNum = false;
 
-      var obj = Object.assign({}, this.allCourse[this.dataIndex - 1]);
+      var obj = Object.assign({}, this.allCourse[this.dataIndex ]);
       this.ruleForm2.courseName = obj.courseName.courseName;
       var length = obj.preCoursesName.length;
       this.ruleForm2.successor = new Array();
@@ -965,10 +965,10 @@ export default {
       console.log(this.ruleForm2, "form2");
     },
     editCourse() {
-      var id = this.allCourse[this.dataIndex - 1].courseName.courseNameID;
+      var id = this.allCourse[this.dataIndex].courseName.courseNameID;
       var oldName = this.data[this.dataIndex].name;
       var newName = this.ruleForm2.courseName;
-      var length = this.allCourse[this.dataIndex - 1].preCoursesName.length;
+      var length = this.allCourse[this.dataIndex ].preCoursesName.length;
 
       var oldLinks = new Array();
       var oldLinksID = new Array();
@@ -1388,7 +1388,7 @@ export default {
             //点击节点获取同名列表
             that.getDupCourse();
             that.courseName =
-              that.allCourse[that.dataIndex - 1].courseName.courseNameID;
+              that.allCourse[that.dataIndex].courseName.courseNameID;
             that.dialog1 = true;
           }
       });

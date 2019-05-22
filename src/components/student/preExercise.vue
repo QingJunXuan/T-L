@@ -27,7 +27,7 @@
       { type: 'number', message: '请选择'}
     ]"
           >
-            <el-radio-group v-model="answer[index]">
+            <el-radio-group v-model="answer[index.toString()]">
               <div 
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
@@ -46,7 +46,7 @@
       { required: true, message: '请选择'},
     ]"
           >
-            <el-checkbox-group v-model="answer[index]">
+            <el-checkbox-group v-model="answer[index.toString()]">
               <div 
               v-for="i in item.exerciseChoiceList.length"
               :key="i"
@@ -131,25 +131,21 @@ export default {
       score: {},
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      exercises:[],
+      exercises: [],
+      length: 1
     };
-  },
-  create() {
-    //this.getPre();
   },
   mounted() {
     this.getPre();
-    this.setAnswer();
   },
   watch: {
     $route(to, from) {
       this.getPre();
-      this.setAnswer();
     }
   },
   methods: {
     setAnswerClass(item, j) {
-      if (item.indexOf(j) >= 0 ) return "answer";
+      if (item.indexOf(j) >= 0) return "answer";
       else return "";
     },
     getPre() {
@@ -168,33 +164,31 @@ export default {
         .then(resp => {
           console.log("pre", resp.data);
           if (resp.data.state == 1) {
+            this.havePre = true;
             this.exercises = resp.data.data;
-            var length = this.exercises.length;
-
-            if (length != 0) {
-              this.havePre = true;
-              this.setTotalPoint();
-            }
-            
+            this.setTotalPoint();
+            this.setAnswer();
           }
         })
         .catch(err => {
           console.log(err);
         });
     },
-    setAnswer(){    
-            var length = this.exercises.length;
-            for(var i=0;i<length;i++){
-              if(this.exercises[i].exercise.exerciseType==1){
-                this.answer[i.toString()]=null
-              }else if(this.exercises[i].exercise.exerciseType==2){
-                this.answer[i.toString()]=[]
-              }
-              this.score[i]=''
-            }
+    setAnswer() {
+      var length = this.exercises.length;
+      var temp = new Object();
+      for (var i = 0; i < length; i++) {
+        if (this.exercises[i].exercise.exerciseType == 1) {
+          temp[i.toString()] = null
+        } else if (this.exercises[i].exercise.exerciseType == 2) {
+          temp[i.toString()] = [];
+        }
+        this.score[i] = "";
+      }
+      this.answer=Object.assign({},temp)
     },
     setTotalPoint() {
-      var count=0;
+      var count = 0;
       for (var i = 0; i < this.exercises.length; i++) {
         count += this.exercises[i].exercise.exercisePoint;
       }
@@ -202,12 +196,12 @@ export default {
     },
     submitForm(formname) {
       var length = Object.keys(this.answer).length;
-      console.log(this.answer);
+      //console.log(this.answer);
       this.$refs[formname].validate(valid => {
         if (valid) {
           for (var i = 0; i < length; i++) {
             var type = typeof this.answer[i];
-            console.log(type, "type");
+            //console.log(type, "type");
             if (type == "number") {
               var resp = String.fromCharCode(this.answer[i] + 65);
               var ans = this.exercises[i].exercise.exerciseAnswer;
@@ -238,16 +232,10 @@ export default {
               this.score[i] = 0;
             }
           }
-          console.log(this.score, "score");
-          /* 
-        this.before = false;
-        this.after = true;
- */
-          ///传后端
 
           var params = new URLSearchParams();
           params.append("answers", this.answer);
-          params.append("studentId", localStorage.getItem('userID'));
+          params.append("studentId", localStorage.getItem("userID"));
           params.append("chapterId", this.sid);
           params.append("type", "preview");
           params.append("comment", 1);
@@ -260,8 +248,6 @@ export default {
               }
             })
             .then(resp => {
-              console.log(resp.data);
-              console.log("pre submit success");
               if (resp.data.state == 1) {
                 this.before = false;
                 this.after = true;
@@ -283,11 +269,11 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style>
 .test {
   color: #747a81;
 }
-.answer{
+.answer {
   color: red;
 }
 </style>

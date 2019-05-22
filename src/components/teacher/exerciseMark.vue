@@ -386,7 +386,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .buttonHid {
   visibility: hidden;
 }

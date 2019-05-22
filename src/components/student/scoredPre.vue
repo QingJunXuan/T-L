@@ -119,7 +119,7 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style>
 .answer{
   color: red;
 }
