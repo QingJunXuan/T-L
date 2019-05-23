@@ -71,17 +71,6 @@ export default {
             courseID:this.courseID
           }
         });
-      /* if (window.history.length <= 1) {
-        this.$router.push({ path: "/" });
-        return false;
-      } else {
-        this.$router.push({
-          path:"/student/courseDetail",
-          query:{
-            courseID:this.courseID
-          }
-        });
-      } */
     },
     handleChapterClose() {
       for (let i = 0; i < this.chapterData.length; i++) {

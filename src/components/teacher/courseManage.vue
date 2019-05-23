@@ -3,7 +3,13 @@
     <el-col :span="20" :offset="2">
       <el-row>
         <el-col :span="2" :offset="2" style="margin-top:30px;">
-          <el-button size="mini" type="success" @click="couAnalysis">课程分析</el-button>
+          <el-row style="margin-bottom:20px">
+            <el-button size="mini" type="success" @click="couAnalysis">课程分析</el-button>
+          </el-row>
+          <el-row>
+            <el-button size="mini" type="primary" @click="courseList">历史课程</el-button>
+          </el-row>
+
         </el-col>
         <el-col :span="16">
           <el-card
@@ -112,6 +118,9 @@ export default {
   methods: {
     couAnalysis(){
       this.$router.push('/teacher/courseAnalysis');
+    },
+    courseList(){
+      this.$router.push('/teacher/courseList');
     },
     courseDetail: function(courseID, classID,courseName) {
       this.$router.push({

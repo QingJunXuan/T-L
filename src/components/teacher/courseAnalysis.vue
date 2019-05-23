@@ -2393,7 +2393,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
   padding-top: 20px;
   margin: 0 auto;

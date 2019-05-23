@@ -135,7 +135,17 @@ export default {
         title: {
           text: "课程关系图"
         },
-        tooltip: {},
+        tooltip: {
+          trigger:'item',
+          formatter:function(params){
+            if(params.dataType=="node"){
+              return '坐标('+params.data.x+','+params.data.y+')';
+            }
+            else{
+              return params.data.source+' > '+params.data.target;
+            }
+          }
+        },
         animationDurationUpdate: 1500,
         animationEasingUpdate: "quinticInOut",
         toolbox: {

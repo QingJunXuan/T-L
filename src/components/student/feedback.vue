@@ -41,9 +41,12 @@ export default {
   },
   methods: {
     feedbackBack() {
-      this.$router.back({
-        path: "/student/courseDetail"
-      });
+      if (window.history.length <= 1) {
+        this.$router.push({ path: "/" });
+        return false;
+      } else {
+        this.$router.go(-1);
+      }
     },
     submit(){
        const routerParams = this.$route.query.courseClassID

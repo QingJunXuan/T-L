@@ -1,12 +1,15 @@
 <template>
   <div>
     <el-row style="padding-top:20px">
-      <el-col :span="20" :offset="3">
+      <el-col :span="16" :offset="4">
         <el-row>
+          <el-col :span="1" style="margin-top:10px;margin-bottom:20px">
+            <el-button size="small" @click="edit" type="success">编 辑 课 程</el-button>
+          </el-col>
+        </el-row>
+        <el-card>
 		<!--列表-->
-		<el-table :data="teachers" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;text-align:center">
-			<el-table-column type="selection" width="50">
-			</el-table-column>
+		<el-table :data="teachers" highlight-current-row v-loading="listLoading" style="width: 100%;text-align:center;margin-bottom:20px">
 			<el-table-column  prop="courseID" label="课程编号" width="120" sortable>
 			</el-table-column>
 			<el-table-column prop="courseName" label="课程名" width="180" sortable>
@@ -21,15 +24,10 @@
 			</el-table-column>
 			<el-table-column prop="startTime" label="开课时间" width="150" sortable>
 			</el-table-column>
-			<el-table-column prop="endTime" label="结课时间" width="150" sortable>
+			<el-table-column prop="endTime" label="结课时间" width="110" sortable>
 			</el-table-column>
-		<!-- 	<el-table-column label="操作" width="70">
-				<template slot-scope="scope">
-					<el-button type="primary" size="mini" @click="handleView(scope.$index, scope.row)">查看</el-button>
-				</template>
-			</el-table-column> -->
 		</el-table>
-        </el-row>
+        </el-card>
       </el-col>
     </el-row>
   </div>
@@ -42,20 +40,22 @@ export default {
       rate: null,
       textarea: "",
       teachers:[],
-      sels:[], 
+      //sels:[], 
       listLoading:false,
     };
   },
   created(){
      this.$axios
      .get('http://10.60.38.173:8765/getAllCourses',{
-headers: {
+       headers: {
             'Authorization':
               "Bearer "+localStorage.getItem("token")
           }
     }).then(resp=>{
       if(resp.data.state==1){
+        
         this.teachers=resp.data.data
+        console.log(this.teachers)
       }
     }).catch(err=>{
       console.log(err)
@@ -64,17 +64,19 @@ headers: {
   methods: {
     edit() {
       this.$router.push({
-        path: "/adminManage/edit"
+        path: "/adminManage/courseGraph"
       });
     },
+    /* 
     selsChange: function (sels) {
         this.sels = sels;
       },
-      handleView(){
+       */
+   /*  handleView(){
         this.$router.push({
         path: "/adminManage/chart"
       })
-      }
+    } */
   }
 };
 </script>

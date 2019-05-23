@@ -373,10 +373,12 @@ export default {
       }
     },  */
     courseBack() {
-      this.$router.push({ path: "/student/courseManagement" ,
-      query: {
-          courseClassID: this.classID
-        }});
+      if (window.history.length <= 1) {
+        this.$router.push({ path: "/" });
+        return false;
+      } else {
+        this.$router.go(-1);
+      }
     },
     feedback() {
       this.$router.push({
@@ -506,7 +508,17 @@ export default {
         /*  title: {
           text: "章节关系图"
         }, */
-        tooltip: {},
+        tooltip: {
+          trigger:'item',
+          formatter:function(params){
+            if(params.dataType=="node"){
+              return '坐标('+params.data.x+','+params.data.y+')';
+            }
+            else{
+              return params.data.source+' > '+params.data.target;
+            }
+          }
+        },
         animationDurationUpdate: 1500,
         animationEasingUpdate: "quinticInOut",
         toolbox: {
@@ -517,6 +529,10 @@ export default {
         },
         series: [
           {
+            graph:{
+              roam:false,
+              scaleLimit:{min:0.7,max:1}
+            },
             type: "graph",
             layout: "none",
             top:30,

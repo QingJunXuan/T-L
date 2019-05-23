@@ -452,7 +452,7 @@ export default {
       var filterForm = Object.assign({}, this.allCourse);
       var name = this.data[this.dataIndex];
 
-      delete filterForm[this.dataIndex - 1];
+      delete filterForm[this.dataIndex];
 
       var length = this.links.length;
       for (var i = 0; i < length; i++) {
@@ -640,7 +640,7 @@ export default {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
-            courseNameID: this.allCourse[this.dataIndex - 1].courseName
+            courseNameID: this.allCourse[this.dataIndex].courseName
               .courseNameID
           }
         })
@@ -973,10 +973,10 @@ export default {
       var oldLinks = new Array();
       var oldLinksID = new Array();
       for (var i = 0; i < length; i++) {//该节点原来的前继节点们
-        oldLinks[i] = this.allCourse[this.dataIndex - 1].preCoursesName[
+        oldLinks[i] = this.allCourse[this.dataIndex].preCoursesName[
           i
         ].courseName;
-        oldLinksID[i] = this.allCourse[this.dataIndex - 1].preCoursesName[
+        oldLinksID[i] = this.allCourse[this.dataIndex].preCoursesName[
           i
         ].courseNameID;
       } 
@@ -1288,9 +1288,19 @@ export default {
       var myChart = this.initGraph();
       var option = {
         title: {
-          text: "课程关系图"
+          text: "课程关系图",
         },
-        tooltip: {},
+        tooltip: {
+          trigger:'item',
+          formatter:function(params){
+            if(params.dataType=="node"){
+              return '坐标('+params.data.x+','+params.data.y+')';
+            }
+            else{
+              return params.data.source+' > '+params.data.target;
+            }
+          }
+        },
         animationDurationUpdate: 1500,
         animationEasingUpdate: "quinticInOut",
         toolbox: {
@@ -1350,6 +1360,7 @@ export default {
       
         focusNum++
         if (params.dataType == "edge") {
+				console.log("TCL: draw -> params", params)
           //that.handleClick(params);
           that.dataIndex = params.dataIndex;
            var value = that.links[that.dataIndex].label.normal.show
@@ -1382,10 +1393,12 @@ export default {
       //右键显示操作框
       myChart.on("contextmenu", function(params) {
         that.dataIndex = params.dataIndex;
-          if (that.dataIndex == 0) {
+          if (that.dataIndex == that.allCourse.length) {
             alert("不可对该节点进行操作");
           } else {
             //点击节点获取同名列表
+            
+				console.log("TCL: draw -> params", params)
             that.getDupCourse();
             that.courseName =
               that.allCourse[that.dataIndex].courseName.courseNameID;

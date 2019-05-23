@@ -33,12 +33,12 @@
       </el-col>
       <!-- 老师列表 -->
       <el-col :span="1" class="icon-right">
-        <i class="el-icon-service" @click="teacherList"></i>
+        <i class="el-icon-menu" @click="teacherList"></i>
       </el-col>
       <!-- 点击跳转到课程页面/当前页面 -->
-      <el-col :span="1" class="icon-right">
+      <!-- <el-col :span="1" class="icon-right">
         <i class="el-icon-menu" @click="courseList"></i>
-      </el-col>
+      </el-col> -->
     </el-row>
     <el-row>
       <router-view class="router-view"></router-view>
@@ -61,9 +61,9 @@ export default {
       
       this.$router.push('/adminManage/courseAnalysis')
     },
-    courseList() {
+    /* courseList() {
       this.$router.push('/adminManage/courseList')
-    },
+    }, */
     teacherList(){
       this.$router.push('/adminManage/teacherList')
     },
@@ -97,7 +97,7 @@ body {
 }
 </style>
 
-<style>
+<style scoped>
 .header {
   height: 60px;
   background-color: cadetblue;

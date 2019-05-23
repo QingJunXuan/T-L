@@ -19,7 +19,7 @@ import tStudentAnalysis from '../components/teacher/studentAnalysis.vue'
 import tExerciseMark from '../components/teacher/exerciseMark.vue'
 import tCourseAnalysis from '../components/teacher/courseAnalysis.vue'
 import feedback from '../components/student/feedback.vue'
-import courseList from '../components/admin/courseList.vue'
+import courseList from '../components/teacher/courseList.vue'
 import teacherList from '../components/admin/teacherList.vue'
 import aCourseAnalysis from '../components/admin/courseAnalysis.vue'
 import aCourseGraph from '../components/admin/courseGraph.vue'
@@ -171,6 +171,11 @@ export default new Router({
           ]
         },
         {
+          path: 'courseList',
+          name: 'courseList',
+          component: courseList
+        },
+        {
           path: 'mark',
           name: 'exerciseMark',
           component: tExerciseMark
@@ -195,17 +200,12 @@ export default new Router({
     {
       path: '/adminManage',
       component: adminManage,
-      redirect: '/adminManage/courseList',
+      redirect: '/adminManage/teacherList',
       name: 'adminManage',
       meta: {
         keepAlive: true
       },
       children: [
-        {
-          path: 'courseList',
-          name: 'courseList',
-          component: courseList
-        },
         {
           path: 'teacherList',
           name: 'teacherList',

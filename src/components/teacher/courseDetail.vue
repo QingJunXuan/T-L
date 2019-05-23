@@ -2,8 +2,8 @@
   <div>
     <el-row class="courseBack">
       <el-row style="line-height:50px">
-        <el-col :span="2">
-          <i class="el-icon-back" @click="courseBack"></i>
+        <el-col :span="1">
+          <i class="el-icon-back" @click="courseBack" style="color:#000"></i>
         </el-col>
       </el-row>
       <el-row>
@@ -86,15 +86,13 @@
           </el-row>
         </div>
         <div v-show="isGrade" class="gradeBack">
-          <el-col :span="10" :offset="7" v-for="(item,index) in tree" :key="index">
-            <div v-if="gradeItem(index)">
+          <el-col :span="10" :offset="7" v-for="(item,index) in unratedChapters" :key="index">
               <el-row style="padding-bottom:20px">
                 <el-card shadow="hover" class="grade">
-                  <p style="margin-bottom:0px">{{item.contentName+"（"+item.exerciseDeadline_2+"）"}}</p>
-                  <el-button type="text" @click="grade(item.id, item.exerciseTitle)">点击进入评分</el-button>
+                  <p style="margin-bottom:0px">{{item.chapterNode.contentName+"（作业截至提交时间："+item.chapterNode.exerciseDeadline_2+"）"}}</p>
+                  <el-button type="text" @click="grade(item.chapterNode.id, item.chapterNode.exerciseTitle,item.studentId)">点击进入评分</el-button>
                 </el-card>
               </el-row>
-            </div>
           </el-col>
         </div>
       </div>
@@ -133,20 +131,22 @@ export default {
         label: "contentName"
       },
       graphTree: [],
-      tree: []
+      tree: [],
+      unratedChapters:[],
     };
   },
   created() {
-    //获得课程目录
+    //获得参数
     this.getParams();
-    const routerParams1 = this.$route.query.courseID;
-    this.courseID = routerParams1;
-    //const routerParams2 = this.$route.query.courseName;
-    //this.courseName = routerParams2;
+
+    //获取课程名
     this.getCourseName();
+    //获取章节关系
     this.getChapterGraph();
-    this.getNotice();
+    //获取章节目录
     this.getLesson();
+    //获取未评分章节
+    this.getUnratedChapters();
   },
   methods: {
     getCourseName(){///getCourseInfoByID
@@ -264,6 +264,28 @@ export default {
         //this.draw()
       }
     },
+    getUnratedChapters() {//获取未评分章节
+      this.$axios
+        .get("http://10.60.38.173:8765/question/getUnratedChapters", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          },
+          params: {
+            classId: this.classID
+          }
+        })
+        .then(resp => {
+           console.log("TCL: getGrade -> resp", resp)
+          if (resp.data.state == 1) {
+            this.unratedChapters = resp.data.data;
+            console.log("TCL: getGrade -> unratedChapters", this.unratedChapters)
+          }
+        })
+       
+        .catch(err => {
+          console.log(err);
+        });
+    },
     getGrade() {
       if (this.isGrade == false) {
         this.isNotice = false;
@@ -285,7 +307,7 @@ export default {
         this.isGrade = false;
       }
     },
-    gradeItem(index) {
+    /* gradeItem(index) {
       var currentDate = new Date();
       var stringDate = this.tree[index].exerciseDeadline_2;
       var deadDate = new Date(stringDate);
@@ -293,15 +315,16 @@ export default {
       if (deadDate < currentDate) {
         return true;
       }
-    },
-    grade(id, title) {
+    }, */
+    grade(chapterId, title,stuId) {
       this.$router.push({
         path: "/teacher/mark",
         name: "exerciseMark",
         query: {
-          chapterID: id,
+          chapterID: chapterId,
           classID: this.classID,
-          name: title
+          name: title,
+          studentId:stuId
         }
       });
     },
@@ -326,7 +349,12 @@ export default {
       });
     },
     courseBack() {
-      this.$router.push({ path: "/teacher/courseManagement" });
+      if (window.history.length <= 1) {
+        this.$router.push({ path: "/" });
+        return false;
+      } else {
+        this.$router.go(-1);
+      }
     },
     init() {
       // 计算节点位置
@@ -433,7 +461,17 @@ export default {
         /*  title: {
           text: "章节关系图"
         }, */
-        tooltip: {},
+        tooltip: {
+          trigger:'item',
+          formatter:function(params){
+            if(params.dataType=="node"){
+              return '坐标('+params.data.x+','+params.data.y+')';
+            }
+            else{
+              return params.data.source+' > '+params.data.target;
+            }
+          }
+        },
         animationDurationUpdate: 1500,
         animationEasingUpdate: "quinticInOut",
         toolbox: {
