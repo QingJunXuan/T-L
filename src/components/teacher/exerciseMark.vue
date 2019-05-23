@@ -120,6 +120,7 @@ export default {
       chapterID: 0,
       classID: 0,
       name: "",
+      studentId:0,
       // 控制选框的显示
       notSelect: true,
       // getExercises
@@ -368,6 +369,7 @@ export default {
     this.chapterID = this.$route.query.chapterID;
     this.classID = this.$route.query.classID;
     this.name = this.$route.query.name;
+    this.studentId = this.$route.query.studentId;
     this.getExercises();
   },
   computed: {
