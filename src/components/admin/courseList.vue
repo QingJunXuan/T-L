@@ -39,8 +39,7 @@
   </div>
 </template>-->
 <script>
-import bus from "../../bus.js";
-export default {
+/* export default {
   name:'courseList',
   data() {
     return {
