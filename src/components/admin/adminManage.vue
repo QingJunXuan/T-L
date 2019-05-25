@@ -46,6 +46,7 @@
   </div>
 </template>
 <script>
+import bus from "../../bus.js";
 export default {
   name:'adminManage',
   data() {
@@ -83,6 +84,20 @@ export default {
 
         });
       },
+  },
+  created() {
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   }
 };
 </script>

@@ -429,6 +429,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 export default {
   name: "revExerciseEdit",
   data() {
@@ -1643,6 +1644,18 @@ export default {
     this.getChapterInfo();
     this.getRevExercises();
     this.getCourses();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可

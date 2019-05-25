@@ -11,7 +11,7 @@
             </div>
             <div class="title">学生列表</div>
           </div>
-          <div>
+          <el-row>
             <el-row :gutter="30" class="margin" style="padding-left: 20px">
               <el-col :span="8">
                 <el-input placeholder="按学号查找" v-model="searchId" size="small"></el-input>
@@ -53,8 +53,8 @@
                 </el-table-column>
               </el-table>
             </el-row>
-          </div>
-          <div class="bottom page">
+          </el-row>
+          <el-row class="page">
             <el-pagination
               :page-size="9"
               layout="prev, pager, next"
@@ -63,7 +63,7 @@
               :current-page.sync="currentPage"
               @current-change="getStudentCurrent(currentPage)"
             ></el-pagination>
-          </div>
+          </el-row>
         </div>
       </el-card>
     </el-main>
@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 export default {
   name: "studentList",
   data() {
@@ -219,6 +220,18 @@ export default {
     this.classID = this.$route.query.classID;
     this.courseID = this.$route.query.courseID;
     this.getStudentInfo();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   }
 };
 </script>
@@ -288,14 +301,7 @@ export default {
 }
 
 .page {
+  margin-top: 20px;
   color: rgba(118, 162, 163, 0.26);
-}
-
-.bottom {
-  position: absolute;
-  bottom: 15px;
-  left: 0;
-  right: 0;
-  margin: auto;
 }
 </style>

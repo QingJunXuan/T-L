@@ -39,7 +39,8 @@
   </div>
 </template>-->
 <script>
-/* export default {
+import bus from "../../bus.js";
+export default {
   name:'courseList',
   data() {
     return {
@@ -123,6 +124,18 @@ headers: {
     }).catch(err=>{
       console.log(err)
     })
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
 
   },
   methods: {

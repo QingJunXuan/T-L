@@ -69,6 +69,7 @@
   </div>
 </template>
 <script>
+import bus from "../../bus.js";
 import store from '../../store/store.js'
 let  chapterNum = 0;
 //let  sectionNum=0;
@@ -121,6 +122,18 @@ export default {
     this.getNotice();
     this.getLesson();
     this.getScore();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   mounted() {
     //this.draw();

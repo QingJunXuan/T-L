@@ -9,20 +9,22 @@
           <el-row>
             <el-button size="mini" type="primary" @click="courseList">历史课程</el-button>
           </el-row>
-
         </el-col>
         <el-col :span="16">
           <el-card
             style="margin-top:10px;height:600px;text-align:center"
-            body-style="{padding:'0px'}" shadow="never"
+            body-style="{padding:'0px'}"
+            shadow="never"
           >
             <graph></graph>
           </el-card>
         </el-col>
-        </el-row>
-       <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
+      </el-row>
+      <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
         <el-row style="padding:30px">还没有课？</el-row>
-        <el-row>请联系<span style="color:darkcyan;font-weight:bold">学院管理员</span>为您开课吧
+        <el-row>
+          请联系
+          <span style="color:darkcyan;font-weight:bold">学院管理员</span>为您开课吧
         </el-row>
       </el-row>
       <el-row :gutter="40">
@@ -77,6 +79,7 @@
 </template>
 <script>
 import graph from "./courseGraph.vue";
+import bus from "../../bus.js";
 export default {
   name: "tCourseManage",
   components: {
@@ -84,7 +87,7 @@ export default {
   },
   data() {
     return {
-      noCourse:true,
+      noCourse: true,
       code: "",
       isPlus: false,
       isConfirm: false,
@@ -95,8 +98,7 @@ export default {
     this.$axios
       .get("http://10.60.38.173:8765/question/currentCourseByTeacherId", {
         headers: {
-          Authorization:
-            "Bearer "+localStorage.getItem("token")
+          Authorization: "Bearer " + localStorage.getItem("token")
         },
         params: {
           teacherId: localStorage.getItem('userID')
@@ -117,21 +119,33 @@ export default {
       .catch(err => {
         console.log(err);
       });
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   methods: {
-    couAnalysis(){
-      this.$router.push('/teacher/courseAnalysis');
+    couAnalysis() {
+      this.$router.push("/teacher/courseAnalysis");
     },
-    courseList(){
-      this.$router.push('/teacher/courseList');
+    courseList() {
+      this.$router.push("/teacher/courseList");
     },
-    courseDetail: function(courseID, classID,courseName) {
+    courseDetail: function(courseID, classID, courseName) {
       this.$router.push({
         path: "/teacher/courseDetail",
         query: {
           courseID: courseID,
           classID: classID,
-          courseName:courseName
+          courseName: courseName
         }
       });
     },

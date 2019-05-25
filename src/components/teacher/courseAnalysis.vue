@@ -231,7 +231,7 @@
                     <el-collapse-item title="教学反馈" name="2" id="start">
                       <el-row class="chapter-set">
                         <el-col
-                          :span="7"
+                          :span="12"
                           align="start"
                           style="padding-top: 5px; padding-bottom: 5px;"
                         >
@@ -248,13 +248,13 @@
                             @change="handleResponse"
                           >按章节</el-radio>
                         </el-col>
-                        <el-col :span="9" align="start" v-if="responseType === 1">
+                        <el-col :span="6" align="start" v-if="responseType === 1">
                           <el-select
                             v-model="chapterIndex"
                             @change="handleChapter"
                             filterable
                             size="small"
-                            style="width: 250px"
+                            style="width: 200px"
                           >
                             <el-option
                               v-for="item in chapterOptions"
@@ -264,7 +264,7 @@
                             ></el-option>
                           </el-select>
                         </el-col>
-                        <el-col :span="8" align="start" v-if="responseType === 1">
+                        <el-col :span="6" align="end" v-if="responseType === 1">
                           <el-rate
                             v-model="chapterRate"
                             disabled
@@ -285,12 +285,17 @@
                           v-loading="commentLoading"
                         >
                           <el-row>
-                            <el-col :span="24"><div class="title">班级{{item.classNum}}</div></el-col>
+                            <el-col :span="24">
+                              <div class="title">班级{{item.classNum}}</div>
+                            </el-col>
                           </el-row>
                           <el-row :gutter="5" style="margin-top: 20px">
                             <el-col :span="5" align="right">
-                              <div class="notice" v-if="responseType === 0">课程评分</div>
-                              <div class="notice" v-else>章节评分</div>
+                              <div
+                                style="letter-spacing: 0.6px; color: #616161"
+                                v-if="responseType === 0"
+                              >课程评分</div>
+                              <div style="letter-spacing: 0.6px; color: #616161" v-else>章节评分</div>
                             </el-col>
                             <el-col :span="14" style="padding-left: 20px">
                               <el-rate
@@ -305,13 +310,21 @@
                           </el-row>
                           <el-row :gutter="10" style="margin-top: 20px">
                             <el-col :span="5" align="end">
-                              <div class="notice">{{item.positive}}人赞赏</div>
+                              <div
+                                style="letter-spacing: 0.6px; color: #616161"
+                              >{{item.positive}}人赞赏</div>
                             </el-col>
                             <el-col :span="14" align="center">
-                              <vs-bar :percentage="item.percentage" :studentNum="item.num" :width="90"></vs-bar>
+                              <vs-bar
+                                :percentage="item.percentage"
+                                :studentNum="item.num"
+                                :width="90"
+                              ></vs-bar>
                             </el-col>
                             <el-col :span="5" align="start">
-                              <div class="notice">{{item.negative}}人吐槽</div>
+                              <div
+                                style="letter-spacing: 0.6px; color: #616161"
+                              >{{item.negative}}人吐槽</div>
                             </el-col>
                           </el-row>
                         </div>
@@ -329,6 +342,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 import echarts from "echarts";
 import vsBar from "../tools/vsbar.vue";
 export default {
@@ -426,27 +440,27 @@ export default {
         {
           value: 0,
           label: "学生",
-          disabled: true,
+          disabled: true
         },
         {
           value: 1,
           label: "性别",
-          disabled: true,
+          disabled: true
         },
         {
           value: 2,
           label: "班级",
-          disabled: false,
+          disabled: false
         },
         {
           value: 3,
           label: "教师",
-          disabled: true,
+          disabled: true
         },
         {
           value: 4,
           label: "章节",
-          disabled: true,
+          disabled: true
         }
       ],
       gradeOptions: [
@@ -546,7 +560,7 @@ export default {
               if (courseList.state === 1) {
                 let i = 0;
                 let courseIndex = 0;
-                this.courseID = courseList.data[i].courseInfo.courseID;
+                this.courseID = 100010; //courseList.data[i].courseInfo.courseID;
                 this.courseName =
                   courseList.data[i].courseInfo.courseName +
                   "[" +
@@ -828,7 +842,10 @@ export default {
               while (i < courseList.data.length) {
                 this.chapterOptions.push({
                   value: i,
-                  label: courseList.data[i].contentName,
+                  label:
+                    courseList.data[i].contentName.length > 15
+                      ? courseList.data[i].contentName.substring(0, 16) + "..."
+                      : courseList.data[i].contentName,
                   id: courseList.data[i].id
                 });
                 i++;
@@ -859,40 +876,41 @@ export default {
           response => {
             if (response.status === 200) {
               let classList = JSON.parse(response.bodyText);
-              if (this.classInfo[0].classNum === 0) {
+              if (classList.state === 1) {
                 let i = 0;
-                this.classInfo = [];
-                while (i < classList.data.classInfo.length) {
-                  this.classInfo.push({
-                    classNum: i + 1, //classList.data.classInfo[i].classNum,
-                    rate: Number(
+                if (this.classInfo[0].classNum === 0) {
+                  this.classInfo = [];
+                  while (i < classList.data.classInfo.length) {
+                    this.classInfo.push({
+                      classNum: i + 1,
+                      rate: Number(
+                        Number(
+                          (classList.data.classInfo[i].girlAvgRate +
+                            classList.data.classInfo[i].boyAvgRate) /
+                            2
+                        ).toFixed(1)
+                      ),
+                      percentage: 0,
+                      positive: "-",
+                      negative: "-",
+                      num: 0
+                    });
+                    i++;
+                  }
+                } else {
+                  while (i < this.classInfo.length) {
+                    this.classInfo[i].rate = Number(
                       Number(
                         (classList.data.classInfo[i].girlAvgRate +
                           classList.data.classInfo[i].boyAvgRate) /
                           2
                       ).toFixed(1)
-                    ),
-                    percentage: 0,
-                    positive: "-",
-                    negative: "-",
-                    num: 0
-                  });
-                  i++;
-                }
-                this.getClassNLP();
-              } else {
-                let i = 0;
-                while (i < classList.data.classInfo.length) {
-                  this.classOptions[i].rate = Number(
-                    Number(
-                      (classList.data.classInfo[i].girlAvgRate +
-                        classList.data.classInfo[i].boyAvgRate) /
-                        2
-                    ).toFixed(1)
-                  );
-                  this.classInfo[i].positive = "-";
-                  this.classInfo[i].negative = "-";
-                  i++;
+                    );
+                    this.classInfo[i].positive = "-";
+                    this.classInfo[i].negative = "-";
+                    this.classInfo[i].num = 0;
+                    i++;
+                  }
                 }
                 this.getClassNLP();
               }
@@ -923,33 +941,38 @@ export default {
           response => {
             if (response.status === 200) {
               let classList = JSON.parse(response.bodyText);
-              let i = 0;
-              while (i < classList.data.classInfo.length) {
-                for (let j = 0; j < this.classInfo.length; j++) {
-                  if (
-                    this.classInfo[j].classNum ===
-                    classList.data.classInfo[i].classNum
-                  ) {
-                    this.classInfo[j].num = Number(
+              if (classList.state === 1) {
+                let i = 0;
+                while (i < classList.data.classInfo.length) {
+                  for (let j = 0; j < this.classInfo.length; j++) {
+                    if (
+                      this.classInfo[j].classNum ===
+                        classList.data.classInfo[i].classNum &&
+                      this.classInfo[j].positive === "-"
+                    ) {
+                      this.classInfo[j].num = Number(
                         classList.data.classInfo[i].classPositiveNum +
                           classList.data.classInfo[i].classNegativeNum
                       );
-                    if ( this.classInfo[j].num
-                       !== 0
-                    ) {
-                      this.classInfo[j].percentage = Math.round(
-                        Number(classList.data.classInfo[i].classPositiveNum) /
-                          this.classInfo[j].num *
-                          100
-                      );
+                      if (this.classInfo[j].num !== 0) {
+                        this.classInfo[j].percentage = Math.round(
+                          (Number(
+                            classList.data.classInfo[i].classPositiveNum
+                          ) /
+                            this.classInfo[j].num) *
+                            100
+                        );
+                      } else {
+                        this.classInfo[j].percentage = 0;
+                      }
+                      this.classInfo[j].positive =
+                        classList.data.classInfo[i].classPositiveNum;
+                      this.classInfo[j].negative =
+                        classList.data.classInfo[i].classNegativeNum;
                     }
-                    this.classInfo[j].positive =
-                      classList.data.classInfo[i].classPositiveNum;
-                    this.classInfo[j].negative =
-                      classList.data.classInfo[i].classNegativeNum;
                   }
+                  i++;
                 }
-                i++;
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -978,40 +1001,30 @@ export default {
           response => {
             if (response.status === 200) {
               let classList = JSON.parse(response.bodyText);
-              if (this.classInfo[0].classNum === 0) {
+              if (classList.state === 1) {
                 let i = 0;
-                this.classInfo = [];
                 while (i < classList.data.length) {
-                  this.classInfo.push({
-                    classNum: classList.data[i].classNum,
-                    rate: Number(
-                      Number(classList.data[i].scoreInfo.totalRateAvg).toFixed(
-                        1
-                      )
-                    ),
-                    percentage: 0,
-                    positive: "-",
-                    negative: "-",
-                    num: 0
-                  });
+                  for (let j = 0; j < this.classInfo.length; j++) {
+                    if (
+                      classList.data[i].classNum === this.classInfo[j].classNum
+                    ) {
+                      this.classInfo[j].rate = Number(
+                        Number(
+                          classList.data[i].scoreInfo.totalRateAvg
+                        ).toFixed(1)
+                      );
+                      this.classInfo[j].positive = "-";
+                      this.classInfo[j].negative = "-";
+                      this.classInfo[j].num = 0;
+                    }
+                  }
                   i++;
                 }
                 this.getChapterClassNLP(chapterID);
-              } else {
-                let i = 0;
-                while (i < this.classInfo.length) {
-                  this.classInfo[i].rate = Number(
-                    Number(classList.data[i].scoreInfo.totalRateAvg).toFixed(1)
-                  );
-                  this.classInfo[i].positive = "-";
-                  this.classInfo[i].negative = "-";
-                  i++;
-                }
-                this.getChapterClassNLP(chapterID);
+                this.chapterRate = Number(
+                  classList.data[0].scoreInfo.totalRateAvg.toFixed(1)
+                );
               }
-              this.chapterRate = Number(
-                classList.data[0].scoreInfo.totalRateAvg.toFixed(1)
-              );
               this.commentLoading = false;
             } else {
               this.commentLoading = false;
@@ -1039,34 +1052,38 @@ export default {
           response => {
             if (response.status === 200) {
               let classList = JSON.parse(response.bodyText);
-              let i = 0;
-              while (i < classList.data.classInfo.length) {
-                for (let j = 0; j < this.classInfo.length; j++) {
-                  if (
-                    this.classInfo[j].classNum ===
-                    classList.data.classInfo[i].classNum
-                  ) {
-                    this.classInfo[j].num = Number(
+              if (classList.state === 1) {
+                let i = 0;
+                while (i < classList.data.classInfo.length) {
+                  for (let j = 0; j < this.classInfo.length; j++) {
+                    if (
+                      this.classInfo[j].classNum ===
+                        classList.data.classInfo[i].classNum &&
+                      this.classInfo[j].positive === "-"
+                    ) {
+                      this.classInfo[j].num = Number(
                         classList.data.classInfo[i].classPositiveNum +
                           classList.data.classInfo[i].classNegativeNum
-                      )
-                    if (this.classInfo[j].num
-                       !== 0
-                    ) {
-                      this.classInfo[j].percentage = Math.round(
-                        Number(classList.data.classInfo[i].classPositiveNum) /
-                          this.classInfo[j].num *
-                          100
                       );
+                      if (this.classInfo[j].num !== 0) {
+                        this.classInfo[j].percentage = Math.round(
+                          (Number(
+                            classList.data.classInfo[i].classPositiveNum
+                          ) /
+                            this.classInfo[j].num) *
+                            100
+                        );
+                      } else {
+                        this.classInfo[j].percentage = 0;
+                      }
+                      this.classInfo[j].positive =
+                        classList.data.classInfo[i].classPositiveNum;
+                      this.classInfo[j].negative =
+                        classList.data.classInfo[i].classNegativeNum;
                     }
-                    this.classInfo[j].positive =
-                      classList.data.classInfo[i].classPositiveNum;
-                    this.classInfo[j].negative =
-                      classList.data.classInfo[i].classNegativeNum;
                   }
-                  alert(this.classInfo[j].percentage)
+                  i++;
                 }
-                i++;
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -1133,8 +1150,8 @@ export default {
                   this.seriesData[1].data[i] =
                     res.data[i].studentChapter.totalScore_2;
                 }
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1233,8 +1250,8 @@ export default {
                       break;
                   }
                 }
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.drawLoading = false;
               this.$message({ type: "error", message: "加载失败!" });
@@ -1265,62 +1282,64 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              let i = 0;
-              if (this.comparison === 1) {
-                // 性别
-                switch (this.gradeAttribute) {
-                  case 0: {
-                    // 总
-                    this.seriesData[seriesIndex].data =
-                      gender === 0
-                        ? res.data[0].scoreInfo.boyScoreAvgDistribute
-                        : res.data[0].scoreInfo.girlScoreAvgDistribute;
-                    break;
-                  }
-                  case 1: {
-                    // 课前
-                    this.seriesData[seriesIndex].data =
-                      gender === 0
-                        ? res.data[0].scoreInfo.boyScoreDistribute1
-                        : res.data[0].scoreInfo.girlScoreDistribute1;
-                    break;
-                  }
-                  case 2: {
-                    this.seriesData[seriesIndex].data =
-                      gender === 0
-                        ? res.data[0].scoreInfo.boyScoreDistribute2
-                        : res.data[0].scoreInfo.girlScoreDistribute2;
-                    // 课后
-                    break;
-                  }
-                  default: {
-                    break;
+              if (res.state === 1) {
+                let i = 0;
+                if (this.comparison === 1) {
+                  // 性别
+                  switch (this.gradeAttribute) {
+                    case 0: {
+                      // 总
+                      this.seriesData[seriesIndex].data =
+                        gender === 0
+                          ? res.data[0].scoreInfo.boyScoreAvgDistribute
+                          : res.data[0].scoreInfo.girlScoreAvgDistribute;
+                      break;
+                    }
+                    case 1: {
+                      // 课前
+                      this.seriesData[seriesIndex].data =
+                        gender === 0
+                          ? res.data[0].scoreInfo.boyScoreDistribute1
+                          : res.data[0].scoreInfo.girlScoreDistribute1;
+                      break;
+                    }
+                    case 2: {
+                      this.seriesData[seriesIndex].data =
+                        gender === 0
+                          ? res.data[0].scoreInfo.boyScoreDistribute2
+                          : res.data[0].scoreInfo.girlScoreDistribute2;
+                      // 课后
+                      break;
+                    }
+                    default: {
+                      break;
+                    }
                   }
                 }
-              }
-              if (this.comparison === 2) {
-                // 班级
-                switch (this.gradeAttribute) {
-                  case 0: {
-                    // 总
-                    this.seriesData[seriesIndex].data =
-                      res.data[0].scoreInfo.totalScoreAvgDistribute;
-                    break;
-                  }
-                  case 1: {
-                    // 课前
-                    this.seriesData[seriesIndex].data =
-                      res.data[0].scoreInfo.totalScoreDistribute1;
-                    break;
-                  }
-                  case 2: {
-                    // 课后
-                    this.seriesData[seriesIndex].data =
-                      res.data[0].scoreInfo.totalScoreDistribute2;
-                    break;
-                  }
-                  default: {
-                    break;
+                if (this.comparison === 2) {
+                  // 班级
+                  switch (this.gradeAttribute) {
+                    case 0: {
+                      // 总
+                      this.seriesData[seriesIndex].data =
+                        res.data[0].scoreInfo.totalScoreAvgDistribute;
+                      break;
+                    }
+                    case 1: {
+                      // 课前
+                      this.seriesData[seriesIndex].data =
+                        res.data[0].scoreInfo.totalScoreDistribute1;
+                      break;
+                    }
+                    case 2: {
+                      // 课后
+                      this.seriesData[seriesIndex].data =
+                        res.data[0].scoreInfo.totalScoreDistribute2;
+                      break;
+                    }
+                    default: {
+                      break;
+                    }
                   }
                 }
               }
@@ -1355,12 +1374,14 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (res.data[0].scoreInfo.totalRateAvg !== undefined) {
-                this.seriesData[seriesIndex].data[
-                  index
-                ] = res.data[0].scoreInfo.totalRateAvg.toFixed(2);
-                this.drawChart();
+              if (res.state === 1) {
+                if (res.data[0].scoreInfo.totalRateAvg !== undefined) {
+                  this.seriesData[seriesIndex].data[
+                    index
+                  ] = res.data[0].scoreInfo.totalRateAvg.toFixed(2);
+                }
               }
+              this.drawChart();
             } else {
               this.drawLoading = false;
               this.$message({ type: "error", message: "加载失败!" });
@@ -1609,6 +1630,18 @@ export default {
       this.xyIndex = [0, 0];
       this.xy = 2;
       this.comparison = 2;
+      this.chapterIndex = 0;
+      this.responseType = 0;
+      this.classInfo = [
+        {
+          classNum: 0,
+          rate: 0,
+          positive: "-",
+          negative: "-",
+          percentage: 0,
+          num: 0
+        }
+      ];
       this.getChapters();
       this.getTeacherInfo();
       this.getBaseInfo();
@@ -1817,16 +1850,6 @@ export default {
         this.getClassInfo();
       }
       if (this.responseType === 1) {
-        this.classInfo = [
-          {
-            classNum: 0,
-            rate: 0,
-            positive: "-",
-            negative: "-",
-            percentage: 0,
-            num: 0
-          }
-        ];
         this.getChapterClassInfo(this.chapterOptions[this.chapterSettings].id);
       }
     },
@@ -2361,6 +2384,18 @@ export default {
     this.studentMap = new Array(4);
     this.genderMap = new Array(2);
     this.genderIndex = new Array(2);
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   computed: {
     detailOptions() {
@@ -2502,20 +2537,9 @@ export default {
   padding: 10px 20px 0 40px;
 }
 
-.chapter-set .notice {
-  letter-spacing: 0.6px;
-  font-size: 12px;
-}
-
 .response {
   border-top: 1px solid #eaeef3;
   padding: 20px 40px 20px 40px;
-}
-
-.response .notice {
-  letter-spacing: 0.6px;
-  font-size: 13px;
-  color: #616161;
 }
 
 .response .title {

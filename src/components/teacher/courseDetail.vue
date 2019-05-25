@@ -95,6 +95,7 @@
   </div>
 </template>
 <script>
+import bus from "../../bus.js";
 export default {
   name: "tCourseDetail",
   data() {
@@ -143,6 +144,18 @@ export default {
     this.getLesson();
     //获取未评分章节
     this.getUnratedChapters();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   mounted(){
  //获取章节关系

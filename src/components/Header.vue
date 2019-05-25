@@ -91,6 +91,14 @@ export default {
       this.reload = val;
     }
   },
+  created() {
+    let user = localStorage.getItem("name");
+    if (user) {
+      this.reload = true;
+    } else {
+      this.reload = false;
+    }
+  },
   mounted() {
     let date = new Date();
     this.activeDate = date.getTime().toString();
@@ -103,12 +111,15 @@ export default {
   },
   watch: {
     reload(val) {
-      if (val === true) {
+      if (val) {
         let user = localStorage.getItem("name");
         if (user) {
           this.isLogin = true;
           this.sysUserName = user;
         }
+      } else {
+        this.isLogin = false;
+        this.$router.push("/");
       }
     }
   }

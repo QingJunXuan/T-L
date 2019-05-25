@@ -1563,6 +1563,18 @@ export default {
     this.getCatalog();
     this.getCourses();
     bus.$on("reloadCatalog", val => this.getData(val));
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   watch: {
     reloadCatalog(val) {

@@ -69,6 +69,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 export default {
   name: "exerciseMark",
   data() {
@@ -253,17 +254,20 @@ export default {
         .then(
           response => {
             if (response.status === 200) {
+              if (this.studentInfo[index].studentId === 1) {
+              alert(response.bodyText)
+              }
               let answer = JSON.parse(response.bodyText);
               if (answer.state === 1) {
                 let i = 0;
-                while (i < answer.data.length) {
-                  if (answer.data[i].exercise.exerciseType === 6) {
+                while (i < answer.data.exerciseSets.length) {
+                  if (answer.data.exerciseSets[i].exercise.exerciseType === 6) {
                     this.studentInfo[index].answer.push({
-                      id: answer.data[i].exercise.exerciseId,
-                      content: answer.data[i].answer,
-                      order: answer.data[i].exercise.exerciseNumber
+                      id: answer.data.exerciseSets[i].exercise.exerciseId,
+                      content: answer.data.exerciseSets[i].answer,
+                      order: answer.data.exerciseSets[i].exercise.exerciseNumber
                     });
-                    this.studentInfo[index].score.push(0);
+                    this.studentInfo[index].score.push((answer.data.scores[i]/answer.data.exerciseSets[i].exercise.exercisePoint).toFixed(1));
                   }
                   i++;
                 }
@@ -272,7 +276,7 @@ export default {
                 for (let i = 0; i < this.question.length; i++) {
                   this.studentInfo[index].answer.push({
                     id: this.question[i].id,
-                    content: "[[[该学生未提交答案!]]]",
+                    content: "[[[该学生未完成习题作业!]]]",
                     order: this.question[i].order
                   });
                   this.studentInfo[index].score.push(0);
@@ -353,6 +357,18 @@ export default {
     this.name = this.$route.query.name;
     this.studentId = this.$route.query.studentId;
     this.getExercises();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   computed: {
     totalScore() {

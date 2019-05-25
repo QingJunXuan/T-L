@@ -399,6 +399,31 @@ export default {
   },
   created() {
     bus.$on("loginVisible", val => this.getData(val));
+    bus.$emit("reload", false);
+    window.onstorage = e => {
+      if (e.key === "role") {
+        switch (e.newValue) {
+          case "0": {
+            bus.$emit("reload", true);
+            this.$router.push("/student");
+            break;
+          }
+          case "1": {
+            bus.$emit("reload", true);
+            this.$router.push("/teacher");
+            break;
+          }
+          case "777": {
+            bus.$emit("reload", true);
+            this.$router.push("/adminManage");
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      }
+    };
   }
 };
 </script>
