@@ -182,13 +182,11 @@ export default {
           value: 0,
           label: "学生",
           disabled: false,
-          limit: 4
         },
         {
           value: 2,
           label: "班级平均分",
           disabled: false,
-          limit: 4
         }
       ],
       gradeOptions: [
@@ -726,7 +724,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
   padding-top: 20px;
   margin: 0 auto;

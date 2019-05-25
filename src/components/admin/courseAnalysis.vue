@@ -3,7 +3,7 @@
     <el-main class="background">
       <el-row
         :gutter="10"
-        style="margin: 0 auto; width: 90%; max-height: 685px"
+        style="margin: 0 auto; width: 100%; max-height: 685px"
         type="flex"
         justify="center"
       >
@@ -100,7 +100,7 @@
                     size="small"
                     v-model="detailValue"
                     @change="handleDetailValue"
-                    :multiple-limit="cOptions[comparison].limit+4"
+                    :multiple-limit="4"
                     filterable
                   >
                     <el-option
@@ -237,26 +237,22 @@ export default {
           value: 0,
           label: "教师",
           disabled: false,
-          limit: 4
         },
         {
           value: 1,
           label: "课程",
           disabled: true,
-          limit: 4
         },
 
         {
           value: 2,
           label: "学期",
           disabled: false,
-          limit: 4
         },
         {
           value: 3,
           label: "学年",
           disabled: false,
-          limit: 4
         }
       ],
       detail: [],
@@ -264,6 +260,7 @@ export default {
       comparison: 3,
       xyIndex: [0, 0],
       xData: [],
+      loadxData: false,
       detailValue: [],
       teacherOptions: [],
       courseOptions: [],
@@ -819,14 +816,15 @@ export default {
               if (this.xy === 4 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.year) {
-                    let index = this.xData.indexOf(Number(key));
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = Number(
-                        res.data.year[key].rate
-                      ).toFixed(1);
+                    if (this.loadxData) {
+                    this.xData.push(key);
                     }
+                      this.seriesData[seriesIndex].data.push(Number(
+                        res.data.year[key].rate
+                      ).toFixed(1));
                   }
                 }
+                this.loadxData = false;
                 this.drawChart();
               }
             } else {
@@ -902,14 +900,15 @@ export default {
               if (this.xy === 5 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.semester) {
-                    let index = this.xData.indexOf(key);
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = Number(
-                        res.data.semester[key].rate
-                      ).toFixed(1);
+                    if (this.loadxData) {
+                    this.xData.push(key);
                     }
+                      this.seriesData[seriesIndex].data.push(Number(
+                        res.data.semester[key].rate
+                      ).toFixed(1));
                   }
                 }
+                this.loadxData = false;
                 this.drawChart();
               }
             } else {
@@ -988,14 +987,15 @@ export default {
               if (this.xy === 1 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.year) {
-                    let index = this.xData.indexOf(Number(key));
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = Number(
-                        res.data.year[key].score
-                      ).toFixed(2);
+                    if (this.loadxData) {
+                    this.xData.push(key);
                     }
+                      this.seriesData[seriesIndex].data.push(Number(
+                        res.data.year[key].score
+                      ).toFixed(2));
                   }
                 }
+                this.loadxData = false;
                 this.drawChart();
               }
             } else {
@@ -1026,12 +1026,12 @@ export default {
                 if (res.state === 1) {
                   for (var key in res.data.year) {
                     if (this.xy === 1) {
-                      let index = this.xData.indexOf(Number(key));
-                      if (index !== -1) {
-                        this.seriesData[seriesIndex].data[index] = Number(
-                          res.data.year[key].score
-                        ).toFixed(2);
+                      if (this.loadxData) {
+                      this.xData.push(key);
                       }
+                        this.seriesData[seriesIndex].data.push(Number(
+                          res.data.year[key].score
+                        ).toFixed(2));
                     }
                     if (this.xy === 3) {
                       let index = this.search(
@@ -1052,6 +1052,7 @@ export default {
                     }
                   }
                 }
+                this.loadxData = false;
                 this.drawChart();
               }
             } else {
@@ -1083,14 +1084,16 @@ export default {
               if (this.xy === 2 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.semester) {
-                    let index = this.xData.indexOf(key);
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = Number(
-                        res.data.semester[key].score
-                      ).toFixed(2);
+                    alert(key)
+                    if (this.xData.indexOf(key) === -1) {
+                    this.xData.push(key);
                     }
+                      this.seriesData[seriesIndex].data.push(Number(
+                        res.data.semester[key].score
+                      ).toFixed(2));
                   }
                 }
+                this.loadxData = false;
                 this.drawChart();
               }
             } else {
@@ -1121,12 +1124,12 @@ export default {
                 if (res.state === 1) {
                   for (var key in res.data.semester) {
                     if (this.xy === 2) {
-                      let index = this.xData.indexOf(key);
-                      if (index !== -1) {
-                        this.seriesData[seriesIndex].data[index] = Number(
-                          res.data.semester[key].score
-                        ).toFixed(2);
+                      if (this.loadxData) {
+                      this.xData.push(key);
                       }
+                        this.seriesData[seriesIndex].push(Number(
+                          res.data.semester[key].score
+                        ).toFixed(2));
                     }
                     if (this.xy === 3) {
                       let index = this.search(
@@ -1143,6 +1146,7 @@ export default {
                     }
                   }
                 }
+                this.loadxData = false;
                 this.drawChart();
               }
             } else {
@@ -1169,6 +1173,7 @@ export default {
       this.legendData = new Array();
       this.drawLoading = true;
       this.drawCount = 0;
+      this.loadxData = true;
       switch (this.xy) {
         // 课程-选课人数
         case 0: {
@@ -1232,9 +1237,6 @@ export default {
         }
         // 年份-成绩
         case 1: {
-          for (let m = 0; m < this.yearOptions.length; m++) {
-            this.xData.push(this.yearOptions[m].label);
-          }
           switch (this.comparison) {
             // 老师
             case 0: {
@@ -1274,9 +1276,6 @@ export default {
         }
         // 学期-成绩
         case 2: {
-          for (let m = 0; m < this.semesterOptions.length; m++) {
-            this.xData.push(this.semesterOptions[m].label);
-          }
           switch (this.comparison) {
             // 老师
             case 0: {
@@ -1399,9 +1398,6 @@ export default {
         }
         // 年份-评分
         case 4: {
-          for (let m = 0; m < this.yearOptions.length; m++) {
-            this.xData.push(this.yearOptions[m].label);
-          }
           switch (this.comparison) {
             // 老师
             case 0: {
@@ -1443,9 +1439,6 @@ export default {
         }
         // 学期-评分
         case 5: {
-          for (let m = 0; m < this.semesterOptions.length; m++) {
-            this.xData.push(this.semesterOptions[m].label);
-          }
           switch (this.comparison) {
             // 老师
             case 0: {
@@ -1712,7 +1705,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
   padding-top: 20px;
   margin: 0 auto;

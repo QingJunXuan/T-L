@@ -10,11 +10,6 @@
               <div v-if="!getUser()">
                 <el-button @click="loginTableVisible = true">JOIN US!</el-button>
               </div>
-              <div v-else>
-                <el-button @click="$router.push('/student')">学生主页</el-button>
-                <el-button @click="$router.push('/teacher')" style="margin-left: 10px">教师主页</el-button>
-                <el-button @click="$router.push('/adminManage')" style="margin-left: 10px">管理员主页</el-button>
-              </div>
             </div>
           </div>
         </div>

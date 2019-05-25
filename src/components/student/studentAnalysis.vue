@@ -237,19 +237,16 @@ export default {
           value: 0,
           label: "学生",
           disabled: false,
-          limit: 4
         },
         {
           value: 1,
           label: "性别",
           disabled: false,
-          limit: 1
         },
         {
           value: 2,
           label: "班级平均分",
           disabled: false,
-          limit: 4
         }
       ],
       gradeOptions: [
@@ -780,6 +777,7 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
+              alert(response.bodyText)
               if (res.state === 1) {
                 if (res.message[1] === "需") {
                   this.suggestion = "最近成绩不太理想哦，你可能需要学习一些";

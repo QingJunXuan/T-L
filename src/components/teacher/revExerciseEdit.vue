@@ -1,6 +1,6 @@
 <template>
-  <el-container>
-    <div class="main" align="start">
+  <el-container class="main">
+    <div align="start" style="width: 100%">
       <el-dialog title="请选择截止时间" :visible.sync="dialogTableVisible">
         <div align="center">
           <el-date-picker v-model="time" type="date" size="small" :picker-options="startLimit"></el-date-picker>
@@ -13,8 +13,13 @@
           >确认</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="请选择习题" :visible.sync="selectHistoryVisible">
+      <el-dialog
+        title="请选择习题"
+        :visible.sync="selectHistoryVisible"
+        style="width: 80%; margin: 0 auto"
+      >
         <el-row type="flex" justify="center">
+          <span style="margin-top: 5px; margin-right: 10px">历史课程</span>
           <el-select size="small" v-model="importSettings" @change="handleChapter">
             <el-option
               v-for="item in importData"
@@ -25,6 +30,7 @@
           </el-select>
         </el-row>
         <el-row type="flex" justify="center" style="margin-top: 10px">
+          <span style="margin-top: 5px; margin-right: 10px">选择章节</span>
           <el-select size="small" v-model="chapterSettings">
             <el-option
               v-for="item in chapterData"
@@ -33,6 +39,11 @@
               :label="item.label"
             ></el-option>
           </el-select>
+        </el-row>
+        <el-row style="margin-top: 20px;">
+          <div
+            style="width: 70%; margin: 0 auto; font-size: 12px;"
+          >注：你可以将指定学期的某课程中指定章节的习题内容导入成为现在的习题内容，导入的习题将覆盖你所保存的全部习题。</div>
         </el-row>
         <el-row type="flex" justify="center" style="margin-top: 15px">
           <el-button
@@ -51,22 +62,39 @@
           <div class="title">
             <pre>{{item1.order}}.（{{item1.score}}分）{{item1.question}}</pre>
           </div>
-          <div
-            class="betweenspace"
-            style="margin-top: 15px; padding: 0 10px 0 10px; font-size: 14px"
-          >
-            <div v-for="(item2, j) in item1.options" :key="100+i+j">
-              <div :class="setAnswerClass(item1, j)">{{String.fromCharCode(j+65)}}.{{item2.content}}</div>
-            </div>
+          <div v-if="item1.type === 4" style="margin: 15px 0 15px 0">
+            <el-radio-group v-model="item1.answer[0]" @change="item1.edited = false">
+              <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px">
+                <el-radio
+                  :disabled="item1.delete"
+                  :label="j"
+                >{{String.fromCharCode(j+65)}}. {{item2.content}}</el-radio>
+              </div>
+            </el-radio-group>
           </div>
-          <div class="detail"><pre>{{item1.detail}}</pre></div>
+          <div
+            v-else-if="item1.type === 5"
+            style="margin: 15px 0 15px 0"
+          >
+            <el-checkbox-group v-model="item1.answer" @change="item1.edited = false">
+              <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px">
+                <el-checkbox
+                  :disabled="item1.delete"
+                  :label="j"
+                >{{String.fromCharCode(j+65)}}. {{item2.content}}</el-checkbox>
+              </div>
+            </el-checkbox-group>
+          </div>
+          <div class="detail">
+            <pre>{{item1.detail}}</pre>
+          </div>
           <div style="margin-top: 15px;" v-if="!item1.delete">
             <span>
               <!-- 进入编辑模式 -->
               <el-button
                 size="mini"
                 @click="editObject(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -77,7 +105,7 @@
               <el-button
                 size="mini"
                 @click="deleteObject(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -87,7 +115,7 @@
               <el-button
                 size="mini"
                 @click="moveObjUp(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -97,7 +125,7 @@
               <el-button
                 size="mini"
                 @click="moveObjDown(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -159,7 +187,7 @@
           </div>
           <div style="margin-top: 15px">
             <!-- 添加选项 -->
-            <el-button size="small" round @click="addRevOptions()">
+            <el-button size="small" round @click="addRevOptions()" type="primary" plain>
               <i class="el-icon-circle-plus-outline" style="margin-right: 6px"></i>添加选项
             </el-button>
           </div>
@@ -224,7 +252,7 @@
           size="small"
           round
           style="margin-top: 20px"
-          type="warning"
+          type="primary"
           plain
           @click="addReviewO"
         >
@@ -245,15 +273,19 @@
           <div class="title">
             <pre>{{item.order}}.（{{item.score}}分）{{item.question}}</pre>
           </div>
-          <div class="answer-text"><pre>{{item.answer}}</pre></div>
-          <div class="detail"><pre>{{item.detail}}</pre></div>
+          <div class="answer-text">
+            <pre>{{item.answer}}</pre>
+          </div>
+          <div class="detail">
+            <pre>{{item.detail}}</pre>
+          </div>
           <div style="margin-top: 15px;" v-if="!item.delete">
             <span>
               <!-- 进入编辑模式 -->
               <el-button
                 size="mini"
                 @click="editSubject(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -264,7 +296,7 @@
               <el-button
                 size="mini"
                 @click="deleteSubject(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -274,7 +306,7 @@
               <el-button
                 size="mini"
                 @click="moveSubUp(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -284,7 +316,7 @@
               <el-button
                 size="mini"
                 @click="moveSubDown(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -335,21 +367,29 @@
             ></el-input>
           </div>
           <div style="margin-top: 20px">
-            <el-button size="mini" @click="saveSubject(i)" type="primary"
+            <el-button size="mini" @click="saveSubject(i)" type="primary" round plain>确认</el-button>
+            <el-button
+              size="mini"
+              style="margin-left: 10px"
+              @click="resetSubject(i)"
+              type="primary"
               round
-              plain>确认</el-button>
-            <el-button size="mini" style="margin-left: 10px" @click="resetSubject(i)" type="primary"
+              plain
+            >重置</el-button>
+            <el-button
+              size="mini"
+              style="margin-left: 10px"
+              @click="cancelSub(i)"
+              type="primary"
               round
-              plain>重置</el-button>
-            <el-button size="mini" style="margin-left: 10px" @click="cancelSub(i)" type="primary"
-              round
-              plain>取消</el-button>
+              plain
+            >取消</el-button>
           </div>
         </div>
       </div>
       <div v-show="subjectButton">
         <el-button
-          type="warning"
+          type="primary"
           plain
           round
           size="small"
@@ -396,7 +436,7 @@ export default {
       id: 0,
       chapterInfo: {},
       courseID: 0,
-      teacherID: localStorage.getItem('userID'),
+      teacherID: localStorage.getItem("userID"),
       // 课后习题
       exercisesObj: [
         {
@@ -570,12 +610,16 @@ export default {
                     }
                     this.exercisesObj.sort(this.compare("order"));
                   } else if (exerciseList.data[i].exercise.exerciseType === 6) {
+                    alert(exerciseList.data[i].exercise.exerciseAnswer.charCodeAt(4))
                     this.exercisesSub.push({
                       exerciseID: exerciseList.data[i].exercise.exerciseId,
                       question: exerciseList.data[i].exercise.exerciseContent,
                       type: exerciseList.data[i].exercise.exerciseType,
                       score: exerciseList.data[i].exercise.exercisePoint,
-                      answer: exerciseList.data[i].exercise.exerciseAnswer,
+                      answer: exerciseList.data[i].exercise.exerciseAnswer.replace(
+          /\/\x0A/g,
+          "\n"
+        ),
                       detail: exerciseList.data[i].exercise.exerciseAnalysis,
                       order: exerciseList.data[i].exercise.exerciseNumber,
                       edit: false,
@@ -768,10 +812,10 @@ export default {
       if (!this.exercisesObj[index - 1].new) {
         this.exercisesObj[index - 1].edited = true;
       }
+      this.exercisesObj[index].order--;
+      this.exercisesObj[index - 1].order++;
       this.exercisesObj.splice(index - 1, 0, this.exercisesObj[index]);
       this.exercisesObj.splice(index + 1, 1);
-      this.exercisesObj[index].order++;
-      this.exercisesObj[index - 1].order--;
     },
     moveObjDown(index) {
       if (index === this.exercisesObj.length - 1) {
@@ -784,10 +828,10 @@ export default {
       if (!this.exercisesObj[index + 1].new) {
         this.exercisesObj[index + 1].edited = true;
       }
+      this.exercisesObj[index].order++;
+      this.exercisesObj[index + 1].order--;
       this.exercisesObj.splice(index + 2, 0, this.exercisesObj[index]);
       this.exercisesObj.splice(index, 1);
-      this.exercisesObj[index].order--;
-      this.exercisesObj[index + 1].order++;
     },
     addReviewO() {
       this.exercisesObj.push({
@@ -842,12 +886,9 @@ export default {
           type: "warning"
         });
         return;
-      } else if (
-        Number(this.objectNew.score) <= 0 ||
-        Number(this.objectNew.score) > 100
-      ) {
+      } else if (Number(this.objectNew.score) <= 0 || this.objectNew.score.toString().indexOf('.') !== -1) {
         this.$message({
-          message: "分数应在0-100之间！",
+          message: "分数应为正整数！",
           type: "warning"
         });
         return;
@@ -855,13 +896,6 @@ export default {
         let sum = this.totalObject;
         sum -= this.exercisesObj[index].score;
         sum += Number(this.objectNew.score);
-        if (sum > 100) {
-          this.$message({
-            message: "总分超出最大值，请调整分数！",
-            type: "warning"
-          });
-          return;
-        }
       }
       this.totalObject -= Number(this.exercisesObj[index].score);
       this.exercisesObj[index] = this.objDeepCopy(this.objectNew);
@@ -929,10 +963,10 @@ export default {
       if (!this.exercisesSub[index - 1].new) {
         this.exercisesSub[index - 1].edited = true;
       }
+      this.exercisesSub[index].order--;
+      this.exercisesSub[index - 1].order++;
       this.exercisesSub.splice(index - 1, 0, this.exercisesSub[index]);
       this.exercisesSub.splice(index + 1, 1);
-      this.exercisesSub[index].order++;
-      this.exercisesSub[index - 1].order--;
     },
     moveSubDown(index) {
       if (index === this.exercisesSub.length - 1) {
@@ -945,10 +979,10 @@ export default {
       if (!this.exercisesSub[index + 1].new) {
         this.exercisesSub[index + 1].edited = true;
       }
+      this.exercisesSub[index].order++;
+      this.exercisesSub[index + 1].order--;
       this.exercisesSub.splice(index + 2, 0, this.exercisesSub[index]);
       this.exercisesSub.splice(index, 1);
-      this.exercisesSub[index].order--;
-      this.exercisesSub[index + 1].order++;
     },
     deleteSubject(index) {
       this.$confirm("确认删除该题吗?", "提示", {
@@ -1008,11 +1042,10 @@ export default {
           type: "warning"
         });
       } else if (
-        Number(this.subjectNew.score) <= 0 ||
-        Number(this.subjectNew.score) > 100
+        Number(this.subjectNew.score) <= 0 || this.subjectNew.score.toString().indexOf('.') !== -1
       ) {
         this.$message({
-          message: "分数应在0-100之间！",
+          message: "分数应为正整数！",
           type: "warning"
         });
         return;
@@ -1020,13 +1053,6 @@ export default {
         let sum = this.totalSubject;
         sum -= this.exercisesSub[index].score;
         sum += Number(this.subjectNew.score);
-        if (this.totalSubject + sum > 100) {
-          this.$message({
-            message: "总分超出最大值，请调整分数！",
-            type: "warning"
-          });
-          return;
-        } else {
           this.totalSubject -= Number(this.exercisesSub[index].score);
           this.exercisesSub[index] = this.objDeepCopy(this.subjectNew);
           this.exercisesSub[index].edit = false;
@@ -1037,7 +1063,6 @@ export default {
           this.totalSubject += Number(this.exercisesSub[index].score);
           this.subjectButton = true;
           this.funcButton = false;
-        }
       }
     },
     resetSubject(index) {
@@ -1163,9 +1188,9 @@ export default {
         chapterId: this.id,
         exerciseType: this.exercisesObj[index].type,
         exerciseNumber: this.exercisesObj[index].order,
-        exerciseContent: this.exercisesObj[index].question.replace(/<br\/>/g, '\n'),
+        exerciseContent: this.exercisesObj[index].question,
         exerciseAnswer: ans,
-        exerciseAnalysis: this.exercisesObj[index].detail.replace(/<br\/>/g, '\n'),
+        exerciseAnalysis: this.exercisesObj[index].detail,
         exercisePoint: this.exercisesObj[index].score
       };
       this.$http
@@ -1200,9 +1225,9 @@ export default {
         chapterId: this.id,
         exerciseType: 6,
         exerciseNumber: this.exercisesSub[index].order,
-        exerciseContent: this.exercisesSub[index].question.replace(/<br\/>/g, '\n'),
-        exerciseAnswer: this.exercisesSub[index].answer.replace(/<br\/>/g, '\n'),
-        exerciseAnalysis: this.exercisesSub[index].detail.replace(/<br\/>/g, '\n'),
+        exerciseContent: this.exercisesSub[index].question,
+        exerciseAnswer: this.exercisesSub[index].answer,
+        exerciseAnalysis: this.exercisesSub[index].detail,
         exercisePoint: this.exercisesSub[index].score
       };
       this.$http
@@ -1327,7 +1352,10 @@ export default {
         exerciseType: 6,
         exerciseNumber: this.exercisesSub[index].order,
         exerciseContent: this.exercisesSub[index].question,
-        exerciseAnswer: this.exercisesSub[index].answer,
+        exerciseAnswer: this.exercisesSub[index].answer.replace(
+          /\x0A/g,
+          "\\n"
+        ),
         exerciseAnalysis: this.exercisesSub[index].detail,
         exercisePoint: this.exercisesSub[index].score
       };
@@ -1701,7 +1729,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
   width: 700px;
   margin: 0 auto;
@@ -1715,10 +1743,11 @@ export default {
 .exercises .title pre {
   padding: 0;
   margin: 0;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
-  white-space: pre-wrap; 
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 
@@ -1733,10 +1762,11 @@ export default {
 .exercises .answer-text pre {
   padding: 0;
   margin: 0;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-weight: 400;
   font-size: 14px;
-  white-space: pre-wrap; 
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 
@@ -1751,10 +1781,11 @@ export default {
 .exercises .detail pre {
   padding: 0;
   margin: 0;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-weight: 400;
   font-size: 14px;
-  white-space: pre-wrap; 
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 

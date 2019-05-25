@@ -2,9 +2,9 @@
   <el-container>
     <el-main class="background">
       <div class="main">
-        <el-card :body-style="{ padding: '0' }">
+        <el-card :body-style="{ padding: '0' }" v-loading="questionLoading">
           <!-- 标题 -->
-          <div align="center" class="header">
+          <div align="center" class="header" id="title">
             <el-row>
               <el-col :span="2" align="start">
                 <div>
@@ -22,55 +22,10 @@
           <div class="cardbody">
             <!-- 成绩和学生信息 -->
             <el-row style="margin-top: 3px;">
-              <el-col :span="4" align="center">
+              <el-col :span="17" style="padding-left: 40px" align="start">
                 <div
-                  style="font-size: 14px; margin-left: 20px;margin-top: 13px; font-weight: 450; letter-spacing: 1px"
-                >总成绩：{{totalScore[index]}}</div>
-              </el-col>
-              <el-col :span="13" align="end" style="height: 10px">
-                <div v-if="notSelect">
-                  <el-button
-                    type="text"
-                    @click="index--"
-                    :class="index === 0? 'buttonHid' : 'switch-button'"
-                  >
-                    <i class="el-icon-caret-left"></i>
-                  </el-button>
-                </div>
-                <div v-else>&nbsp;</div>
-              </el-col>
-              <el-col :span="5" align="center">
-                <div
-                  v-if="notSelect && studentInfo.length > 0"
-                  @dblclick="notSelect = false"
-                  class="student-info"
+                  class="student-info" v-if="studentInfo.length > 0"
                 >{{studentInfo[index].id}} {{studentInfo[index].name}}</div>
-                <div v-else class="student-option">
-                  <el-select v-model="index" placeholder="跳转到学生" filterable size="small">
-                    <el-option
-                      v-for="item in studentOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    ></el-option>
-                  </el-select>
-                </div>
-              </el-col>
-              <el-col :span="2" align="start">
-                <div v-if="notSelect">
-                  <el-button
-                    type="text"
-                    @click="index++"
-                    :class="index === studentInfo.length - 1? 'buttonHid' : 'switch-button'"
-                  >
-                    <i class="el-icon-caret-right"></i>
-                  </el-button>
-                </div>
-                <div v-else>
-                  <el-button @click="notSelect = true" class="cancel-button" type="text">
-                    <i class="el-icon-circle-close"></i>
-                  </el-button>
-                </div>
               </el-col>
             </el-row>
             <!-- 问题答案和选择分数 -->
@@ -78,10 +33,8 @@
               v-if="question.length > 0 && studentInfo.length > 0 && question.length === studentInfo[index].answer.length"
             >
               <div v-for="(question, i) in question" :key="i" align="start" class="question">
-                <div
-                  style="font-weight: 400; letter-spacing: 0.8px; font-size: 14px"
-                >{{question.order}}.{{question.content}}({{question.score}}分)</div>
-                <div class="answer">{{studentInfo[index].answer[i].content}}</div>
+                <pre>{{question.order}}.{{question.content}}({{question.score}}分)</pre>
+                <div class="answer"><pre>{{studentInfo[index].answer[i].content}}</pre></div>
                 <div style="margin-top: 15px">
                   <span class="notice">得分</span>
                   <span style="margin-left: 10px">
@@ -102,8 +55,12 @@
               </div>
             </div>
           </div>
+          <div
+                  style="font-size: 14px; margin-left: 40px;margin-top: 13px; font-weight: 450; letter-spacing: 1px">总成绩：{{totalScore[index]}}</div>
           <div style="margin-top: 20px; padding-bottom: 15px;" align="center">
-            <el-button type="primary" class="submit-button" size="small" @click="submit">提交</el-button>
+            <el-button type="primary" class="submit-button" size="small" @click="stuBack" :disabled="index === 0">上一名</el-button>
+            <el-button type="primary" class="submit-button" size="small" @click="submit" :loading="submitLoading">提交</el-button>
+            <el-button type="primary" class="submit-button" size="small" @click="stuForward" :disabled="next">下一名</el-button>
           </div>
         </el-card>
       </div>
@@ -117,21 +74,23 @@ export default {
   data() {
     return {
       // 章节id需要传值
+      courseID: 0,
       chapterID: 0,
       classID: 0,
       name: "",
       studentId:0,
-      // 控制选框的显示
-      notSelect: true,
       // getExercises
       question: [],
       index: 0,
+      next: true,
       // getStudentInfo
-      studentInfo: [],
-      studentOptions: [],
+      studentInfo: [{
+        id: '',
+        name: '暂无学生信息'
+      }],
       // loading
       submitLoading: false,
-      questionLoading: false,
+      questionLoading: true,
       studentLoading: false,
       // 分数设定
       scoreOptions: [
@@ -165,12 +124,26 @@ export default {
         this.$router.push({ path: "/" });
         return false;
       } else {
-        this.$router.go(-1);
+        this.$router.push({path: '/teacher/courseDetail', query: {
+          courseID: this.courseID,
+          classID: this.classID
+        }});
       }
+    },
+    stuBack() {
+      this.index--;
+      this.next = false;
+      window.location.hash = "#title"
+    },
+    stuForward() {
+      this.index++;
+      this.next = true;
+      window.location.hash = "#title"
     },
     // 获取
     getExercises() {
       this.question = [];
+      this.questionLoading = true;
       this.$http
         .get(
           // 传值chapterid
@@ -202,19 +175,22 @@ export default {
                 }
                 this.getStudentInfo();
                 this.question.sort(this.compare("order"));
+                this.questionLoading = false;
               }
             } else {
+              this.questionLoading = false;
               this.$message({ type: "error", message: "加载失败!" });
             }
           },
           response => {
+            this.questionLoading = false;
             this.$message({ type: "error", message: "加载失败!" });
           }
         );
     },
     getStudentInfo() {
       this.studentInfo = [];
-      this.studentOptions = [];
+      this.studentLoading = true;
       this.$http
         .get(
           // 传值班级号
@@ -240,24 +216,22 @@ export default {
                     name: studentList.data[i].name,
                     studentId: studentList.data[i].userID
                   });
-                  this.studentOptions.push({
-                    value: i,
-                    label:
-                      studentList.data[i].workID +
-                      " " +
-                      studentList.data[i].name
-                  });
+                  if (this.studentInfo[i].studentId === this.$route.query.studentId) {
+                    this.index = i;
+                  }
                   this.getAnswers(i);
                   i++;
                 }
               }
+              this.studentLoading = false;
               console.log(this.studentInfo.length);
-              console.log(this.studentOptions.length);
             } else {
+              this.studentLoading = false;
               this.$message({ type: "error", message: "加载失败!" });
             }
           },
           response => {
+            this.studentLoading = false;
             this.$message({ type: "error", message: "加载失败!" });
           }
         );
@@ -322,6 +296,7 @@ export default {
         this.studentInfo[this.index].score.length === 1
           ? this.studentInfo[this.index].score[0]
           : this.studentInfo[this.index].score;
+          this.submitLoading = true;
       this.$http
         .post(
           "http://10.60.38.173:8765/question/correctAll",
@@ -340,12 +315,18 @@ export default {
         .then(
           response => {
             if (response.status === 200) {
+              this.submitLoading = false;
+              if (this.index !== this.studentInfo.length - 1) {
+                this.next = false;
+              }
               this.$message({ type: "success", message: "提交成功!" });
             } else {
+              this.submitLoading = false;
               this.$message({ type: "error", message: "提交失败!" });
             }
           },
           response => {
+            this.submitLoading = false;
             this.$message({ type: "error", message: "提交失败!" });
           }
         );
@@ -368,6 +349,7 @@ export default {
   created() {
     this.chapterID = this.$route.query.chapterID;
     this.classID = this.$route.query.classID;
+    this.courseID = this.$route.query.courseID;
     this.name = this.$route.query.name;
     this.studentId = this.$route.query.studentId;
     this.getExercises();
@@ -428,7 +410,7 @@ export default {
 
 .background {
   background-image: url("../../assets/background.jpg"); /*背景图片地址*/
-  background-repeat: no-repeat; /*背景图片不重复*/
+  background-repeat: repeat-y; /*背景图片不重复*/
   background-size: cover; /*背景图片拉伸铺满*/
   width: 100%; /* 宽度为100%；*/
 }
@@ -472,11 +454,23 @@ export default {
 }
 
 .cardbody {
-  height: 680px;
+  min-height: 680px;
 }
 
 .submit-button {
   background-color: #7cc8fb;
   border-color: #7cc8fb;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.8px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>

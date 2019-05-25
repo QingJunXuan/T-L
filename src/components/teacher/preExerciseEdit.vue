@@ -1,6 +1,6 @@
 <template>
-  <el-container>
-    <div class="main" align="start">
+  <el-container class="main">
+    <div align="start" style="width: 100%">
       <el-dialog title="请选择截止时间" :visible.sync="dialogTableVisible">
         <div align="center">
           <el-date-picker v-model="time" type="date" size="small" :picker-options="startLimit"></el-date-picker>
@@ -13,8 +13,9 @@
           >确认</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="请选择习题" :visible.sync="selectHistoryVisible">
+      <el-dialog title="请选择习题" :visible.sync="selectHistoryVisible" style="width: 80%; margin: 0 auto">
         <el-row type="flex" justify="center">
+          <span style="margin-top: 5px; margin-right: 10px">历史课程</span>
           <el-select size="small" v-model="importSettings" @change="handleChapter">
             <el-option
               v-for="item in importData"
@@ -25,6 +26,7 @@
           </el-select>
         </el-row>
         <el-row type="flex" justify="center" style="margin-top: 10px">
+          <span style="margin-top: 5px; margin-right: 10px">选择章节</span>
           <el-select size="small" v-model="chapterSettings">
             <el-option
               v-for="item in chapterData"
@@ -33,6 +35,9 @@
               :label="item.label"
             ></el-option>
           </el-select>
+        </el-row>
+        <el-row style="margin-top: 20px;">
+          <div style="width: 70%; margin: 0 auto; font-size: 12px;">注：你可以将指定学期的某课程中指定章节的习题内容导入成为现在的习题内容，导入的习题将覆盖你所保存的全部习题。</div>
         </el-row>
         <el-row type="flex" justify="center" style="margin-top: 15px">
           <el-button
@@ -50,22 +55,36 @@
           <div class="title">
             <pre>{{item1.order}}.（{{item1.score}}分）{{item1.question}}</pre>
           </div>
-          <div
-            class="betweenspace"
-            style="margin-top: 15px; padding: 0 10px 0 10px; font-size: 14px"
-          >
-            <div v-for="(item2, j) in item1.options" :key="j">
-              <div :class="setAnswerClass(item1, j)">{{String.fromCharCode(j+65)}}.{{item2.content}}</div>
-            </div>
+          <div v-if="item1.type === 1" style="margin: 15px 0 15px 0">
+            <el-radio-group v-model="item1.answer[0]" @change="item1.edited = false">
+              <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px">
+                <el-radio
+                :disabled="item1.delete"
+                  :label="j"
+                >{{String.fromCharCode(j+65)}}. {{item2.content}}</el-radio>
+              </div>
+            </el-radio-group>
           </div>
-          <div class="detail"><pre>{{item1.detail}}</pre></div>
+          <div v-else-if="item1.type === 2" style="margin: 15px 0 15px 0">
+            <el-checkbox-group v-model="item1.answer">
+              <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px" @change="item1.edited = false">
+                <el-checkbox
+                :disabled="item1.delete"
+                  :label="j"
+                >{{String.fromCharCode(j+65)}}. {{item2.content}}</el-checkbox>
+              </div>
+            </el-checkbox-group>
+          </div>
+          <div class="detail">
+            <pre>{{item1.detail}}</pre>
+          </div>
           <div style="margin-top: 15px;" v-if="!item1.delete">
             <span>
               <!-- 进入编辑模式 -->
               <el-button
                 size="mini"
                 @click="editMode(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -76,7 +95,7 @@
               <el-button
                 size="mini"
                 @click="deletePreExercise(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -86,7 +105,7 @@
               <el-button
                 size="mini"
                 @click="moveUp(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -96,7 +115,7 @@
               <el-button
                 size="mini"
                 @click="moveDown(i)"
-                type="warning"
+                type="primary"
                 round
                 plain
                 class="edit-button"
@@ -162,7 +181,8 @@
             </div>
           </div>
           <div style="margin-top: 15px">
-            <el-button size="small" round @click="addOption()">
+            <el-button size="small" round @click="addOption()" type="primary"
+              plain>
               <i class="el-icon-circle-plus-outline" style="margin-right: 6px"></i>添加选项
             </el-button>
           </div>
@@ -221,7 +241,7 @@
       </div>
       <div v-show="addButton">
         <el-button
-          type="warning"
+          type="primary"
           plain
           size="small"
           round
@@ -268,7 +288,7 @@ export default {
       id: 0,
       chapterInfo: {},
       courseID: 0,
-      teacherID: localStorage.getItem('userID'),
+      teacherID: localStorage.getItem("userID"),
       // 课前习题
       exercises: [
         {
@@ -351,7 +371,9 @@ export default {
       this.$http
         .get(
           // 传值chapterid
-          "http://10.60.38.173:8765/question/view?chapterId=" + this.id + "&type=preview",
+          "http://10.60.38.173:8765/question/view?chapterId=" +
+            this.id +
+            "&type=preview",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -513,10 +535,6 @@ export default {
           }
         );
     },
-    setAnswerClass(item, j) {
-      if (item.answer.indexOf(j) >= 0 && !item.delete) return "answer";
-      else return "";
-    },
     handleType() {
       if (this.exerciseNew.type === 1) {
         for (let i = 1; i < this.exerciseNew.answer.length; i++) {
@@ -633,10 +651,10 @@ export default {
       if (!this.exercises[index + 1].new) {
         this.exercises[index + 1].edited = true;
       }
+      this.exercises[index].order++;
+      this.exercises[index + 1].order--;
       this.exercises.splice(index + 2, 0, this.exercises[index]);
       this.exercises.splice(index, 1);
-      this.exercises[index].order--;
-      this.exercises[index + 1].order++;
     },
     // 删除选项
     deleteOption(index) {
@@ -671,11 +689,10 @@ export default {
         });
         return;
       } else if (
-        Number(this.exerciseNew.score) <= 0 ||
-        Number(this.exerciseNew.score) > 100
+        Number(this.exerciseNew.score) <= 0 || this.exerciseNew.score.toString().indexOf('.') !== -1
       ) {
         this.$message({
-          message: "分数应在0-100之间！",
+          message: "分数应为正整数！",
           type: "warning"
         });
         return;
@@ -683,13 +700,6 @@ export default {
         let sum = this.totalScore;
         sum -= this.exercises[index].score;
         sum += Number(this.exerciseNew.score);
-        if (sum > 100) {
-          this.$message({
-            message: "总分超出最大值，请调整分数！",
-            type: "warning"
-          });
-          return;
-        }
       }
       this.totalScore -= Number(this.exercises[index].score);
       this.exercises[index] = this.objDeepCopy(this.exerciseNew);
@@ -909,11 +919,15 @@ export default {
         exercisePoint: this.exercises[index].score
       };
       this.$http
-        .post("http://10.60.38.173:8765/question/alterExercise", exerciseEntity, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+        .post(
+          "http://10.60.38.173:8765/question/alterExercise",
+          exerciseEntity,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(
           response => {
             if (response.status === 200) {
@@ -1088,7 +1102,7 @@ export default {
               {
                 sourceChapterId: this.chapterSettings,
                 aimChapterId: this.id,
-                type: "review"
+                type: "preview"
               },
               {
                 headers: {
@@ -1206,9 +1220,9 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
-  width: 80%;
+  width: 700px;
   margin: 0 auto;
 }
 
@@ -1220,10 +1234,11 @@ export default {
 .exercises .title pre {
   padding: 0;
   margin: 0;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
-  white-space: pre-wrap; 
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 
@@ -1238,10 +1253,11 @@ export default {
 .exercises .detail pre {
   padding: 0;
   margin: 0;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
-  white-space: pre-wrap; 
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 

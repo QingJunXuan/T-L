@@ -126,7 +126,7 @@
                     size="small"
                     v-model="detailValue"
                     @change="handleDetailValue"
-                    :multiple-limit="cOptions[comparison].limit+4"
+                    :multiple-limit="4"
                     filterable
                   >
                     <el-option
@@ -285,7 +285,7 @@
                           v-loading="commentLoading"
                         >
                           <el-row>
-                            <div class="title">班级{{item.classNum}}</div>
+                            <el-col :span="24"><div class="title">班级{{item.classNum}}</div></el-col>
                           </el-row>
                           <el-row :gutter="5" style="margin-top: 20px">
                             <el-col :span="5" align="right">
@@ -427,31 +427,26 @@ export default {
           value: 0,
           label: "学生",
           disabled: true,
-          limit: 4
         },
         {
           value: 1,
           label: "性别",
           disabled: true,
-          limit: 1
         },
         {
           value: 2,
           label: "班级",
           disabled: false,
-          limit: 4
         },
         {
           value: 3,
           label: "教师",
           disabled: true,
-          limit: 4
         },
         {
           value: 4,
           label: "章节",
           disabled: true,
-          limit: 4
         }
       ],
       gradeOptions: [
@@ -766,6 +761,10 @@ export default {
               let i = 0;
               let teacherIndex = 0;
               while (i < courseList.data.length) {
+                if (courseList.data[i].courseInfo.teacherID == this.teacherID) {
+                  i++;
+                  continue;
+                }
                 let notExist = true;
                 for (let j = 0; j < this.teacherInfo.length; j++) {
                   if (
@@ -1065,6 +1064,7 @@ export default {
                     this.classInfo[j].negative =
                       classList.data.classInfo[i].classNegativeNum;
                   }
+                  alert(this.classInfo[j].percentage)
                 }
                 i++;
               }

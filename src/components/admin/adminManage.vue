@@ -41,7 +41,7 @@
       </el-col> -->
     </el-row>
     <el-row>
-      <router-view class="router-view"></router-view>
+      <router-view></router-view>
     </el-row>
   </div>
 </template>
