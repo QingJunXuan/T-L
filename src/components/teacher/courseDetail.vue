@@ -52,12 +52,13 @@
         </div>
         <div v-show="isLesson" class="noticeBack">
           <el-row style="margin-bottom:20px">
-            <el-col :span="4" :offset="17" style="margin-top:-120px">
+            <el-col :span="20" :offset="3" style="margin-top:-120px" align="start">
               <el-button type="success" size="small" @click="changeLesson">
                 <span v-if="isGraph==true">查看章节目录</span>
                 <span v-else>查看关系图</span>
               </el-button>
-              <el-button type="primary" size="small" @click="editChapter">编辑章节及练习</el-button>
+              <el-button type="primary" size="small" @click="editChapter" style="margin-left: 65%">编辑章节</el-button>
+              <el-button type="primary" size="small" @click="editExercise" style="margin-left: 20px">编辑习题</el-button>
             </el-col>
           </el-row>
           <el-row>
@@ -84,8 +85,7 @@
           <el-col :span="10" :offset="7" v-for="(item,index) in unratedChapters" :key="index">
               <el-row style="padding-bottom:20px">
                 <el-card shadow="hover" class="grade">
-                  <p style="margin-bottom:0px">{{item.chapterNode.contentName+"（作业截至提交时间："+item.chapterNode.exerciseDeadline_2+"）"}}</p>
-                  <el-button type="text" @click="grade(item.chapterNode.id, item.chapterNode.exerciseTitle,item.studentId)">点击进入评分</el-button>
+                  <p style="margin-bottom:0px; cursor: pointer; font-size: 14px" @click="grade(item.chapterNode.id, item.chapterNode.exerciseTitle,item.studentId)">{{item.chapterNode.contentName+"（作业截至提交时间："+item.chapterNode.exerciseDeadline_2+"）"}}</p>
                 </el-card>
               </el-row>
           </el-col>
@@ -322,6 +322,7 @@ export default {
         query: {
           chapterID: chapterId,
           classID: this.classID,
+          courseID: this.courseID,
           name: title,
           studentId:stuId
         }
@@ -340,7 +341,16 @@ export default {
     },
     editChapter() {
       this.$router.push({
-        path: "/teacher/chapterEdit",
+        path: "/teacher/chapterEdit/chapterHint",
+        query: {
+          id: this.courseID,
+          classID: this.classID
+        }
+      });
+    },
+    editExercise() {
+      this.$router.push({
+        path: "/teacher/exerciseEdit/exerciseHint",
         query: {
           id: this.courseID,
           classID: this.classID
@@ -352,7 +362,7 @@ export default {
         this.$router.push({ path: "/" });
         return false;
       } else {
-        this.$router.go(-1);
+        this.$router.push({path: '/teacher/courseManagement'});
       }
     },
     init() {

@@ -1,9 +1,9 @@
 <template>
   <el-container>
-    <el-aside style="width:25%">
+    <el-aside style="width:20%">
       <el-menu
         default-active="0-0"
-        style="height: 778px"
+        style="height: calc(90vh)"
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
@@ -106,18 +106,6 @@
                   </el-col>
                 </el-row>
               </div>
-              <router-link
-                :to="{name: 'preExerciseEdit', query:{id: item1.id, courseID: courseID}}"
-                class="router-link-active"
-              >
-                <el-menu-item :index="'pre' + index1.toString()">课前摸底习题</el-menu-item>
-              </router-link>
-              <router-link
-                :to="{name: 'revExerciseEdit', query:{id: item1.id, courseID: courseID}}"
-                class="router-link-active"
-              >
-                <el-menu-item :index="'rev' + index1.toString()">课后习题</el-menu-item>
-              </router-link>
               <el-menu-item :index="index1.toString() + '100'">
                 <span>
                   <el-button type="text" @click="deleteChapter(index1)" style="color: #fff">删除本章</el-button>
@@ -347,13 +335,6 @@ export default {
                 this.insertChapter();
               }
               this.activeIndex = "0-0";
-              this.$router.push({
-                path: "/teacher/chapterEdit",
-                query: {
-                  id: this.courseID,
-                  classID: this.classID
-                }
-              });
               let date = new Date();
               this.activeDate = date.getTime().toString();
               this.getRelation();
@@ -1593,7 +1574,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 a {
   text-decoration: none;
 }

@@ -11,6 +11,9 @@ import sStudentAnalysis from '../components/student/studentAnalysis.vue'
 import tCourseManage from '../components/teacher/courseManage.vue'
 import tCourseDetail from '../components/teacher/courseDetail.vue'
 import tChapterCatalog from '../components/teacher/chapterCatalog.vue'
+import tExerciseCatalog from '../components/teacher/exerciseCatalog.vue'
+import tChapterHint from '../components/teacher/chapterHint.vue'
+import tExerciseHint from '../components/teacher/exerciseHint.vue'
 import tPointEdit from '../components/teacher/pointEdit.vue'
 import preExerciseEdit from '../components/teacher/preExerciseEdit.vue'
 import revExerciseEdit from '../components/teacher/revExerciseEdit.vue'
@@ -130,9 +133,26 @@ export default new Router({
           component: tChapterCatalog,
           children: [
             {
+              path: 'chapterHint',
+              name: 'chapterHint',
+              component: tChapterHint
+            },
+            {
               path: 'pointEdit',
               name: 'pointEdit',
               component: tPointEdit
+            }
+          ]
+        },
+        {
+          path: 'exerciseEdit',
+          name: 'tExerciseCatalog',
+          component: tExerciseCatalog,
+          children: [
+            {
+              path: 'exerciseHint',
+              name: 'exerciseHint',
+              component: tExerciseHint
             },
             {
               path: 'preEdit',
