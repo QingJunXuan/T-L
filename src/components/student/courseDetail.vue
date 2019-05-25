@@ -3,7 +3,7 @@
     <el-row class="courseBack">
       <el-row style="line-height:50px">
         <el-col :span="2">
-          <i class="el-icon-back" @click="courseBack"></i>
+          <i class="el-icon-back" @click="courseBack" style="color:#000"></i>
         </el-col>
       </el-row>
       <el-row>
@@ -40,11 +40,11 @@
           <el-col style="margin-bottom:40px;margin-top:80px">
             <el-col :span="18" :offset="3" v-show="isGraph==true">
               <div style="padding-bottom:20px">
-              <el-col :span="3"><el-button type="success" size="small" @click="changeLesson">
+              <el-col :span="2"><el-button type="success" size="small" @click="changeLesson">
                 <span v-if="isGraph==true">查看章节目录</span>
               </el-button></el-col>
               </div>
-              <div style="height:800px;border:1px solid #ddd;margin-bottom:20px;margin-top:40px" ref="graph"></div>
+              <div style="height:1000px; border:1px solid #ddd;margin-bottom:20px;margin-top:40px" class="graph" ref="graph"></div>
             </el-col>
 
             <el-col :span="12" :offset="6" v-show="isGraph==false">
@@ -76,6 +76,7 @@ export default {
   name: "sCourseDetail",
   data() {
     return {
+      setHeight:'',
       courseName:'',
       courseID: 1,
       classID: 1,
@@ -435,6 +436,10 @@ export default {
       nodes.forEach(n => {
         tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]));
       });
+      var lastNode= nodes.slice(-1);
+      var maxLevel = lastNode[0][1].level;
+      this.setHeight=(maxLevel+2)*70+'px'
+
 
       let data = [];
       var width=4800;
@@ -548,9 +553,12 @@ export default {
                   //color: '#000',
                   formatter:function(val){   
                     //让series 中的文字进行换行
-                    if(val.name.indexOf("、")!= -1)
-                      return val.name.split("、").join("\n")
-                    else  return val.name.split(" ").join("\n");}
+                    if(val.name.indexOf("、") == -1 && val.name.indexOf(":") != -1)  
+                      return val.name.split(":").join("\n");
+                    else if (val.name.indexOf("、") != -1 && val.name.indexOf(":") == -1)
+                      return val.name.split("、").join("\n");
+                    else return val.name;
+                    }
                   }
               }
             },
@@ -579,6 +587,9 @@ export default {
         ]
       };
       myChart.setOption(option);
+      myChart.getDom().style.height = this.setHeight
+      myChart.resize()
+
       var that = this;
       let focusNum=0;
       myChart.on("click", function(params) {

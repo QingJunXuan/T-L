@@ -3,7 +3,7 @@
     <el-main class="background">
       <el-row
         :gutter="10"
-        style="margin: 0 auto; width: 90%; max-height: 685px"
+        style="margin: 0 auto; width: 90%; max-height: 737px"
         type="flex"
         justify="center"
       >
@@ -113,7 +113,7 @@
         <el-col :span="16">
           <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
+              <el-scrollbar wrap-style="height: 737px; margin-top: 5px;overflow-x: hidden;" :native="false">
                 <div>
                   <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="成绩分析" name="1">
@@ -726,12 +726,12 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
   padding-top: 20px;
   margin: 0 auto;
   width: 80%;
-  height: 650px;
+  height: 737px;
 }
 
 .select {
@@ -783,6 +783,7 @@ export default {
 .content-card {
   width: 800px;
   height: 690px;
+  margin-bottom:50px
 }
 
 .content-card .collapse {

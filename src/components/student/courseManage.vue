@@ -19,14 +19,15 @@
       </el-row>
       <el-row :gutter="40">
         <el-col :span="22" :offset="1">
-        <el-col :span="8" v-for="(item,index) in items" :key="index">
+        <span v-for="(item,index) in items" :key="index">
+        <el-col :span="8" v-for="(item2,index2) in item.courseClasses" :key="index2">
           <el-card :body-style="{padding:0}" style="margin:20px 0;">
             <el-row class="top">
               <p
                 id="name"
                 style="cursor: pointer"
-                @click="courseDetail(item.courseInfo.courseID,item.courseClass.id,item.courseInfo.courseName)"
-              >{{item.courseInfo.courseName}}</p>
+                @click="courseDetail(item.courseInfo.courseID,item2.id,item.courseName)"
+              >{{item.courseName}}</p>
               <el-col :span="5" :offset="18" style="margin-top:10px">
                 <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
               </el-col>
@@ -35,20 +36,21 @@
               <el-row>
                 <el-col :span="16" :offset="1" style="text-align:left">
                   <p style="font-size:13px;color:#000">近期作业</p>
-                  <p v-if="item.courseClass.currentExerciseChapter != -1"
+                  <p v-if="item2.currentExerciseChapter != -1"
                     id="newest"
-                    @click="homework(item.courseClass.currentExerciseChapter)"
-                  >第 {{item.courseClass.currentExerciseChapter}} 章课后习题</p>
+                    @click="homework(item2.currentExerciseChapter)"
+                  >第 {{item2.currentExerciseChapter}} 章课后习题</p>
                 </el-col>
               </el-row>
               <el-row>
                 <el-row style="font-size:12px;text-align:right">
-                  <el-col :span="10" :offset="13">邀请码：{{item.courseClass.classCode}}</el-col>
+                  <el-col :span="10" :offset="13">邀请码：{{item2.classCode}}</el-col>
                 </el-row>
               </el-row>
             </el-row>
           </el-card>
         </el-col>
+        </span>
         </el-col>
       </el-row>
       <el-dialog :visible.sync="isPlus" title="添加课程" width="30%" center>
@@ -97,7 +99,7 @@ export default {
           classNum: -1,
           classCode: "",
           currentExerciseChapter: -1
-        }
+        },
       },
       chapterNameList: [],
       items: []
@@ -105,12 +107,12 @@ export default {
   },
   created() {
     this.$axios
-      .get("http://10.60.38.173:8765/getStuCourseList", {
+      .get("http://10.60.38.173:8765/question/currentCourseByStudentId", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
         },
         params: {
-          studentID: localStorage.getItem('userID')
+          studentId: localStorage.getItem('userID')
         }
       })
       .then(resp => {
@@ -121,10 +123,6 @@ export default {
             this.items = resp.data.data;
           }
         }
-
-        console.log(resp, "resp");
-        console.log(resp.data, "courselist");
-        console.log(this.items, "items");
       })
       .catch(err => {
         console.log(err);
@@ -146,7 +144,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log("TCL:submit - resp", resp)
           if(resp.data.state==0){
             alert('该课程不存在')
           }else{
@@ -178,7 +175,6 @@ export default {
           //==============================将新获得的课程添加到当前列表
           if(this.noCourse==true) this.noCourse=false
           this.items.push(this.courseConfirm);
-          console.log(resp);
           this.$message('添加成功');
         })
         .catch(err => {

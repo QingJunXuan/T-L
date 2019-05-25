@@ -3,14 +3,14 @@
     <el-col :span="24" class="header">
       <el-col :span="10" class="logo logo-width">
         <div>
-          <div style="display: inline-block;">
+          <el-col :span="12">
             <i class="fa fa-leanpub" aria-hidden="true" style="margin-right: 10px;"></i>
             <span style="letter-spacing:3px; font-weight: bold;">教与学</span>
-          </div>
-          <div style="color: #fff; display: inline-block;">
-            <div class="subhead" style="top: -6px">专业在线教育平台</div>
-            <div class="subhead" style="top: 8px;">TEACH AND LEARN</div>
-          </div>
+          </el-col>
+          <el-col style="color: #fff;height:60px" :span="12">
+            <div class="subhead" style="margin-top: -6px">专业在线教育平台</div>
+            <div class="subhead" style="margin-top: 8px;">TEACH AND LEARN</div>
+          </el-col>
         </div>
       </el-col>
       <el-col :span="4" class="userinfo">
@@ -152,7 +152,7 @@ export default {
       }
     }
     .logo-width {
-      width: 200px;
+      width: 400px;
     }
     .logo-collapse-width {
       width: 60px;
@@ -171,6 +171,7 @@ export default {
       font-weight: bold;
       position: absolute;
       letter-spacing: 3px;
+
     }
   }
   .main {

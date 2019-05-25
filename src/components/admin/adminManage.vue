@@ -82,7 +82,6 @@ export default {
         }).catch(() => {
 
         });
-        this.isLogin = false;
       },
   }
 };

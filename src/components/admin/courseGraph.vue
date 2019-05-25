@@ -307,7 +307,6 @@
   </el-container>
 </template>
 <script>
-import axios from "axios";
 export default {
   name: "courseGraph",
   data() {
@@ -423,7 +422,7 @@ export default {
     };
   },
   created() {
-    axios
+    this.$axios
       .get("http://10.60.38.173:8765/getAllCoursesRelation", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
@@ -571,7 +570,7 @@ export default {
       this.draw();
     },
     setAllCourse() {
-      axios
+      this.$axios
         .get("http://10.60.38.173:8765/getAllCoursesRelation", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -634,7 +633,7 @@ export default {
       return result;
     },
     getDupCourse() {
-      axios
+      this.$axios
         .get("http://10.60.38.173:8765/getAllCoursesByNameID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -716,7 +715,7 @@ export default {
             params.append("courseSemester", form.courseSemester),
             params.append("startTime", form.startTime),
             params.append("endTime", form.endTime),
-            axios
+            this.$axios
               .post("http://10.60.38.173:8765/addCourse", params, {
                 headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
@@ -782,7 +781,7 @@ export default {
             params.append("courseSemester", form.courseSemester),
             params.append("startTime", form.startTime),
             params.append("endTime", form.endTime),
-            axios
+            this.$axios
               .post("http://10.60.38.173:8765/alterCourseInfo", params, {
                 headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
@@ -891,7 +890,7 @@ export default {
       var addCourse = Object.assign({}, this.ruleForm1);
       var params = new URLSearchParams();
       params.append("courseName", addCourse.courseName);
-      axios
+      this.$axios
         .post("http://10.60.38.173:8765/addCourseName", params, {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -908,7 +907,7 @@ export default {
                   addCourse.successor[i] ==
                   this.allCourse[j].courseName.courseName
                 ) {
-                  axios
+                  this.$axios
                     .get("http://10.60.38.173:8765/addCourseRelation", {
                       params: {
                         courseNameID: id,
@@ -1004,7 +1003,7 @@ export default {
         var params = new URLSearchParams();
         params.append("courseNameID", id);
         params.append("courseName", newName);
-        axios
+        this.$axios
           .post("http://10.60.38.173:8765/alertCourseName", params, {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -1111,7 +1110,7 @@ export default {
           }
         }
         for (var p = 0; p < delLength; p++) {
-          axios
+          this.$axios
             .get("http://10.60.38.173:8765/deleteCourseRelation", {
               headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
@@ -1129,7 +1128,7 @@ export default {
             });
         }
         for (var q = 0; q < addLength; q++) {
-          axios
+          this.$axios
             .get("http://10.60.38.173:8765/addCourseRelation", {
               headers: {
                 Authorization: "Bearer " + localStorage.getItem("token")
@@ -1217,7 +1216,7 @@ export default {
       var params = new URLSearchParams();
       params.append("courseID", this.rowIndex.courseInfo.courseID);
       params.append("classNum", this.rowIndex.courseClasses.length + 1);
-      axios
+      this.$axios
         .post("http://10.60.38.173:8765/addClass", params, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -1234,7 +1233,7 @@ export default {
       this.rowIndex.courseClasses.splice(data.$index, 1);
       console.log(this.rowIndex, "rowindex2");
       console.log(data.$index);
-     axios
+     this.$axios
         .get("http://10.60.38.173:8765/deleteClass", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -1255,7 +1254,7 @@ export default {
       //删除课程下的某一老师开的课程
       this.dialog2 = false;
       this.dupCourse.splice(this.rowIndex, 1);
-      axios
+      this.$axios
         .get("http://10.60.38.173:8765/deleteCourse", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")

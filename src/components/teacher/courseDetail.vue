@@ -9,11 +9,6 @@
       <el-row>
         <div style="line-height:150px">{{courseName}}</div>
       </el-row>
-      <!-- <el-row>
-        <el-col :span="1" :offset="21">
-          <el-button type="text" @click="stuDetail">学生</el-button>
-        </el-col>
-      </el-row> -->
     </el-row>
     <el-row>
       <div class="tabs">
@@ -104,6 +99,7 @@ export default {
   name: "tCourseDetail",
   data() {
     return {
+      setHeight:'',
       courseName:'',
       number: 0, //章节号
       courseID: 1,
@@ -147,6 +143,10 @@ export default {
     this.getLesson();
     //获取未评分章节
     this.getUnratedChapters();
+  },
+  mounted(){
+ //获取章节关系
+    this.getChapterGraph();
   },
   methods: {
     getCourseName(){///getCourseInfoByID
@@ -261,7 +261,6 @@ export default {
       if (this.isGraph == true) this.isGraph = false;
       else {
         this.isGraph = true;
-        //this.draw()
       }
     },
     getUnratedChapters() {//获取未评分章节
@@ -362,7 +361,6 @@ export default {
         i.chapterNode.contentName,
         { level: 0, subChapter: i.subChapterNodes.map(k => k.contentName) }
       ]);
-      console.log("TCL: init -> nodes", this.graphTree, nodes);
       for (let j = 0; j < nodes.length; j++) {
         let curr = nodes[j][1];
         if (curr.subChapter.length) {
@@ -389,13 +387,19 @@ export default {
         tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]));
       });
 
+      var lastNode= nodes.slice(-1);
+      var maxLevel = lastNode[0][1].level;
+      this.setHeight=(maxLevel+2)*70+'px'
+console.log(this.setHeight,"height")
+
       let data = [];
-      var width = 6000;
+      var width = 4800;
       var init = 0;
+      
 
       for (let item of tempData.entries()) {
         var num = item[1].length;
-        init = 3000 / num;
+        init = 2400 / num;
         item[1].forEach((value, index) => {
           let addData = {
             name: value,
@@ -407,7 +411,7 @@ export default {
       }
       data.push({
         name: "start",
-        x: 3000,
+        x: 2400,
         y: 0
       });
       this.data = data;
@@ -488,6 +492,7 @@ export default {
             symbolSize: 20,
             color: "#ec7814",
             roam: true,
+            
             itemStyle: {
               normal: {
                 color: "#ec7814",
@@ -498,9 +503,11 @@ export default {
                   //color: '#000',
                   formatter: function(val) {
                     //让series 中的文字进行换行
-                    if (val.name.indexOf("、") != -1)
+                     if(val.name.indexOf("、") == -1 && val.name.indexOf(":") != -1)  
+                      return val.name.split(":").join("\n");
+                    else if (val.name.indexOf("、") != -1 && val.name.indexOf(":") == -1)
                       return val.name.split("、").join("\n");
-                    else return val.name.split(" ").join("\n");
+                    else return val.name;
                   }
                 }
               }
@@ -528,6 +535,9 @@ export default {
         ]
       };
       myChart.setOption(option);
+      myChart.getDom().style.height = this.setHeight
+      myChart.resize()
+
       var that = this;
       let focusNum = 0;
       myChart.on("click", function(params) {

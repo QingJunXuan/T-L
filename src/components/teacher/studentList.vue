@@ -223,7 +223,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .background {
   background-image: url("../../assets/background.jpg"); /*背景图片地址*/
   background-repeat: no-repeat; /*背景图片不重复*/
@@ -235,6 +235,7 @@ export default {
   margin: 0 auto;
   width: 900px;
   height: 680px;
+  margin-bottom:57px;
 }
 
 .header {

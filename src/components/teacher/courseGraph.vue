@@ -35,10 +35,8 @@ export default {
       .catch(err => {
         console.log(err);
       });
-    //console.log(this.screenWidth.width);
   },
   mounted() {
-    //console.log(this.data);
     this.draw();
   },
   methods: {
@@ -67,7 +65,6 @@ export default {
       var width=3400;
       var init=0;
       for (let item of tempData.entries()) {
-        console.log("TCL: set -> item", item[0])
         var num=item[1].length
         init=1700/num
         item[1].forEach((value, index) => {
@@ -161,6 +158,7 @@ export default {
             top:30,
             symbolSize: 30,
             roam: true,
+
             label: {
               normal: {
                 show: true

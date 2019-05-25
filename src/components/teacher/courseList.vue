@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="background" style="height:778px">
     <el-row style="padding-top:20px">
         <el-col :span="4" align="right">
           <div style="margin-top:10px">
@@ -10,9 +10,9 @@
         </el-col>
       <el-col :span="17" style="padding-left:20px">
 
-        <el-card >
+        <el-card>
 		<!--列表-->
-		<el-table :data="courses" highlight-current-row v-loading="listLoading" style="width: 100%;text-align:center;margin-bottom:20px">
+		<el-table :data="courses" highlight-current-row v-loading="listLoading"  style="width: 100%;text-align:center;margin-bottom:20px">
 	<!-- 		<el-table-column type="selection" width="50">
 			</el-table-column> -->
 			<el-table-column  prop="courseInfo.courseID" label="课程编号" width="140" sortable>
@@ -50,6 +50,7 @@ export default {
     };
   },
   created(){
+    console.log(window.screen.height,"height")
      this.$axios
      .get('http://10.60.38.173:8765/getCoursesByTeacherID',{
        headers: {
@@ -69,6 +70,16 @@ export default {
       console.log(err)
     })
   },
+ /*  mounted(){
+    const that = this;
+    window.onresize=function() {
+      
+       //window.screenHeight = document.body.clientHeight;
+       that.$refs.background.style.height = window.screen.height
+    };
+    console.log(this.$refs.background,"height")
+
+  }, */
   methods: {
      goBack() {
       if (window.history.length <= 1) {

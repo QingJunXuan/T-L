@@ -1,4 +1,4 @@
-<template>
+<!--<template>
   <div>
     <el-row style="padding-top:20px">
       <el-col :span="20" :offset="2">
@@ -29,7 +29,7 @@
                 <el-row style="padding-bottom:10px">
                   <el-col>{{item.startTime+" - "+item.endTime}}</el-col>
                 </el-row>
-                <!-- <el-row style="padding-bottom:10px;"><el-col>邀请码：{{item.courseClass.classCode}}</el-col></el-row> -->
+                                  <el-row style="padding-bottom:10px;"><el-col>邀请码：{{item.courseClass.classCode}}</el-col></el-row> 
               </el-row>
             </el-card>
           </el-col>
@@ -37,9 +37,9 @@
       </el-col>
     </el-row>
   </div>
-</template>
+</template>-->
 <script>
-export default {
+/* export default {
   name:'courseList',
   data() {
     return {
@@ -132,23 +132,21 @@ headers: {
       });
     },
   }
-};
+}; */
 </script>
 <style>
-html,
+/* html,
 body {
   width: 100%;
   height: 100%;
   padding: 0;
   margin: 0;
-}
+} */
 </style>
 
-<style>
-.top {
-  /*   background-color: rgba(54, 88, 241, 0.808);*/
+<style >
+/* .top {
   background-image: url(../../assets/course/img-5.jpg);
-  /* background-image: image-set(); */
   height: 110px;
   background-size: cover;
 }
@@ -187,11 +185,10 @@ body {
 }
 .bottom {
   height: 100px;
-  /* text-align: left; */
   font: 12px 黑体;
   font-weight: bold;
   padding-top: 15px;
   color: rgb(102, 161, 163);
-}
+} */
 </style>
-
+ 

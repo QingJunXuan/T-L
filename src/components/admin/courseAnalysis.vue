@@ -1,20 +1,18 @@
 <template>
-  <el-container>
+  <el-row>
     <el-main class="background">
       <el-row
-        :gutter="10"
-        style="margin: 0 auto; width: 90%; max-height: 685px"
-        type="flex"
-        justify="center"
+        :gutter="15"
+        
       >
-        <el-col :span="2" align="right">
+        <!-- <el-col :span="2" align="right">
           <div>
             <el-button @click="goBack" circle style="box-shadow: 0 0 8px 1px #dbdbdb">
               <i class="el-icon-back"></i>
             </el-button>
           </div>
-        </el-col>
-        <el-col :span="6" align="right">
+        </el-col> -->
+        <el-col :span="6" :offset="2" align="right">
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="start">
               <div class="course-info">
@@ -128,7 +126,7 @@
         <el-col :span="16">
           <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <el-scrollbar wrap-style="height: 650px; margin-top: 5px" :native="false">
+              <el-scrollbar wrap-style="height: 778px; margin-top: 5px;overflow-x: hidden;" :native="false">
                 <div>
                   <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="数据分析" name="1">
@@ -144,7 +142,7 @@
         </el-col>
       </el-row>
     </el-main>
-  </el-container>
+  </el-row>
 </template>
 
 <script>
@@ -1712,12 +1710,17 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+/* .html,body{
+  padding:0px;
+  margin:0px;
+  width:100%;
+  height: 100%;
+} */
 .main {
-  padding-top: 20px;
-  margin: 0 auto;
-  width: 80%;
-  height: 650px;
+  padding-top: 18px;
+  
+  height: 800px;
 }
 
 .select {
@@ -1781,12 +1784,12 @@ export default {
 .select-card {
   margin-top: 10px;
   width: 300px;
-  height: 480px;
+  height: 520px;
 }
 
 .content-card {
   width: 800px;
-  height: 690px;
+  height: 730px;
 }
 
 .content-card .collapse {

@@ -27,14 +27,15 @@
       </el-row>
       <el-row :gutter="40">
         <el-col :span="22" :offset="1">
-        <el-col :span="8" v-for="(item,index) in items" :key="index">
+        <span v-for="(item,index) in items" :key="index">
+          <el-col :span="8" v-for="(item2,index2) in item.courseClasses" :key="index2">
           <el-card :body-style="{padding:0}" style="margin:20px 0;">
             <el-row class="top">
               <p
                 id="name"
-                @click="courseDetail(item.courseInfo.courseID, item.courseClass.id,item.courseInfo.courseName)"
+                @click="courseDetail(item.courseInfo.courseID, item2.id,item.courseName)"
                 style="cursor: pointer"
-              >{{item.courseInfo.courseName+'('+item.courseClass.classNum+')'}}</p>
+              >{{item.courseName+'('+item2.classNum+'班)'}}</p>
               <el-row>
                 <el-col :span="5" :offset="18" style="margin-top:0px">
                   <span
@@ -54,20 +55,21 @@
               <el-row>
                 <el-col :span="16" :offset="1" style="text-align:left">
                   <p style="font-size:13px;color:#000">近期作业</p>
-                  <p v-if="item.courseClass.currentExerciseChapter != -1"
+                  <p v-if="item2.currentExerciseChapter != -1"
                     id="newest"
-                    @click="homework(item.courseClass.currentExerciseChapter)"
-                  >第 {{item.courseClass.currentExerciseChapter}} 章课后习题</p>
+                    @click="homework(item2.currentExerciseChapter)"
+                  >第 {{item2.currentExerciseChapter}} 章课后习题</p>
                 </el-col>
               </el-row>
               <el-row>
                 <el-row style="font-size:12px;text-align:right">
-                  <el-col :span="10" :offset="13">邀请码：{{item.courseClass.classCode}}</el-col>
+                  <el-col :span="10" :offset="13">邀请码：{{item2.classCode}}</el-col>
                 </el-row>
               </el-row>
             </el-row>
           </el-card>
-        </el-col>
+          </el-col>
+        </span>
         </el-col>
       </el-row>
     </el-col>
@@ -91,16 +93,18 @@ export default {
   },
   created() {
     this.$axios
-      .get("http://10.60.38.173:8765/getCoursesByTeacherID", {
+      .get("http://10.60.38.173:8765/question/currentCourseByTeacherId", {
         headers: {
           Authorization:
             "Bearer "+localStorage.getItem("token")
         },
         params: {
-          teacherID: localStorage.getItem('userID')
+          teacherId: localStorage.getItem('userID')
         }
       })
       .then(resp => {
+        
+      console.log("TCL: created -> resp", resp)
         if (resp.data.state == 1) {
           this.items = resp.data.data;
           var length = this.items.length;
@@ -108,9 +112,8 @@ export default {
             this.noCourse = false;
           }
         }
-        this.items = resp.data.data;
-        console.log(resp.data, "resp.data");
       })
+    
       .catch(err => {
         console.log(err);
       });
@@ -186,9 +189,5 @@ body {
   /* background-image: image-set(); */
   height: 100px;
   background-size: cover;
-} /* 
-.bottom {
-  height: 90px;
-  text-align: left;
-} */
+} 
 </style>
