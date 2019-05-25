@@ -611,16 +611,12 @@ export default {
                     }
                     this.exercisesObj.sort(this.compare("order"));
                   } else if (exerciseList.data[i].exercise.exerciseType === 6) {
-                    alert(exerciseList.data[i].exercise.exerciseAnswer.charCodeAt(4))
                     this.exercisesSub.push({
                       exerciseID: exerciseList.data[i].exercise.exerciseId,
                       question: exerciseList.data[i].exercise.exerciseContent,
                       type: exerciseList.data[i].exercise.exerciseType,
                       score: exerciseList.data[i].exercise.exercisePoint,
-                      answer: exerciseList.data[i].exercise.exerciseAnswer.replace(
-          /\/\x0A/g,
-          "\n"
-        ),
+                      answer: exerciseList.data[i].exercise.exerciseAnswer,
                       detail: exerciseList.data[i].exercise.exerciseAnalysis,
                       order: exerciseList.data[i].exercise.exerciseNumber,
                       edit: false,
@@ -1353,10 +1349,7 @@ export default {
         exerciseType: 6,
         exerciseNumber: this.exercisesSub[index].order,
         exerciseContent: this.exercisesSub[index].question,
-        exerciseAnswer: this.exercisesSub[index].answer.replace(
-          /\x0A/g,
-          "\\n"
-        ),
+        exerciseAnswer: this.exercisesSub[index].answer,
         exerciseAnalysis: this.exercisesSub[index].detail,
         exercisePoint: this.exercisesSub[index].score
       };

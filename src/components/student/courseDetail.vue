@@ -391,7 +391,7 @@ export default {
         this.$router.push({ path: "/" });
         return false;
       } else {
-        this.$router.go(-1);
+        this.$router.push({ path: "/student/courseManagement" });
       }
     },
     feedback() {

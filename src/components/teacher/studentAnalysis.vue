@@ -368,7 +368,6 @@ export default {
         );
     },
     getStudentLabel() {
-      ti;
       this.$http
         .get(
           "http://10.60.38.173:8765/question/userLabel?studentId=" +
