@@ -37,11 +37,7 @@ export default {
           }
         })
         .then(resp => {
-          //this.tree = resp.data.data;
-          console.log(this.chapterID, "chapterid");
-          console.log(resp.data, "chapter content");
           this.point = resp.data.data;
-          //console.log(this.courseID,"courseID");
         })
         .catch(err => {
           console.log(err);
@@ -50,8 +46,6 @@ export default {
   },
   watch: {
     $route(to, from) {
-      //对路由变化做出响应
-      console.log("有变化了"); //测试点击路由的反应
       //页面需要重新加载的地方
       this.getContent();
     }

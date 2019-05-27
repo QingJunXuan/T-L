@@ -135,7 +135,6 @@ export default {
           params: { courseID: this.courseID }
         })
         .then(resp => {
-          console.log(resp.data);
           if (resp.data.state == 1) {
             this.courseName = resp.data.data.courseName;
           }
@@ -153,9 +152,7 @@ export default {
           params: { courseID: this.courseID,studentID:localStorage.getItem('userID') }
         })
         .then(resp => {
-          console.log(resp.data,"score-first-resp");
           if (resp.data.state == 1) {
-            console.log(resp.data,"score-second-resp")
             store.commit("setScore",resp.data.data)
           }
         })
@@ -174,7 +171,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log(resp.data, "notice data");
           if (resp.data.state == 1) {
             this.notice = resp.data.data.courseNotice;
           }
@@ -196,7 +192,6 @@ export default {
         .then(resp => {
           if (resp.data.state == 1) {
             this.tree = resp.data.data;
-						console.log("TCL: getLesson -> tree", this.tree)
             store.commit('setCatalog',this.tree)
           }
         })
@@ -390,7 +385,6 @@ export default {
       });
     },
     getChapterGraph() {
-      console.log(this.courseID,"getgraph-courseid")
       this.$axios
         .get("http://10.60.38.173:8765/getChapterRelationByCourseID", {
           headers: {
@@ -400,7 +394,6 @@ export default {
         })
         .then(resp => {
           if (resp.data.state == 1) {
-            console.log(resp.data,"chapter-tree")
             this.graphTree = resp.data.data;
             this.init();
           }
@@ -415,7 +408,6 @@ export default {
         i.chapterNode.contentName,
         { level: 0, subChapter: i.subChapterNodes.map(k => k.contentName) }
       ]);
-			console.log("TCL: init -> nodes", this.graphTree, nodes)
       for (let j = 0; j < nodes.length; j++) {
         let curr = nodes[j][1];
         if (curr.subChapter.length) {
@@ -463,7 +455,6 @@ export default {
         y: 0
       });
       this.data = data;
-      console.log("TCL: set -> data", data);
 
       // 计算结束
       var length = this.graphTree.length;

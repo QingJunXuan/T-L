@@ -162,7 +162,7 @@ export default {
           }
         })
         .then(resp => {
-          console.log("pre", resp.data);
+          console.log("TCL: getPre -> resp", resp)
           if (resp.data.state == 1) {
             this.havePre = true;
             this.exercises = resp.data.data;
@@ -170,6 +170,7 @@ export default {
             this.setAnswer();
           }
         })
+        
         .catch(err => {
           console.log(err);
         });
@@ -179,7 +180,7 @@ export default {
       var temp = new Object();
       for (var i = 0; i < length; i++) {
         if (this.exercises[i].exercise.exerciseType == 1) {
-          temp[i.toString()] = null
+          temp[i.toString()] = ''
         } else if (this.exercises[i].exercise.exerciseType == 2) {
           temp[i.toString()] = [];
         }
@@ -196,14 +197,12 @@ export default {
     },
     submitForm(formname) {
       var length = Object.keys(this.answer).length;
-      //console.log(this.answer);
       this.$refs[formname].validate(valid => {
         if (valid) {
           for (var i = 0; i < length; i++) {
-            var type = typeof this.answer[i];
-            //console.log(type, "type");
+            var type = typeof this.answer[i.toString()];
             if (type == "number") {
-              var resp = String.fromCharCode(this.answer[i] + 65);
+              var resp = String.fromCharCode(this.answer[i.toString()] + 65);
               var ans = this.exercises[i].exercise.exerciseAnswer;
               if (resp == ans) {
                 this.score[i] = this.exercises[i].exercise.exercisePoint;
@@ -211,17 +210,17 @@ export default {
                 this.score[i] = 0;
               }
             } else if (type == "object") {
-              var respNum = this.answer[i].length;
-              this.answer[i] = this.answer[i].sort();
+              var respNum = this.answer[i.toString()].length;
+              this.answer[i.toString()] = this.answer[i.toString()].sort();
               var array = new Array();
               for (var j = 0; j < respNum; j++) {
-                array[j] = String.fromCharCode(this.answer[i][j] + 65);
+                array[j] = String.fromCharCode(this.answer[i.toString()][j] + 65);
               }
 
               var ansArray = this.exercises[i].exercise.exerciseAnswer;
               var ansNum = ansArray.length;
               var try2 = array.join("");
-              var isEqual = try2 === ansArray;
+              var isEqual = (try2 === ansArray);
 
               if (isEqual) {
                 this.score[i] = this.exercises[i].exercise.exercisePoint;

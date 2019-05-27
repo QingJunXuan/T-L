@@ -3,7 +3,7 @@
     <el-col :span="20" :offset="2">
       <el-row :gutter="40">
         <el-col :span="2" style="margin-top:10px">
-          <el-button type="primary" size="mini" @click="isPlus=true">添加课程</el-button>
+          <el-button type="primary" size="mini" @click="isPlus=true">加入班级</el-button>
         </el-col>
         <el-col :span="2" style="margin-top:10px">
           <el-button type="success" size="mini" @click="toAnalysis">课程分析</el-button>
@@ -13,7 +13,7 @@
         <el-row style="padding:30px">还没有课？</el-row>
         <el-row>
           点击上方的
-          <span style="color:darkcyan;font-weight:bold">添加课程</span>，输入专属
+          <span style="color:darkcyan;font-weight:bold">加入班级</span>，输入专属
           <span style="color:darkcyan;font-weight:bold">邀请码</span>加入课程吧！
         </el-row>
       </el-row>
@@ -53,7 +53,7 @@
         </span>
         </el-col>
       </el-row>
-      <el-dialog :visible.sync="isPlus" title="添加课程" width="30%" center>
+      <el-dialog :visible.sync="isPlus" title="加入班级" width="30%" center>
         <el-form>
           <el-form-item label="邀请码" label-width="70px">
             <el-input v-model="code" auto-complete="off" placeholder="请输入邀请码" @keyup.native.enter="submit"></el-input>
@@ -120,6 +120,7 @@ export default {
           var length = resp.data.data.length;
           if (length != 0) {
             this.noCourse = false;
+            resp.data.data.splice(2,1)
             this.items = resp.data.data;
           }
         }
@@ -158,7 +159,7 @@ export default {
       
     },
     confirm() {
-      //确认添加课程
+      //确认加入班级
       this.isPlus = false;
       this.isConfirm = false;
       this.$axios
@@ -172,7 +173,7 @@ export default {
           }
         })
         .then(resp => {
-          //==============================将新获得的课程添加到当前列表
+          //==============================将新获得的班级添加到当前列表
           if(this.noCourse==true) this.noCourse=false
           this.items.push(this.courseConfirm);
           this.$message('添加成功');

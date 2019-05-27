@@ -117,8 +117,6 @@ export default {
         .then(resp => {
           this.tree = resp.data.data;
           this.menuLoading = false;
-          console.log(resp.data, "resp.data");
-          console.log(this.courseID, "courseID");
         })
         .catch(err => {
           console.log(err);
@@ -128,18 +126,11 @@ export default {
   watch: {
     $route(to, from) {
       //对路由变化做出响应
-      console.log("有变化了"); //测试点击路由的反应
+      console.log("有变化了"); 
       //页面需要重新加载的地方
     }
   },
   created() {
-    /* for (let i = 0; i < this.catalog.length; i++) {
-      this.chapterData.push({
-        key: i,
-        label: this.catalog[i].chapterName,
-        disabled: false
-      });
-    } */
     this.getCatalog();
   }
 };

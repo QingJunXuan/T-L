@@ -64,7 +64,6 @@ export default {
                   "Bearer "+localStorage.getItem("token")
               }
             }).then(resp=>{
-console.log(resp.data,"feedback");
             if(resp.data.state==1){
               this.$message("提交成功")
             }

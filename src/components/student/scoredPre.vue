@@ -86,7 +86,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log("pre", resp.data);
           if (resp.data.state == 1) {
             this.exercises = resp.data.data;
             this.setScore();

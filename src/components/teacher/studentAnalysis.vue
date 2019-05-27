@@ -622,7 +622,7 @@ export default {
       let myChart = this.$echarts.init(document.getElementById("myChart"));
       myChart.clear();
       this.drawCount++;
-      console.log(this.xData.length);
+      
       // 绘制图表
       myChart.setOption({
         color: this.colorOptions,

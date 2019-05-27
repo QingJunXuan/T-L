@@ -99,7 +99,6 @@ export default {
       for (var i = 0; i < this.exercises.length; i++) {
         this.totalPoint += this.exercises[i].exercise.exercisePoint;
       }
-      console.log(this.totalPoint, "totalPoint");
     },
     setTime(){
       const index =this.$route.query.index
@@ -123,7 +122,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log("rev", resp.data);
           this.exercises = resp.data.data;
           var length = this.exercises.length;
           if (length != 0) {

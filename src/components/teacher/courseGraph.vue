@@ -28,7 +28,6 @@ export default {
         }
       })
       .then(resp => {
-        console.log(resp.data);
         this.list = resp.data.data;
         this.set();
       })
@@ -84,7 +83,6 @@ export default {
       })
 
       this.data = data
-      console.log("TCL: set -> data", data)
       
       // 计算结束
 

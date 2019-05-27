@@ -50,7 +50,6 @@ export default {
     };
   },
   created(){
-    console.log(window.screen.height,"height")
      this.$axios
      .get('http://10.60.38.173:8765/getCoursesByTeacherID',{
        headers: {
@@ -62,24 +61,12 @@ export default {
         }
     }).then(resp=>{
       if(resp.data.state==1){
-        
         this.courses=resp.data.data
-		console.log("TCL: created -> courses", resp.data)
       }
     }).catch(err=>{
       console.log(err)
     })
   },
- /*  mounted(){
-    const that = this;
-    window.onresize=function() {
-      
-       //window.screenHeight = document.body.clientHeight;
-       that.$refs.background.style.height = window.screen.height
-    };
-    console.log(this.$refs.background,"height")
-
-  }, */
   methods: {
      goBack() {
       if (window.history.length <= 1) {

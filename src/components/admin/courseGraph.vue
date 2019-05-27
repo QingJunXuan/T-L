@@ -431,7 +431,7 @@ export default {
       .then(resp => {
         if (resp.data.state == 1) {
           this.allCourse = resp.data.data;
-          console.log(this.allCourse,"allcourse")
+
           var length = this.allCourse.length;
           if (length != 0) {
             this.set(length);
@@ -468,8 +468,6 @@ export default {
     }
   },
   mounted() {
-    //console.log(this.data);
-    //this.draw();
   },
   methods: {
     set(length) {
@@ -478,7 +476,6 @@ export default {
         i.courseName.courseName,
         { level: 0, subCourses: i.subCoursesName.map(k => k.courseName) }
       ]);
-      console.log("nodes", nodes)
       for (let j = 0; j < nodes.length; j++) {
         let curr = nodes[j][1];
         if (curr.subCourses.length) {
@@ -488,13 +485,10 @@ export default {
               nodes[findIndex][0],
               Object.assign({}, nodes[findIndex][1], { level: nodes[findIndex][1].level > curr.level ? nodes[findIndex][1].level : curr.level + 1 })
             ];
-            console.log("!!!", nodes[findIndex])
           });
         }
       }
       
-      //console.log("nodes", nodes)
-
       let tempData = new Map();
       nodes.forEach(n => {
         tempData.set(n[1].level, []);
@@ -525,7 +519,6 @@ export default {
         y: 0
       });
       this.data = data;
-      console.log("TCL: set -> data", data);
 
       // 计算结束
       for (var i = 0; i < length; i++) {
@@ -566,7 +559,6 @@ export default {
           }
         }
       }
-			console.log("TCL: set -> links", this.links)
       this.draw();
     },
     setAllCourse() {
@@ -644,11 +636,9 @@ export default {
           }
         })
         .then(resp => {
-          console.log(resp.data, "resp.data");
           if (resp.data.state == 1) {
             this.dupCourse = resp.data.data;
           }
-          console.log(this.dupCourse, "dup");
         })
         .catch(err => {
           console.log(err);
@@ -700,12 +690,10 @@ export default {
         if (valid) {
           //=======================给后端
           var form = Object.assign({}, this.ruleForm3);
-          console.log(this.ruleForm3, "ruleForm3");
+
           form.startTime = this.setTime(form.startTime);
           form.endTime = this.setTime(form.endTime);
           form.courseYear = this.getTime(form.courseYear);
-
-          console.log(form);
 
           var params = new URLSearchParams();
           params.append("teacherID", form.teacherID),
@@ -723,9 +711,7 @@ export default {
                 }
               })
               .then(resp => {
-                console.log(resp.data, "need");
                 if (resp.data.state == 1) {
-                  console.log(resp.data, "addClass");
                   var id = resp.data.data.courseID;
                   for (var i = 0; i < form.classNum; i++) {
                     var params = new URLSearchParams();
@@ -739,7 +725,6 @@ export default {
                         }
                       })
                       .then(resp => {
-                        console.log(resp.data, "addClassNum");
                         if (resp.data.state == 1) {
                           this.$message("添加成功");
                         } else {
@@ -790,7 +775,6 @@ export default {
               })
               .then(resp => {
                 if (resp.data.state == 1) {
-                  console.log(resp.data, "editClass");
                   if (resp.data.state == 1) {
                     this.$message("修改成功");
                   } else {
@@ -919,8 +903,6 @@ export default {
                       }
                     })
                     .then(resp => {
-                      console.log("links,success");
-
                       if (resp.data.state == 0) {
                         alert("关系添加失败");
                       }
@@ -961,7 +943,6 @@ export default {
       for (var i = 0; i < length; i++) {
         this.ruleForm2.successor[i] = obj.preCoursesName[i].courseName;
       }
-      console.log(this.ruleForm2, "form2");
     },
     editCourse() {
       var id = this.allCourse[this.dataIndex].courseName.courseNameID;
@@ -999,7 +980,6 @@ export default {
                     break;
                 }
             }
-        console.log(this.data,"this.data-edit");
         var params = new URLSearchParams();
         params.append("courseNameID", id);
         params.append("courseName", newName);
@@ -1010,7 +990,6 @@ export default {
             }
           })
           .then(resp => {
-            console.log(resp.data, "editCourseName");
             if (resp.message.state == 1) {
               this.$message("修改成功");
             } else {
@@ -1024,7 +1003,6 @@ export default {
       }
       //links
       var isEqual = oldLinks.sort().toString() === newLinks.sort().toString();
-      console.log(isEqual);
       if (isEqual == false) {
         //更改links
         //store.commit("editLinks", { new: newLinks, index: this.dataIndex });
@@ -1035,7 +1013,6 @@ export default {
                     return item
                 }
             })
-            console.log(array,"array")
             if (newLength == 0 ) {
                 
                 var addLink = {
@@ -1069,7 +1046,6 @@ export default {
                 }
             }
             this.links = array
-        console.log(this.links, "links");
 
         //去重-获得需删除的link
         var tempArray1 = []; //临时数组存放
@@ -1088,8 +1064,9 @@ export default {
         //获得需增加的link
         var tempArray2 = []; //临时数组存放
         var add = [];
+        //将oldLinks中的元素值作为tempArray1 中的键，值为true；
         for (var i = 0; i < oldLinks.length; i++) {
-          tempArray2[oldLinks[i]] = true; //将oldLinks中的元素值作为tempArray1 中的键，值为true；
+          tempArray2[oldLinks[i]] = true; 
         }
         for (var i = 0; i < newLinks.length; i++) {
           if (!tempArray2[newLinks[i]]) {
@@ -1121,7 +1098,6 @@ export default {
               }
             })
             .then(resp => {
-              console.log("links,del,success", p);
               if (resp.data.state == 0) {
                 alert("关系删除失败");
               }
@@ -1139,7 +1115,6 @@ export default {
               }
             })
             .then(resp => {
-              //console.log("links,add,success", q);
               if (resp.data.state == 0) {
                 alert("关系添加失败");
               }
@@ -1148,7 +1123,6 @@ export default {
       }
       //查看是否修改了信息
       if (isEqual == false || newName != oldName) {
-        console.log(this.allCourse);
         this.isEditCourse = false;
         this.isAddCourse = true;
         this.test();
@@ -1160,10 +1134,7 @@ export default {
     },
     rowClick(row) {
       this.dialog2 = true;
-      console.log(row, "row");
       this.rowIndex = row;
-      console.log(this.rowIndex, "rowIndex");
-      //dubCourse
     },
     addClassVisible() {
       this.isAddCourse = false;
@@ -1184,17 +1155,12 @@ export default {
       this.editClassNum = false;
 
       var b = Object.assign({}, this.rowIndex);
-      //var a = this.rowIndex;
       var a = b.courseInfo;
-      console.log(a);
+
       a["courseYear"] = new Date(a["courseYear"]);
       a["startTime"] = new Date(a["startTime"]);
       a["endTime"] = new Date(a["endTime"]);
       this.ruleForm4 = a;
-      /* 
-      var num = this.rowIndex.courseClasses.length;
-      this.ruleForm4.classNum = num; */
-      console.log(this.ruleForm4);
     },
     editClassNumVisible() {
       this.dialog1 = false;
@@ -1204,12 +1170,9 @@ export default {
       this.isAddClass = false;
       this.isEditClass = false;
       this.editClassNum = true;
-      //this.editClassNum = false;
     },
     selsChange(arr) {
       this.multipleSelection = arr;
-      console.log(arr);
-      console.log(this.allCourse);
     },
     addClassNum() {
       this.isAddClassNum = false;
@@ -1223,16 +1186,11 @@ export default {
           }
         })
         .then(resp => {
-          console.log("success");
-          console.log(resp, "addClassNumresp");
           this.rowIndex.courseClasses.push(resp.data.data);
         });
     },
-    delClassNum(data) {
-      console.log(this.rowIndex, "rowindex1");
-      this.rowIndex.courseClasses.splice(data.$index, 1);
-      console.log(this.rowIndex, "rowindex2");
-      console.log(data.$index);
+    delClassNum(data) {      
+     this.rowIndex.courseClasses.splice(data.$index, 1);
      this.$axios
         .get("http://10.60.38.173:8765/deleteClass", {
           headers: {
@@ -1243,8 +1201,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log("success");
-          console.log(resp, "deleteClassNumresp");
           if (resp.data.state == 1) {
             this.$message(resp.data.message);
           }
@@ -1264,8 +1220,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log("success");
-          console.log(resp, "deleteClassresp");
           if (resp.data.state == 0) {
             alert("删除失败");
           }
@@ -1280,7 +1234,6 @@ export default {
           }
         ]
       };
-      console.log("test");
       this.initGraph().setOption(option);
     },
     draw() {
@@ -1359,8 +1312,6 @@ export default {
       
         focusNum++
         if (params.dataType == "edge") {
-				console.log("TCL: draw -> params", params)
-          //that.handleClick(params);
           that.dataIndex = params.dataIndex;
            var value = that.links[that.dataIndex].label.normal.show
             if (value == false) {
@@ -1396,8 +1347,6 @@ export default {
             alert("不可对该节点进行操作");
           } else {
             //点击节点获取同名列表
-            
-				console.log("TCL: draw -> params", params)
             that.getDupCourse();
             that.courseName =
               that.allCourse[that.dataIndex].courseName.courseNameID;

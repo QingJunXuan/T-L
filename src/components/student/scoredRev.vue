@@ -117,7 +117,6 @@ methods:{
           }
         })
         .then(resp => {
-          console.log("/question/exerciseScore", resp.data);
           if (resp.data.state == 1) {
             this.score=resp.data.data
             var count=0;
@@ -166,7 +165,6 @@ methods:{
           }
         })
         .then(resp => {
-          console.log("rev", resp.data);
           if (resp.data.state == 1) {
             this.exercises = resp.data.data;
             this.getScore();

@@ -52,13 +52,13 @@
         </div>
         <div v-show="isLesson" class="noticeBack">
           <el-row style="margin-bottom:20px">
-            <el-col :span="20" :offset="3" style="margin-top:-120px" align="start">
+            <el-col :span="6" :offset="17" style="margin-top:-120px" align="start">
               <el-button type="success" size="small" @click="changeLesson">
                 <span v-if="isGraph==true">查看章节目录</span>
                 <span v-else>查看关系图</span>
               </el-button>
-              <el-button type="primary" size="small" @click="editChapter" style="margin-left: 65%">编辑章节</el-button>
-              <el-button type="primary" size="small" @click="editExercise" style="margin-left: 20px">编辑习题</el-button>
+              <el-button type="primary" size="small" @click="editChapter" >编辑章节</el-button>
+              <el-button type="primary" size="small" @click="editExercise">编辑习题</el-button>
             </el-col>
           </el-row>
           <el-row>
@@ -82,6 +82,9 @@
           </el-row>
         </div>
         <div v-show="isGrade" class="gradeBack">
+           <el-row style="font-size:18px;letter-spacing:5px" v-show="unratedLength == 0">
+             <el-row style="padding:30px">当前无需要批改的作业</el-row>
+           </el-row>
           <el-col :span="10" :offset="7" v-for="(item,index) in unratedChapters" :key="index">
               <el-row style="padding-bottom:20px">
                 <el-card shadow="hover" class="grade">
@@ -129,6 +132,7 @@ export default {
       graphTree: [],
       tree: [],
       unratedChapters:[],
+      unratedLength:0
     };
   },
   created() {
@@ -158,7 +162,6 @@ export default {
           params: { courseID: this.courseID }
         })
         .then(resp => {
-          console.log(resp.data);
           if (resp.data.state == 1) {
             this.courseName = resp.data.data.courseName;
           }
@@ -176,10 +179,8 @@ export default {
           params: { courseID: this.courseID }
         })
         .then(resp => {
-          console.log(resp.data);
           if (resp.data.state == 1) {
             this.graphTree = resp.data.data;
-            console.log(this.graphTree, "graphtree-teacher");
             this.init();
           }
         })
@@ -224,8 +225,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log("notice success", resp.data);
-
           if (resp.data.state == 1) {
             this.$message("修改成功");
           } else {
@@ -249,9 +248,7 @@ export default {
         .then(resp => {
           if (resp.data.state == 1) {
             this.tree = resp.data.data;
-            console.log(this.tree, "lesson-tree");
           }
-          console.log(this.courseID);
         })
         .catch(err => {
           console.log(err);
@@ -274,10 +271,9 @@ export default {
           }
         })
         .then(resp => {
-           console.log("TCL: getGrade -> resp", resp)
           if (resp.data.state == 1) {
             this.unratedChapters = resp.data.data;
-            console.log("TCL: getGrade -> unratedChapters", this.unratedChapters)
+           this.unratedLength = resp.data.data.length
           }
         })
        
@@ -400,7 +396,6 @@ export default {
       var lastNode= nodes.slice(-1);
       var maxLevel = lastNode[0][1].level;
       this.setHeight=(maxLevel+2)*70+'px'
-console.log(this.setHeight,"height")
 
       let data = [];
       var width = 4800;
@@ -425,7 +420,6 @@ console.log(this.setHeight,"height")
         y: 0
       });
       this.data = data;
-      console.log("TCL: set -> data", data);
 
       // 计算结束
       var length = this.graphTree.length;
@@ -625,7 +619,6 @@ console.log(this.setHeight,"height")
       }
     },
     pre(data) {
-      console.log(data, "pre");
       this.$router.push({
         path: "chapterDetail/preExercise",
         query: {
@@ -635,7 +628,6 @@ console.log(this.setHeight,"height")
       });
     },
     rev(node, data) {
-      console.log(node, data, "rev");
       this.$router.push({
         path: "chapterDetail/revExercise",
         query: {

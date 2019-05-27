@@ -12,7 +12,7 @@
         element-loading-background="rgba(0, 0, 0, 0.8)"
         class="menu"
       >
-        <el-scrollbar wrap-style="height: calc(83vh);overflow-x: hidden" :native="false">
+        <el-scrollbar wrap-style="height: calc(83vh);" :native="false">
           <el-submenu v-for="(item1,index1) in catalog" :index="index1.toString()" :key="index1">
             <template slot="title">
               <div align="start" class="chapter-name">{{item1.chapterName}}</div>

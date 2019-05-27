@@ -103,8 +103,6 @@ export default {
         }
       })
       .then(resp => {
-        
-      console.log("TCL: created -> resp", resp)
         if (resp.data.state == 1) {
           this.items = resp.data.data;
           var length = this.items.length;

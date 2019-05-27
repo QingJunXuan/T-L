@@ -990,7 +990,7 @@ export default {
       let myChart = this.$echarts.init(document.getElementById("myChart"));
       myChart.clear();
       this.drawCount++;
-      console.log(this.drawCount);
+      
       // 绘制图表
       myChart.setOption({
         color: this.colorOptions,

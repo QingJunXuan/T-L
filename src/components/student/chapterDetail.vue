@@ -92,10 +92,10 @@ export default {
           }
         })
         .then(resp => {
+          
+        console.log("TCL: getCatalog -> resp", resp)
           this.tree = resp.data.data;
           this.menuLoading = false;
-          console.log(resp.data,"resp.data");
-          console.log(this.courseID,"courseID");
         })
         .catch(err => {
           console.log(err);
@@ -177,7 +177,6 @@ export default {
       
       console.log('有变化了') 
       
-
   }
 },
   created() {

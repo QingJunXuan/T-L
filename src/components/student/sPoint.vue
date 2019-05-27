@@ -37,8 +37,6 @@ export default {
           }
         })
         .then(resp => {
-          console.log(this.chapterID, "chapterid");
-          console.log(resp.data, "chapter content");
           if(resp.data.state==1){
           this.point = resp.data.data;}
         })
