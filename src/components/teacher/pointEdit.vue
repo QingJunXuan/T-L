@@ -81,6 +81,8 @@ export default {
         )
         .then(
           response => {
+          console.log("TCL: getContents -> response", response)
+            
             if (response.status === 200) {
               let content = JSON.parse(response.bodyText);
               let dot = this.item.name.indexOf(".") + 1;

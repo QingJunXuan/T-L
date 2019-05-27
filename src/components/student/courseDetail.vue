@@ -407,8 +407,12 @@ export default {
         })
         .then(resp => {
           if (resp.data.state == 1) {
+
             this.graphTree = resp.data.data;
+            console.log("TCL: getChapterGraph -> graphTree", this.graphTree)
+            
             this.init();
+
           }
         })
         .catch(err => {
@@ -519,12 +523,11 @@ export default {
         }, */
         tooltip: {
           trigger:'item',
-          formatter:function(params){
-            if(params.dataType=="node"){
-              return '坐标('+params.data.x+','+params.data.y+')';
-            }
-            else{
-              return params.data.source+' > '+params.data.target;
+           formatter: function(params) {
+            if (params.dataType == "edge") {
+              return params.data.source + " > " + params.data.target;
+            }else{
+              return params.data.name
             }
           }
         },
