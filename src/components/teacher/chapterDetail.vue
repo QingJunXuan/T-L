@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 export default {
   name: "tChapterDetail",
   data() {
@@ -132,6 +133,18 @@ export default {
   },
   created() {
     this.getCatalog();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   }
 };
 </script>

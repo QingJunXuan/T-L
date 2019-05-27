@@ -24,7 +24,8 @@
             <el-row style="margin-top: 3px;">
               <el-col :span="17" style="padding-left: 40px" align="start">
                 <div
-                  class="student-info" v-if="studentInfo.length > 0"
+                  class="student-info"
+                  v-if="studentInfo.length > 0"
                 >{{studentInfo[index].id}} {{studentInfo[index].name}}</div>
               </el-col>
             </el-row>
@@ -34,7 +35,9 @@
             >
               <div v-for="(question, i) in question" :key="i" align="start" class="question">
                 <pre>{{question.order}}.{{question.content}}({{question.score}}分)</pre>
-                <div class="answer"><pre>{{studentInfo[index].answer[i].content}}</pre></div>
+                <div class="answer">
+                  <pre>{{studentInfo[index].answer[i].content}}</pre>
+                </div>
                 <div style="margin-top: 15px">
                   <span class="notice">得分</span>
                   <span style="margin-left: 10px">
@@ -56,11 +59,30 @@
             </div>
           </div>
           <div
-                  style="font-size: 14px; margin-left: 40px;margin-top: 13px; font-weight: 450; letter-spacing: 1px">总成绩：{{totalScore[index]}}</div>
+            style="font-size: 14px; margin-left: 40px;margin-top: 13px; font-weight: 450; letter-spacing: 1px"
+          >总成绩：{{totalScore[index]}}</div>
           <div style="margin-top: 20px; padding-bottom: 15px;" align="center">
-            <el-button type="primary" class="submit-button" size="small" @click="stuBack" :disabled="index === 0">上一名</el-button>
-            <el-button type="primary" class="submit-button" size="small" @click="submit" :loading="submitLoading">提交</el-button>
-            <el-button type="primary" class="submit-button" size="small" @click="stuForward" :disabled="next">下一名</el-button>
+            <el-button
+              type="primary"
+              class="submit-button"
+              size="small"
+              @click="stuBack"
+              :disabled="index === 0"
+            >上一名</el-button>
+            <el-button
+              type="primary"
+              class="submit-button"
+              size="small"
+              @click="submit"
+              :loading="submitLoading"
+            >提交</el-button>
+            <el-button
+              type="primary"
+              class="submit-button"
+              size="small"
+              @click="stuForward"
+              :disabled="next"
+            >下一名</el-button>
           </div>
         </el-card>
       </div>
@@ -69,6 +91,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 export default {
   name: "exerciseMark",
   data() {
@@ -78,16 +101,18 @@ export default {
       chapterID: 0,
       classID: 0,
       name: "",
-      studentId:0,
+      studentId: 0,
       // getExercises
       question: [],
       index: 0,
       next: true,
       // getStudentInfo
-      studentInfo: [{
-        id: '',
-        name: '暂无学生信息'
-      }],
+      studentInfo: [
+        {
+          id: "",
+          name: "暂无学生信息"
+        }
+      ],
       // loading
       submitLoading: false,
       questionLoading: true,
@@ -124,21 +149,24 @@ export default {
         this.$router.push({ path: "/" });
         return false;
       } else {
-        this.$router.push({path: '/teacher/courseDetail', query: {
-          courseID: this.courseID,
-          classID: this.classID
-        }});
+        this.$router.push({
+          path: "/teacher/courseDetail",
+          query: {
+            courseID: this.courseID,
+            classID: this.classID
+          }
+        });
       }
     },
     stuBack() {
       this.index--;
       this.next = false;
-      window.location.hash = "#title"
+      window.location.hash = "#title";
     },
     stuForward() {
       this.index++;
       this.next = true;
-      window.location.hash = "#title"
+      window.location.hash = "#title";
     },
     // 获取
     getExercises() {
@@ -216,7 +244,10 @@ export default {
                     name: studentList.data[i].name,
                     studentId: studentList.data[i].userID
                   });
-                  if (this.studentInfo[i].studentId === this.$route.query.studentId) {
+                  if (
+                    this.studentInfo[i].studentId ===
+                    this.$route.query.studentId
+                  ) {
                     this.index = i;
                   }
                   this.getAnswers(i);
@@ -256,14 +287,18 @@ export default {
               let answer = JSON.parse(response.bodyText);
               if (answer.state === 1) {
                 let i = 0;
-                while (i < answer.data.length) {
-                  if (answer.data[i].exercise.exerciseType === 6) {
+                while (i < answer.data.exerciseSets.length) {
+                  if (answer.data.exerciseSets[i].exercise.exerciseType === 6) {
                     this.studentInfo[index].answer.push({
-                      id: answer.data[i].exercise.exerciseId,
-                      content: answer.data[i].answer,
-                      order: answer.data[i].exercise.exerciseNumber
+                      id: answer.data.exerciseSets[i].exercise.exerciseId,
+                      content: answer.data.exerciseSets[i].answer,
+                      order: answer.data.exerciseSets[i].exercise.exerciseNumber
                     });
-                    this.studentInfo[index].score.push(0);
+                    if (answer.data.scores[i] === undefined) {
+                      this.studentInfo[index].score.push(0);
+                    } else {
+                      this.studentInfo[index].score.push(answer.data.scores[i]);
+                    }
                   }
                   i++;
                 }
@@ -272,7 +307,7 @@ export default {
                 for (let i = 0; i < this.question.length; i++) {
                   this.studentInfo[index].answer.push({
                     id: this.question[i].id,
-                    content: "[[[该学生未提交答案!]]]",
+                    content: "[[[该学生未完成习题作业!]]]",
                     order: this.question[i].order
                   });
                   this.studentInfo[index].score.push(0);
@@ -292,26 +327,18 @@ export default {
         this.$message({ type: "warning", message: "学生没有作答，无法评分!" });
         return;
       }
-      let scores =
-        this.studentInfo[this.index].score.length === 1
-          ? this.studentInfo[this.index].score[0]
-          : this.studentInfo[this.index].score;
-          this.submitLoading = true;
-      this.$http
-        .post(
-          "http://10.60.38.173:8765/question/correctAll",
-          {
-            scores: scores,
-            studentId: this.studentInfo[this.index].studentId,
-            chapterId: this.chapterID,
-            type: "review"
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token")
-            }
+      var params = new URLSearchParams();
+      params.append("scores", this.studentInfo[this.index].score);
+      params.append("studentId", this.studentInfo[this.index].studentId);
+      params.append("chapterId", this.chapterID);
+      params.append("type", "review");
+      this.$axios
+        .post("http://10.60.38.173:8765/question/correctAll", params, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
-        )
+        })
         .then(
           response => {
             if (response.status === 200) {
@@ -329,7 +356,10 @@ export default {
             this.submitLoading = false;
             this.$message({ type: "error", message: "提交失败!" });
           }
-        );
+        )
+        .catch(err => {
+          console.log(err);
+        });
     },
     // 比较器
     compare(propertyName) {
@@ -353,6 +383,18 @@ export default {
     this.name = this.$route.query.name;
     this.studentId = this.$route.query.studentId;
     this.getExercises();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   computed: {
     totalScore() {
@@ -465,6 +507,7 @@ export default {
 pre {
   padding: 0;
   margin: 0;
+  color: #494949;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-weight: 400;

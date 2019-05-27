@@ -6,6 +6,7 @@
   </el-container>
 </template>
 <script>
+import bus from "../../bus.js";
 export default {
   name: "tCourseGraph",
   data() {

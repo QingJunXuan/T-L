@@ -1,18 +1,8 @@
 <template>
   <el-row>
     <el-main class="background">
-      <el-row
-        :gutter="10"
-        
-      >
-        <!-- <el-col :span="2" align="right">
-          <div>
-            <el-button @click="goBack" circle style="box-shadow: 0 0 8px 1px #dbdbdb">
-              <i class="el-icon-back"></i>
-            </el-button>
-          </div>
-        </el-col> -->
-        <el-col :span="6" :offset="2" align="right">
+      <el-row :gutter="10">
+        <el-col :span="6" :offset="2" align="right" class="left">
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="start">
               <div class="course-info">
@@ -126,7 +116,10 @@
         <el-col :span="16">
           <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <el-scrollbar wrap-style="height: 778px; margin-top: 5px;overflow-x: hidden;" :native="false">
+              <el-scrollbar
+                wrap-style="height: 778px; margin-top: 5px;overflow-x: hidden;"
+                :native="false"
+              >
                 <div>
                   <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="数据分析" name="1">
@@ -146,6 +139,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 import echarts from "echarts";
 export default {
   name: "courseAnalysis",
@@ -234,23 +228,23 @@ export default {
         {
           value: 0,
           label: "教师",
-          disabled: false,
+          disabled: false
         },
         {
           value: 1,
           label: "课程",
-          disabled: true,
+          disabled: true
         },
 
         {
           value: 2,
           label: "学期",
-          disabled: false,
+          disabled: false
         },
         {
           value: 3,
           label: "学年",
-          disabled: false,
+          disabled: false
         }
       ],
       detail: [],
@@ -258,7 +252,6 @@ export default {
       comparison: 3,
       xyIndex: [0, 0],
       xData: [],
-      loadxData: false,
       detailValue: [],
       teacherOptions: [],
       courseOptions: [],
@@ -717,8 +710,8 @@ export default {
                     }
                   }
                 }
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -754,8 +747,8 @@ export default {
                     }
                   }
                 }
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -783,8 +776,8 @@ export default {
                     }
                   }
                 }
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -814,17 +807,21 @@ export default {
               if (this.xy === 4 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.year) {
-                    if (this.loadxData) {
-                    this.xData.push(key);
-                    }
-                      this.seriesData[seriesIndex].data.push(Number(
+                    let index = this.xData.indexOf(key);
+                    if (index === -1) {
+                      this.xData.push(key);
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data.year[key].rate).toFixed(1);
+                    } else {
+                      this.seriesData[seriesIndex].data[index] = Number(
                         res.data.year[key].rate
-                      ).toFixed(1));
+                      ).toFixed(1);
+                    }
                   }
                 }
-                this.loadxData = false;
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -834,7 +831,7 @@ export default {
           }
         );
     },
-    getYearRateData(courseNameID, seriesIndex, index, year) {
+    getYearRateData(courseNameID, seriesIndex, detail, courseIndex) {
       this.$http
         .get(
           "http://10.60.38.173:8765/getRateBySemesterAndYear?courseNameID=" +
@@ -849,26 +846,54 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (this.xy === 4 && this.comparison === 1 || (this.xy === 6 && this.comparison === 3)) {
+              if (this.xy === 4 && this.comparison === 1) {
+                if (res.state === 1) {
+                  let i = 0;
+                  let count = 0;
+                  while (i < res.data.length) {
+                    let year = res.data[i].semesterAndYear.year;
+                    let index = this.xData.indexOf(year);
+                    if (index === -1) {
+                      this.xData.push(year);
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data[i].avgRate).toFixed(1);
+                    } else {
+                      if (
+                        this.seriesData[seriesIndex].data[index] === undefined
+                      ) {
+                        this.seriesData[seriesIndex].data[index] = 0;
+                      }
+                      this.seriesData[seriesIndex].data[index] += Number(
+                        res.data[i].avgRate
+                      );
+                      count++;
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        this.seriesData[seriesIndex].data[index] / count
+                      ).toFixed(1);
+                    }
+                    i++;
+                  }
+                }
+              } else if (this.xy === 6 && this.comparison === 3) {
                 if (res.state === 1) {
                   let i = 0;
                   let count = 0;
                   let rate = 0;
-
                   while (i < res.data.length) {
-                    if (res.data[i].semesterAndYear.year == year) {
-                      rate += res.data[i].avgRate;
+                    let year = res.data[i].semesterAndYear.year;
+                    if (year == detail) {
+                      rate += Number(res.data[i].avgRate);
                       count++;
                     }
                     i++;
                   }
-                  if (count !== 0) {
-                    rate = (rate / count).toFixed(1);
-                  }
-                  this.seriesData[seriesIndex].data[index] = rate;
+                  this.seriesData[seriesIndex].data[courseIndex] = Number(
+                    rate / count
+                  ).toFixed(1);
                 }
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -898,17 +923,21 @@ export default {
               if (this.xy === 5 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.semester) {
-                    if (this.loadxData) {
-                    this.xData.push(key);
-                    }
-                      this.seriesData[seriesIndex].data.push(Number(
+                    let index = this.xData.indexOf(key);
+                    if (index === -1) {
+                      this.xData.push(key);
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data.semester[key].rate).toFixed(1);
+                    } else {
+                      this.seriesData[seriesIndex].data[index] = Number(
                         res.data.semester[key].rate
-                      ).toFixed(1));
+                      ).toFixed(1);
+                    }
                   }
                 }
-                this.loadxData = false;
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -918,7 +947,7 @@ export default {
           }
         );
     },
-    getSemesterRateData(courseNameID, seriesIndex, index, semester) {
+    getSemesterRateData(courseNameID, seriesIndex, detail, courseIndex) {
       this.$http
         .get(
           "http://10.60.38.173:8765/getRateBySemesterAndYear?courseNameID=" +
@@ -933,29 +962,45 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (this.xy === 6 && this.comparison === 2 || (this.xy === 5 && this.comparison === 1)) {
+              if (this.xy === 5 && this.comparison === 1) {
                 if (res.state === 1) {
                   let i = 0;
-                  let count = 0;
-                  let rate = 0;
                   while (i < res.data.length) {
-                    if (
+                    let semester =
                       res.data[i].semesterAndYear.year +
-                        res.data[i].semesterAndYear.semester ===
-                      semester
-                    ) {
-                      rate += res.data[i].avgRate;
-                      count++;
+                      res.data[i].semesterAndYear.semester;
+                    let index = this.xData.indexOf(semester);
+                    if (index === -1) {
+                      this.xData.push(semester);
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data[i].avgRate).toFixed(1);
+                    } else {
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        res.data[i].avgRate
+                      ).toFixed(1);
                     }
                     i++;
                   }
-                  if (count !== 0) {
-                    rate = (rate / count).toFixed(1);
-                  }
-                  this.seriesData[seriesIndex].data[index] = rate;
                 }
-                this.drawChart();
+              } else if (this.xy === 6 && this.comparison === 2) {
+                if (res.state === 1) {
+                  let i = 0;
+                  while (i < res.data.length) {
+                    let semester =
+                      res.data[i].semesterAndYear.year +
+                      res.data[i].semesterAndYear.semester;
+                    if (semester === detail) {
+                      this.seriesData[seriesIndex].data[courseIndex] = Number(
+                        res.data[i].avgRate
+                      ).toFixed(1);
+                      break;
+                    }
+                    i++;
+                  }
+                }
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -985,17 +1030,21 @@ export default {
               if (this.xy === 1 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.year) {
-                    if (this.loadxData) {
-                    this.xData.push(key);
-                    }
-                      this.seriesData[seriesIndex].data.push(Number(
+                    let index = this.xData.indexOf(key);
+                    if (index === -1) {
+                      this.xData.push(key);
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data.year[key].score).toFixed(2);
+                    } else {
+                      this.seriesData[seriesIndex].data[index] = Number(
                         res.data.year[key].score
-                      ).toFixed(2));
+                      ).toFixed(2);
+                    }
                   }
                 }
-                this.loadxData = false;
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1020,39 +1069,41 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (this.xy === 1 && this.comparison === 1 || (this.xy === 3 && this.comparison === 3)) {
-                if (res.state === 1) {
-                  for (var key in res.data.year) {
-                    if (this.xy === 1) {
-                      if (this.loadxData) {
+              if (res.state === 1) {
+                for (var key in res.data.year) {
+                  if (this.xy === 1) {
+                    let index = this.xData.indexOf(key);
+                    if (index === -1) {
                       this.xData.push(key);
-                      }
-                        this.seriesData[seriesIndex].data.push(Number(
-                          res.data.year[key].score
-                        ).toFixed(2));
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data.year[key].score).toFixed(2);
+                    } else {
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        res.data.year[key].score
+                      ).toFixed(2);
                     }
-                    if (this.xy === 3) {
-                      let index = this.search(
-                        this.courseOptions,
-                        courseNameID,
-                        "id"
-                      );
-                      let sIndex = this.search(
-                        this.detail,
-                        Number(key),
-                        "label"
-                      );
-                      if (sIndex !== -1) {
-                        this.seriesData[sIndex].data[index] = Number(
-                          res.data.year[key].score
-                        ).toFixed(2);
-                      }
+                  }
+                  if (this.xy === 3) {
+                    let index = this.search(
+                      this.courseOptions,
+                      courseNameID,
+                      "id"
+                    );
+                    let sIndex = this.search(
+                      this.detail,
+                      Number(key.substring(0, 4)),
+                      "label"
+                    );
+                    if (sIndex !== -1) {
+                      this.seriesData[sIndex].data[index] = Number(
+                        res.data.year[key].score
+                      ).toFixed(2);
                     }
                   }
                 }
-                this.loadxData = false;
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1082,18 +1133,21 @@ export default {
               if (this.xy === 2 && this.comparison === 0) {
                 if (res.state === 1) {
                   for (var key in res.data.semester) {
-                    alert(key)
-                    if (this.xData.indexOf(key) === -1) {
-                    this.xData.push(key);
-                    }
-                      this.seriesData[seriesIndex].data.push(Number(
+                    let index = this.xData.indexOf(key);
+                    if (index === -1) {
+                      this.xData.push(key);
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data.semester[key].score).toFixed(2);
+                    } else {
+                      this.seriesData[seriesIndex].data[index] = Number(
                         res.data.semester[key].score
-                      ).toFixed(2));
+                      ).toFixed(2);
+                    }
                   }
                 }
-                this.loadxData = false;
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1118,35 +1172,37 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (this.xy === 2 && this.comparison === 1 || (this.xy === 3 && this.comparison === 2)) {
-                if (res.state === 1) {
-                  for (var key in res.data.semester) {
-                    if (this.xy === 2) {
-                      if (this.loadxData) {
+              if (res.state === 1) {
+                for (var key in res.data.semester) {
+                  if (this.xy === 2) {
+                    let index = this.xData.indexOf(key);
+                    if (index === -1) {
                       this.xData.push(key);
-                      }
-                        this.seriesData[seriesIndex].push(Number(
-                          res.data.semester[key].score
-                        ).toFixed(2));
+                      this.seriesData[seriesIndex].data[
+                        this.xData.length - 1
+                      ] = Number(res.data.semester[key].score).toFixed(2);
+                    } else {
+                      this.seriesData[seriesIndex].data[index] = Number(
+                        res.data.semester[key].score
+                      ).toFixed(2);
                     }
-                    if (this.xy === 3) {
-                      let index = this.search(
-                        this.courseOptions,
-                        courseNameID,
-                        "id"
-                      );
-                      let sIndex = this.search(this.detail, key, "label");
-                      if (sIndex !== -1) {
-                        this.seriesData[sIndex].data[index] = Number(
-                          res.data.semester[key].score
-                        ).toFixed(2);
-                      }
+                  }
+                  if (this.xy === 3) {
+                    let index = this.search(
+                      this.courseOptions,
+                      courseNameID,
+                      "id"
+                    );
+                    let sIndex = this.search(this.detail, key, "label");
+                    if (sIndex !== -1) {
+                      this.seriesData[sIndex].data[index] = Number(
+                        res.data.semester[key].score
+                      ).toFixed(2);
                     }
                   }
                 }
-                this.loadxData = false;
-                this.drawChart();
               }
+              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1171,7 +1227,6 @@ export default {
       this.legendData = new Array();
       this.drawLoading = true;
       this.drawCount = 0;
-      this.loadxData = true;
       switch (this.xy) {
         // 课程-选课人数
         case 0: {
@@ -1424,9 +1479,7 @@ export default {
                 });
                 this.colorOptions.push(this.colors[i]);
                 this.legendData.push(this.detail[i].label);
-                for (let j = 0; j < this.xData.length; j++) {
-                  this.getYearRateData(this.detail[i].id, i, j, this.xData[j]);
-                }
+                this.getYearRateData(this.detail[i].id, i);
               }
               break;
             }
@@ -1445,7 +1498,7 @@ export default {
                   name: this.detail[i].label,
                   type: "bar",
                   barGap: 0,
-                  data: new Array(this.xData.length)
+                  data: new Array()
                 });
                 this.colorOptions.push(this.colors[i]);
                 this.legendData.push(this.detail[i].label);
@@ -1465,18 +1518,11 @@ export default {
                   name: this.detail[i].label,
                   type: "bar",
                   barGap: 0,
-                  data: new Array(this.xData.length)
+                  data: new Array()
                 });
                 this.colorOptions.push(this.colors[i]);
                 this.legendData.push(this.detail[i].label);
-                for (let j = 0; j < this.xData.length; j++) {
-                  this.getSemesterRateData(
-                    this.detail[i].id,
-                    i,
-                    j,
-                    this.xData[j]
-                  );
-                }
+                this.getSemesterRateData(this.detail[i].id, i);
               }
               break;
             }
@@ -1536,12 +1582,12 @@ export default {
                 });
                 this.colorOptions.push(this.colors[i]);
                 this.legendData.push(this.detail[i].label);
-                for (let j = 0; j < this.courseOptions.length; j++) {
+                for (let j = 0; j < this.xData.length; j++) {
                   this.getSemesterRateData(
                     this.courseOptions[j].id,
                     i,
-                    j,
-                    this.detail[i].label
+                    this.detail[i].label,
+                    j
                   );
                 }
               }
@@ -1562,8 +1608,8 @@ export default {
                   this.getYearRateData(
                     this.courseOptions[j].id,
                     i,
-                    j,
-                    this.detail[i].label
+                    this.detail[i].label,
+                    j
                   );
                 }
               }
@@ -1671,6 +1717,18 @@ export default {
     this.getCourseOptions();
     this.getTeacherOptions();
     this.courseLoading = true;
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   computed: {
     detailOptions() {
@@ -1703,10 +1761,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .main {
   padding-top: 18px;
-  
+
   height: 800px;
 }
 
@@ -1733,7 +1791,7 @@ export default {
 }
 
 .info-card {
-  width: 300px;
+  width: 98%;
   height: 200px;
 }
 
@@ -1770,13 +1828,13 @@ export default {
 
 .select-card {
   margin-top: 10px;
-  width: 300px;
-  height: 520px;
+  width: 98%;
+  height: calc(61vh);
 }
 
 .content-card {
   width: 800px;
-  height: 730px;
+  height: calc(86vh);
 }
 
 .content-card .collapse {
@@ -1798,5 +1856,11 @@ export default {
 .cardbody {
   height: 100%;
   position: relative;
+}
+
+@media screen and (max-width: 960px) {
+  .left {
+    display: none;
+  }
 }
 </style>

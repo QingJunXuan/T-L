@@ -115,6 +115,7 @@
   </div>
 </template>
 <script>
+import bus from "../../bus.js";
 export default {
   data() {
     return {
@@ -132,7 +133,8 @@ export default {
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
       exercises: [],
-      length: 1
+      length: 1,
+      answerArr: [],
     };
   },
   mounted() {
@@ -204,6 +206,7 @@ export default {
             if (type == "number") {
               var resp = String.fromCharCode(this.answer[i.toString()] + 65);
               var ans = this.exercises[i].exercise.exerciseAnswer;
+              this.answerArr[i] = resp;
               if (resp == ans) {
                 this.score[i] = this.exercises[i].exercise.exercisePoint;
               } else {
@@ -220,20 +223,22 @@ export default {
               var ansArray = this.exercises[i].exercise.exerciseAnswer;
               var ansNum = ansArray.length;
               var try2 = array.join("");
-              var isEqual = (try2 === ansArray);
 
+              var isEqual = try2 === ansArray;
+              this.answerArr[i] = try2;
+              
               if (isEqual) {
                 this.score[i] = this.exercises[i].exercise.exercisePoint;
               } else {
                 this.score[i] = 0;
               }
             } else {
+              this.answerArr = this.answer[i];
               this.score[i] = 0;
             }
           }
-
           var params = new URLSearchParams();
-          params.append("answers", this.answer);
+          params.append("answers", this.answerArr);
           params.append("studentId", localStorage.getItem("userID"));
           params.append("chapterId", this.sid);
           params.append("type", "preview");
@@ -265,6 +270,20 @@ export default {
         this.totalScore += this.score[i];
       }
     }
+  },
+  created() {
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   }
 };
 </script>

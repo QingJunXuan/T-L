@@ -14,7 +14,7 @@
             </el-button>
           </div>
         </el-col>
-        <el-col :span="6" align="right">
+        <el-col :span="6" align="right" class="left">
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
               <div class="info" align="start">
@@ -28,12 +28,22 @@
                   >最近学习到 [{{currentName}}]</div>
                 </el-row>
               </div>
-
-              <div style="padding: 10px 20px 10px 20px" align="start">
-                <el-tag type="danger" size="small" style="margin-top: 5px">学科</el-tag>
-                <el-tag type="warning" size="small" style="margin-top: 5px">语言</el-tag>
-                <el-tag type="success" size="small" style="margin-top: 5px">专业</el-tag>
-                <el-tag type="info" size="small" style="margin-top: 5px">薄弱</el-tag>
+              <div style="padding: 5px 20px 10px 20px" align="start" v-loading="labelLoading">
+                <el-row v-for="(item, index) in labels" :key="index" style="margin-top: 5px">
+                  <el-col :span="10">
+                    <div style="font-size: 12px; color: #4b4b4b">{{item.label}}:</div>
+                  </el-col>
+                  <el-col :span="10">
+                    <div style="margin-top: 5px; padding-right: 8px" v-if="item.value >= 0">
+                      <el-progress :percentage="item.value" :color="item.color" :show-text="false"></el-progress>
+                    </div>
+                  </el-col>
+                  <el-col :span="4">
+                    <div style="margin-top: -3px">
+                      <el-tag :type="item.status" size="mini">{{item.text}}</el-tag>
+                    </div>
+                  </el-col>
+                </el-row>
               </div>
             </div>
           </el-card>
@@ -69,7 +79,7 @@
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
-                      :disabled="item.disabled"
+                      v-show="!item.disabled"
                     ></el-option>
                   </el-select>
                 </el-row>
@@ -77,7 +87,7 @@
                 <el-row v-if="gradeAttribute !== 3">
                   <el-select v-model="comparison" size="small" @change="handleGradeAttribute">
                     <el-option
-                      :disabled="item.disabled"
+                      v-show="!item.disabled"
                       v-for="item in cOptions"
                       :key="item.value"
                       :label="item.label"
@@ -116,7 +126,10 @@
         <el-col :span="16">
           <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <el-scrollbar wrap-style="height: 737px; margin-top: 5px;overflow-x: hidden;" :native="false">
+              <el-scrollbar
+                wrap-style="height: 737px; margin-top: 5px;overflow-x: hidden;"
+                :native="false"
+              >
                 <div>
                   <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="成绩分析" name="1">
@@ -126,7 +139,7 @@
                     </el-collapse-item>
                     <el-collapse-item title="学习情况" name="2">
                       <el-row class="response" style="padding-top: 25px">
-                        <div align="start">
+                        <div align="start" v-if="suggestion.length > 0">
                           <i
                             class="el-icon-warning"
                             v-if="suggestion[4] === '不'"
@@ -137,7 +150,7 @@
                             v-else
                             style="color: #33CC33; margin-right: 5px"
                           ></i>
-                          <span>{{suggestion}}</span>
+                          <span style="letter-spacing: 0.8px">{{suggestion}}</span>
                           <span v-if="suggestion[4] === '不'">
                             <el-dropdown :hide-on-click="false">
                               <span class="el-dropdown-link">其他课程</span>
@@ -204,6 +217,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 export default {
   name: "studentAnalysis",
   data() {
@@ -236,17 +250,17 @@ export default {
         {
           value: 0,
           label: "学生",
-          disabled: false,
+          disabled: false
         },
         {
           value: 1,
           label: "性别",
-          disabled: false,
+          disabled: false
         },
         {
           value: 2,
           label: "班级平均分",
-          disabled: false,
+          disabled: false
         }
       ],
       gradeOptions: [
@@ -278,6 +292,8 @@ export default {
       studentInfo: [],
       suggestion: "",
       suggestCourses: [],
+      labels: [],
+      labelLoading: true,
       colors: ["#0997F7", "#92DD22", "#FFFF33", "#FFAAEE"],
       seriesData: [],
       colorOptions: [],
@@ -344,7 +360,10 @@ export default {
               while (i < courseList.data.length) {
                 this.chapterOptions.push({
                   value: i,
-                  label: courseList.data[i].contentName,
+                  label:
+                    courseList.data[i].contentName.length > 15
+                      ? courseList.data[i].contentName.substring(0, 16) + "..."
+                      : courseList.data[i].contentName,
                   id: courseList.data[i].id
                 });
                 i++;
@@ -448,6 +467,75 @@ export default {
             }
           },
           response => {
+            this.$message({ type: "error", message: "加载失败!" });
+          }
+        );
+    },
+    getStudentLabel() {
+      this.$http
+        .get(
+          "http://10.60.38.173:8765/question/userLabel?studentId=" +
+            this.userID,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          }
+        )
+        .then(
+          response => {
+            if (response.status === 200) {
+              let res = JSON.parse(response.bodyText);
+              if (res.state === 1) {
+                for (var key in res.data) {
+                  if (res.data[key] === -1) {
+                    this.labels.push({
+                      status: "info",
+                      text: "数据不足",
+                      color: "#fff",
+                      label: key,
+                      value: res.data[key]
+                    });
+                  } else {
+                    if (res.data[key] < 50) {
+                      this.labels.push({
+                        status: "warning",
+                        text: "薄弱",
+                        color: "#FFCC00",
+                        label: key,
+                        value: res.data[key]
+                      });
+                    } else if (res.data[key] < 85) {
+                      this.labels.push({
+                        status: "success",
+                        text: "良好",
+                        color: "#2BD591",
+                        label: key,
+                        value: res.data[key]
+                      });
+                    } else {
+                      if (res.data[key] > 100) {
+                        res.data[key] = 100;
+                      }
+                      this.labels.push({
+                        status: "danger",
+                        text: "突出",
+                        color: "#E61A94",
+                        label: key,
+                        value: res.data[key]
+                      });
+                    }
+                  }
+                }
+              }
+              this.labelLoading = false;
+            } else {
+              this.labelLoading = false;
+              this.$message({ type: "error", message: "加载失败!" });
+            }
+          },
+          response => {
+            this.labelLoading = false;
             this.$message({ type: "error", message: "加载失败!" });
           }
         );
@@ -777,7 +865,6 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              alert(response.bodyText)
               if (res.state === 1) {
                 if (res.message[1] === "需") {
                   this.suggestion = "最近成绩不太理想哦，你可能需要学习一些";
@@ -1062,6 +1149,7 @@ export default {
   },
   created() {
     this.getCourses();
+    this.getStudentLabel();
     this.seriesData.push({
       name: this.studentName,
       type: "bar",
@@ -1070,6 +1158,18 @@ export default {
     });
     this.colorOptions.push(this.colors[0]);
     this.legendData.push(this.studentName);
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   }
 };
 </script>
@@ -1105,7 +1205,7 @@ export default {
 }
 
 .info-card {
-  width: 300px;
+  width: 98%;
   height: 200px;
 }
 
@@ -1124,13 +1224,13 @@ export default {
 
 .select-card {
   margin-top: 10px;
-  width: 300px;
-  height: 525px;
+  width: 98%;
+  height: calc(61vh);
 }
 
 .content-card {
   width: 800px;
-  height: 737px;
+  height: calc(86vh);
 }
 
 .content-card .collapse {
@@ -1195,5 +1295,11 @@ export default {
   min-height: 100px;
   background-color: #fafafa;
   padding: 15px 20px 15px 20px;
+}
+
+@media screen and (max-width: 960px) {
+  .left {
+    display: none;
+  }
 }
 </style>

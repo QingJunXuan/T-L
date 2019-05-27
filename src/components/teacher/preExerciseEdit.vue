@@ -13,7 +13,11 @@
           >确认</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="请选择习题" :visible.sync="selectHistoryVisible" style="width: 80%; margin: 0 auto">
+      <el-dialog
+        title="请选择习题"
+        :visible.sync="selectHistoryVisible"
+        style="width: 80%; margin: 0 auto"
+      >
         <el-row type="flex" justify="center">
           <span style="margin-top: 5px; margin-right: 10px">历史课程</span>
           <el-select size="small" v-model="importSettings" @change="handleChapter">
@@ -37,7 +41,9 @@
           </el-select>
         </el-row>
         <el-row style="margin-top: 20px;">
-          <div style="width: 70%; margin: 0 auto; font-size: 12px;">注：你可以将指定学期的某课程中指定章节的习题内容导入成为现在的习题内容，导入的习题将覆盖你所保存的全部习题。</div>
+          <div
+            style="width: 70%; margin: 0 auto; font-size: 12px;"
+          >注：你可以将指定学期的某课程中指定章节的习题内容导入成为现在的习题内容，导入的习题将覆盖你所保存的全部习题。</div>
         </el-row>
         <el-row type="flex" justify="center" style="margin-top: 15px">
           <el-button
@@ -59,7 +65,7 @@
             <el-radio-group v-model="item1.answer[0]" @change="item1.edited = false">
               <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px">
                 <el-radio
-                :disabled="item1.delete"
+                  :disabled="item1.delete"
                   :label="j"
                 >{{String.fromCharCode(j+65)}}. {{item2.content}}</el-radio>
               </div>
@@ -67,9 +73,14 @@
           </div>
           <div v-else-if="item1.type === 2" style="margin: 15px 0 15px 0">
             <el-checkbox-group v-model="item1.answer">
-              <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px" @change="item1.edited = false">
+              <div
+                v-for="(item2, j) in item1.options"
+                :key="j"
+                style="margin-top: 10px"
+                @change="item1.edited = false"
+              >
                 <el-checkbox
-                :disabled="item1.delete"
+                  :disabled="item1.delete"
                   :label="j"
                 >{{String.fromCharCode(j+65)}}. {{item2.content}}</el-checkbox>
               </div>
@@ -181,8 +192,7 @@
             </div>
           </div>
           <div style="margin-top: 15px">
-            <el-button size="small" round @click="addOption()" type="primary"
-              plain>
+            <el-button size="small" round @click="addOption()" type="primary" plain>
               <i class="el-icon-circle-plus-outline" style="margin-right: 6px"></i>添加选项
             </el-button>
           </div>
@@ -266,12 +276,14 @@
           :loading="submitLoading"
           @click="submitPreview"
           :disabled="funcButton"
+          v-show="saveButton"
           size="small"
         >保存</el-button>
         <el-button
           type="success"
-          @click="dialogTableVisible = true"
+          @click="setDeadline"
           :disabled="funcButton"
+          v-show="publishButton"
           size="small"
         >发布</el-button>
         <el-button @click="getPreExercises" :disabled="funcButton" type="info" size="small">重置</el-button>
@@ -281,6 +293,7 @@
 </template>
 
 <script>
+import bus from "../../bus.js";
 export default {
   name: "preExerciseEdit",
   data() {
@@ -318,6 +331,8 @@ export default {
       chapterSettings: "暂无数据",
       addButton: true,
       funcButton: false,
+      saveButton: false,
+      publishButton: true,
       submitLoading: false,
       publishLoading: false,
       importLoading: false,
@@ -384,7 +399,7 @@ export default {
           response => {
             if (response.status === 200) {
               let exerciseList = JSON.parse(response.bodyText);
-              if (exerciseList.state === 1) {
+              if (exerciseList.state !== 0) {
                 let i = 0;
                 while (i < exerciseList.data.length) {
                   this.exercises.push({
@@ -436,6 +451,13 @@ export default {
                   i++;
                 }
                 this.exercises.sort(this.compare("order"));
+                if (exerciseList.state === 2) {
+                  this.saveButton = false;
+                  this.publishButton = true;
+                } else {
+                  this.saveButton = false;
+                  this.publishButton = false;
+                }
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -535,6 +557,16 @@ export default {
           }
         );
     },
+    setDeadline() {
+      if (this.totalScore === 0) {
+        this.$message({
+          type: "warning",
+          message: "请添加习题!"
+        });
+        return;
+      }
+      this.dialogTableVisible = true;
+    },
     handleType() {
       if (this.exerciseNew.type === 1) {
         for (let i = 1; i < this.exerciseNew.answer.length; i++) {
@@ -573,6 +605,8 @@ export default {
       this.exerciseNew = this.objDeepCopy(this.exercises[last]);
       this.addButton = false;
       this.funcButton = true;
+      this.saveButton = true;
+      this.publishButton = false;
     },
     // 删除习题
     deletePreExercise(index) {
@@ -595,6 +629,8 @@ export default {
               that.exercises[i].edited = true;
             }
           }
+          this.saveButton = true;
+          this.publishButton = false;
         })
         .catch(() => {
           this.$message({
@@ -623,6 +659,8 @@ export default {
       this.exerciseNew = this.objDeepCopy(this.exercises[index]);
       this.addButton = false;
       this.funcButton = true;
+      this.saveButton = true;
+      this.publishButton = false;
     },
     moveUp(index) {
       if (index === 0) {
@@ -639,6 +677,8 @@ export default {
       this.exercises.splice(index + 1, 1);
       this.exercises[index].order++;
       this.exercises[index - 1].order--;
+      this.saveButton = true;
+      this.publishButton = false;
     },
     moveDown(index) {
       if (index === this.exercises.length - 1) {
@@ -655,6 +695,8 @@ export default {
       this.exercises[index + 1].order--;
       this.exercises.splice(index + 2, 0, this.exercises[index]);
       this.exercises.splice(index, 1);
+      this.saveButton = true;
+      this.publishButton = false;
     },
     // 删除选项
     deleteOption(index) {
@@ -689,7 +731,8 @@ export default {
         });
         return;
       } else if (
-        Number(this.exerciseNew.score) <= 0 || this.exerciseNew.score.toString().indexOf('.') !== -1
+        Number(this.exerciseNew.score) <= 0 ||
+        this.exerciseNew.score.toString().indexOf(".") !== -1
       ) {
         this.$message({
           message: "分数应为正整数！",
@@ -1168,6 +1211,18 @@ export default {
     this.getPreExercises();
     this.getChapterInfo();
     this.getCourses();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
   watch: {
     // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可

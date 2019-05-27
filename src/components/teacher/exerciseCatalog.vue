@@ -147,6 +147,18 @@ export default {
     let date = new Date();
     this.activeDate = date.getTime().toString();
     this.getCatalog();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
 };
 </script>
@@ -183,7 +195,7 @@ a {
   text-align: start;
 }
 
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 960px) {
   .menu {
     display: none;
   }

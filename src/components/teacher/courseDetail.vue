@@ -67,7 +67,7 @@
                 <div style="height:1000px;border:1px solid #ddd;margin-bottom:20px" ref="graph"></div>
               </div>
             </el-col>
-            <el-col  :span="12" :offset="6" style="margin-top:-80px;margin-bottom:40px">
+            <el-col :span="12" :offset="6" style="margin-top:-80px;margin-bottom:40px">
               <div v-show="isGraph==false">
                 <el-tree
                   :data="tree"
@@ -86,11 +86,14 @@
              <el-row style="padding:30px">当前无需要批改的作业</el-row>
            </el-row>
           <el-col :span="10" :offset="7" v-for="(item,index) in unratedChapters" :key="index">
-              <el-row style="padding-bottom:20px">
-                <el-card shadow="hover" class="grade">
-                  <p style="margin-bottom:0px; cursor: pointer; font-size: 14px" @click="grade(item.chapterNode.id, item.chapterNode.exerciseTitle,item.studentId)">{{item.chapterNode.contentName+"（作业截至提交时间："+item.chapterNode.exerciseDeadline_2+"）"}}</p>
-                </el-card>
-              </el-row>
+            <el-row style="padding-bottom:20px">
+              <el-card shadow="hover" class="grade">
+                <p
+                  style="margin-bottom:0px; cursor: pointer; font-size: 14px"
+                  @click="grade(item.chapterNode.id, item.chapterNode.exerciseTitle,item.studentId)"
+                >{{item.chapterNode.contentName+"（作业截至提交时间："+item.chapterNode.exerciseDeadline_2+"）"}}</p>
+              </el-card>
+            </el-row>
           </el-col>
         </div>
       </div>
@@ -98,12 +101,13 @@
   </div>
 </template>
 <script>
+import bus from "../../bus.js";
 export default {
   name: "tCourseDetail",
   data() {
     return {
-      setHeight:'',
-      courseName:'',
+      setHeight: "",
+      courseName: "",
       number: 0, //章节号
       courseID: 1,
       classID: 1,
@@ -111,7 +115,7 @@ export default {
       isLesson: true,
       isGrade: false,
       isGraph: true,
-      isList:false,
+      isList: false,
       notice: "Java是一门面向对象编程语言.",
       textarea: "添加/修改课程介绍",
       //data: null,
@@ -147,14 +151,27 @@ export default {
     this.getLesson();
     //获取未评分章节
     this.getUnratedChapters();
+    window.onstorage = e => {
+      if (e.key === "username") {
+        if (e.newValue === null) {
+          this.$alert("你已退出登录", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              bus.$emit("reload", false);
+            }
+          });
+        }
+      }
+    };
   },
-  mounted(){
- //获取章节关系
+  mounted() {
+    //获取章节关系
     this.getChapterGraph();
   },
   methods: {
-    getCourseName(){///getCourseInfoByID
-    this.$axios
+    getCourseName() {
+      ///getCourseInfoByID
+      this.$axios
         .get("http://10.60.38.173:8765/getCourseInfoByID", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
@@ -260,7 +277,8 @@ export default {
         this.isGraph = true;
       }
     },
-    getUnratedChapters() {//获取未评分章节
+    getUnratedChapters() {
+      //获取未评分章节
       this.$axios
         .get("http://10.60.38.173:8765/question/getUnratedChapters", {
           headers: {
@@ -276,7 +294,7 @@ export default {
            this.unratedLength = resp.data.data.length
           }
         })
-       
+
         .catch(err => {
           console.log(err);
         });
@@ -311,7 +329,7 @@ export default {
         return true;
       }
     }, */
-    grade(chapterId, title,stuId) {
+    grade(chapterId, title, stuId) {
       this.$router.push({
         path: "/teacher/mark",
         name: "exerciseMark",
@@ -320,7 +338,7 @@ export default {
           classID: this.classID,
           courseID: this.courseID,
           name: title,
-          studentId:stuId
+          studentId: stuId
         }
       });
     },
@@ -358,7 +376,7 @@ export default {
         this.$router.push({ path: "/" });
         return false;
       } else {
-        this.$router.push({path: '/teacher/courseManagement'});
+        this.$router.push({ path: "/teacher/courseManagement" });
       }
     },
     init() {
@@ -393,14 +411,13 @@ export default {
         tempData.set(n[1].level, tempData.get(n[1].level).concat([n[0]]));
       });
 
-      var lastNode= nodes.slice(-1);
+      var lastNode = nodes.slice(-1);
       var maxLevel = lastNode[0][1].level;
       this.setHeight=(maxLevel+2)*70+'px'
 
       let data = [];
       var width = 4800;
       var init = 0;
-      
 
       for (let item of tempData.entries()) {
         var num = item[1].length;
@@ -470,13 +487,12 @@ export default {
           text: "章节关系图"
         }, */
         tooltip: {
-          trigger:'item',
-          formatter:function(params){
-            if(params.dataType=="node"){
-              return '坐标('+params.data.x+','+params.data.y+')';
-            }
-            else{
-              return params.data.source+' > '+params.data.target;
+          trigger: "item",
+          formatter: function(params) {
+            if (params.dataType == "node") {
+              return "坐标(" + params.data.x + "," + params.data.y + ")";
+            } else {
+              return params.data.source + " > " + params.data.target;
             }
           }
         },
@@ -496,7 +512,7 @@ export default {
             symbolSize: 20,
             color: "#ec7814",
             roam: true,
-            
+
             itemStyle: {
               normal: {
                 color: "#ec7814",
@@ -507,9 +523,15 @@ export default {
                   //color: '#000',
                   formatter: function(val) {
                     //让series 中的文字进行换行
-                     if(val.name.indexOf("、") == -1 && val.name.indexOf(":") != -1)  
+                    if (
+                      val.name.indexOf("、") == -1 &&
+                      val.name.indexOf(":") != -1
+                    )
                       return val.name.split(":").join("\n");
-                    else if (val.name.indexOf("、") != -1 && val.name.indexOf(":") == -1)
+                    else if (
+                      val.name.indexOf("、") != -1 &&
+                      val.name.indexOf(":") == -1
+                    )
                       return val.name.split("、").join("\n");
                     else return val.name;
                   }
@@ -539,8 +561,8 @@ export default {
         ]
       };
       myChart.setOption(option);
-      myChart.getDom().style.height = this.setHeight
-      myChart.resize()
+      myChart.getDom().style.height = this.setHeight;
+      myChart.resize();
 
       var that = this;
       let focusNum = 0;
