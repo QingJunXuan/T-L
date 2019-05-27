@@ -1,18 +1,8 @@
 <template>
   <el-row>
     <el-main class="background">
-      <el-row
-        :gutter="10"
-        
-      >
-        <!-- <el-col :span="2" align="right">
-          <div>
-            <el-button @click="goBack" circle style="box-shadow: 0 0 8px 1px #dbdbdb">
-              <i class="el-icon-back"></i>
-            </el-button>
-          </div>
-        </el-col> -->
-        <el-col :span="6" :offset="2" align="right">
+      <el-row :gutter="10">
+        <el-col :span="6" :offset="2" align="right" class="left">
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="start">
               <div class="course-info">
@@ -126,7 +116,10 @@
         <el-col :span="16">
           <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <el-scrollbar wrap-style="height: 778px; margin-top: 5px;overflow-x: hidden;" :native="false">
+              <el-scrollbar
+                wrap-style="height: 778px; margin-top: 5px;overflow-x: hidden;"
+                :native="false"
+              >
                 <div>
                   <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="数据分析" name="1">
@@ -1097,7 +1090,11 @@ export default {
                       courseNameID,
                       "id"
                     );
-                    let sIndex = this.search(this.detail, Number(key), "label");
+                    let sIndex = this.search(
+                      this.detail,
+                      Number(key.substring(0, 4)),
+                      "label"
+                    );
                     if (sIndex !== -1) {
                       this.seriesData[sIndex].data[index] = Number(
                         res.data.year[key].score
@@ -1767,7 +1764,7 @@ export default {
 <style>
 .main {
   padding-top: 18px;
-  
+
   height: 800px;
 }
 
@@ -1794,7 +1791,7 @@ export default {
 }
 
 .info-card {
-  width: 300px;
+  width: 98%;
   height: 200px;
 }
 
@@ -1831,13 +1828,13 @@ export default {
 
 .select-card {
   margin-top: 10px;
-  width: 300px;
-  height: 520px;
+  width: 98%;
+  height: calc(61vh);
 }
 
 .content-card {
   width: 800px;
-  height: 730px;
+  height: calc(86vh);
 }
 
 .content-card .collapse {
@@ -1859,5 +1856,11 @@ export default {
 .cardbody {
   height: 100%;
   position: relative;
+}
+
+@media screen and (max-width: 960px) {
+  .left {
+    display: none;
+  }
 }
 </style>

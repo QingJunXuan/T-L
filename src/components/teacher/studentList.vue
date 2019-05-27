@@ -135,6 +135,9 @@ export default {
                 }
                 this.getStudentCurrent(1);
               }
+              else {
+                this.listLoading = false;
+              }
             } else {
               this.listLoading = false;
               this.$message({ type: "error", message: "加载失败!" });

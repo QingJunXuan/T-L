@@ -14,7 +14,7 @@
             </el-button>
           </div>
         </el-col>
-        <el-col :span="6" align="right">
+        <el-col :span="6" align="right" class="left">
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
               <div class="info" align="start">
@@ -410,6 +410,9 @@ export default {
                         value: res.data[key]
                       });
                     } else {
+                      if (res.data[key] > 100) {
+                        res.data[key] = 100;
+                      }
                       this.labels.push({
                         status: "danger",
                         text: "突出",
@@ -851,7 +854,7 @@ export default {
 }
 
 .info-card {
-  width: 300px;
+  width: 98%;
   height: 200px;
 }
 
@@ -870,14 +873,13 @@ export default {
 
 .select-card {
   margin-top: 10px;
-  width: 300px;
-  height: 480px;
+  width: 98%;
+  height: calc(61vh);
 }
 
 .content-card {
   width: 800px;
-  height: 690px;
-  margin-bottom:50px
+  height: calc(86vh);
 }
 
 .content-card .collapse {
@@ -930,5 +932,11 @@ export default {
   min-height: 100px;
   background-color: #fafafa;
   padding: 5px 10px 5px 10px;
+}
+
+@media screen and (max-width: 960px) {
+  .left {
+    display: none;
+  }
 }
 </style>

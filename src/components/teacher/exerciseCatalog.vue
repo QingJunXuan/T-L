@@ -195,7 +195,7 @@ a {
   text-align: start;
 }
 
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 960px) {
   .menu {
     display: none;
   }

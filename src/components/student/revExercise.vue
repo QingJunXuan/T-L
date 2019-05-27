@@ -187,7 +187,8 @@ export default {
       score: {},
       totalPoint: 0, //题目总分数
       totalScore: 0, //总得分
-      exercises: []
+      exercises: [],
+      answerArr: [],
     };
   },
   mounted() {
@@ -287,6 +288,7 @@ export default {
     submitForm(formname) {
       //暂存
       var length = Object.keys(this.answer).length;
+      this.answerArr = new Array(length);
       this.$refs[formname].validate(valid => {
         if (valid) {
           for (var i = 0; i < length; i++) {
@@ -294,6 +296,7 @@ export default {
             if (type == "number") {
               var resp = String.fromCharCode(this.answer[i] + 65);
               var ans = this.exercises[i].exercise.exerciseAnswer;
+              this.answerArr[i] = resp;
               if (resp == ans) {
                 this.score[i] = this.exercises[i].exercise.exercisePoint;
               } else {
@@ -310,13 +313,14 @@ export default {
               var ansNum = ansArray.length;
               var try1 = array.join("");
               var isEqual = try1 === ansArray;
-
+              this.answerArr[i] = try1;
               if (isEqual) {
                 this.score[i] = this.exercises[i].exercise.exercisePoint;
               } else {
                 this.score[i] = 0;
               }
             } else {
+              this.answerArr[i] = this.answer[i];
               this.score[i] = 0;
             }
           }
@@ -339,7 +343,7 @@ export default {
       } else {
         this.isRated = true;
         var params = new URLSearchParams();
-        params.append("answers", this.answer);
+        params.append("answers", this.answerArr);
         params.append("studentId", localStorage.getItem("userID"));
         params.append("chapterId", this.sid);
         params.append("type", "review");

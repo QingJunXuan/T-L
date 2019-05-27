@@ -14,7 +14,7 @@
             </el-button>
           </div>
         </el-col>
-        <el-col :span="6" align="right">
+        <el-col :span="6" align="right" class="left">
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
               <div class="info" align="start">
@@ -79,7 +79,7 @@
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
-                      :disabled="item.disabled"
+                      v-show="!item.disabled"
                     ></el-option>
                   </el-select>
                 </el-row>
@@ -87,7 +87,7 @@
                 <el-row v-if="gradeAttribute !== 3">
                   <el-select v-model="comparison" size="small" @change="handleGradeAttribute">
                     <el-option
-                      :disabled="item.disabled"
+                      v-show="!item.disabled"
                       v-for="item in cOptions"
                       :key="item.value"
                       :label="item.label"
@@ -126,7 +126,10 @@
         <el-col :span="16">
           <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <el-scrollbar wrap-style="height: 737px; margin-top: 5px;overflow-x: hidden;" :native="false">
+              <el-scrollbar
+                wrap-style="height: 737px; margin-top: 5px;overflow-x: hidden;"
+                :native="false"
+              >
                 <div>
                   <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="成绩分析" name="1">
@@ -247,17 +250,17 @@ export default {
         {
           value: 0,
           label: "学生",
-          disabled: false,
+          disabled: false
         },
         {
           value: 1,
           label: "性别",
-          disabled: false,
+          disabled: false
         },
         {
           value: 2,
           label: "班级平均分",
-          disabled: false,
+          disabled: false
         }
       ],
       gradeOptions: [
@@ -357,7 +360,8 @@ export default {
               while (i < courseList.data.length) {
                 this.chapterOptions.push({
                   value: i,
-                  label: courseList.data[i].contentName.length > 15
+                  label:
+                    courseList.data[i].contentName.length > 15
                       ? courseList.data[i].contentName.substring(0, 16) + "..."
                       : courseList.data[i].contentName,
                   id: courseList.data[i].id
@@ -510,6 +514,9 @@ export default {
                         value: res.data[key]
                       });
                     } else {
+                      if (res.data[key] > 100) {
+                        res.data[key] = 100;
+                      }
                       this.labels.push({
                         status: "danger",
                         text: "突出",
@@ -1198,7 +1205,7 @@ export default {
 }
 
 .info-card {
-  width: 300px;
+  width: 98%;
   height: 200px;
 }
 
@@ -1217,13 +1224,13 @@ export default {
 
 .select-card {
   margin-top: 10px;
-  width: 300px;
-  height: 525px;
+  width: 98%;
+  height: calc(61vh);
 }
 
 .content-card {
   width: 800px;
-  height: 737px;
+  height: calc(86vh);
 }
 
 .content-card .collapse {
@@ -1288,5 +1295,11 @@ export default {
   min-height: 100px;
   background-color: #fafafa;
   padding: 15px 20px 15px 20px;
+}
+
+@media screen and (max-width: 960px) {
+  .left {
+    display: none;
+  }
 }
 </style>

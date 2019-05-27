@@ -72,10 +72,7 @@
               </div>
             </el-radio-group>
           </div>
-          <div
-            v-else-if="item1.type === 5"
-            style="margin: 15px 0 15px 0"
-          >
+          <div v-else-if="item1.type === 5" style="margin: 15px 0 15px 0">
             <el-checkbox-group v-model="item1.answer" @change="item1.edited = false">
               <div v-for="(item2, j) in item1.options" :key="j" style="margin-top: 10px">
                 <el-checkbox
@@ -413,12 +410,14 @@
           class="edit-button"
           @click="submitReview"
           :loading="submitLoading"
+          v-show="saveButton"
           :disabled="funcButton"
           size="small"
         >保存</el-button>
         <el-button
           type="success"
-          @click="dialogTableVisible = true"
+          @click="setDeadline"
+          v-show="publishButton"
           :disabled="funcButton"
           size="small"
         >发布</el-button>
@@ -488,6 +487,8 @@ export default {
       time: "",
       dialogTableVisible: false,
       funcButton: false,
+      saveButton: false,
+      publishButton: true,
       submitLoading: false,
       importLoading: false,
       publishLoading: false,
@@ -554,7 +555,7 @@ export default {
           response => {
             if (response.status === 200) {
               let exerciseList = JSON.parse(response.bodyText);
-              if (exerciseList.state === 1) {
+              if (exerciseList.state !== 0) {
                 let i = 0;
                 while (i < exerciseList.data.length) {
                   if (
@@ -632,6 +633,13 @@ export default {
                   i++;
                 }
                 this.exercisesSub.sort(this.compare("order"));
+                if (exerciseList.state === 2) {
+                  this.saveButton = false;
+                  this.publishButton = true;
+                } else {
+                  this.saveButton = false;
+                  this.publishButton = false;
+                }
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -731,9 +739,15 @@ export default {
           }
         );
     },
-    setAnswerClass(item, j) {
-      if (item.answer.indexOf(j) >= 0 && !item.delete) return "answer";
-      else return "";
+    setDeadline() {
+      if (this.totalObject + this.totalSubject === 0) {
+        this.$message({
+            type: "warning",
+            message: "请添加习题!"
+          });
+        return;
+      }
+      this.dialogTableVisible = true;
     },
     handleType() {
       if (this.objectNew.type === 4) {
@@ -776,6 +790,8 @@ export default {
               that.exercisesObj[i].edited = true;
             }
           }
+          this.saveButton = true;
+          this.publishButton = false;
         })
         .catch(() => {
           this.$message({
@@ -800,7 +816,7 @@ export default {
     },
     moveObjUp(index) {
       if (index === 0) {
-        this.$message({ type: "error", message: "此题无法上移" });
+        this.$message({ type: "warning", message: "此题无法上移" });
         return;
       }
       if (!this.exercisesObj[index].new) {
@@ -813,10 +829,12 @@ export default {
       this.exercisesObj[index - 1].order++;
       this.exercisesObj.splice(index - 1, 0, this.exercisesObj[index]);
       this.exercisesObj.splice(index + 1, 1);
+      this.saveButton = true;
+      this.publishButton = false;
     },
     moveObjDown(index) {
       if (index === this.exercisesObj.length - 1) {
-        this.$message({ type: "error", message: "此题无法下移" });
+        this.$message({ type: "warning", message: "此题无法下移" });
         return;
       }
       if (!this.exercisesObj[index].new) {
@@ -829,6 +847,8 @@ export default {
       this.exercisesObj[index + 1].order--;
       this.exercisesObj.splice(index + 2, 0, this.exercisesObj[index]);
       this.exercisesObj.splice(index, 1);
+      this.saveButton = true;
+      this.publishButton = false;
     },
     addReviewO() {
       this.exercisesObj.push({
@@ -853,12 +873,16 @@ export default {
       this.objectNew = this.objDeepCopy(this.exercisesObj[last]);
       this.objectButton = false;
       this.funcButton = true;
+      this.saveButton = true;
+      this.publishButton = false;
     },
     editObject(index) {
       this.exercisesObj[index].edit = true;
       this.objectNew = this.objDeepCopy(this.exercisesObj[index]);
       this.objectButton = false;
       this.funcButton = true;
+      this.saveButton = true;
+      this.publishButton = false;
     },
     saveObject(index) {
       for (let i = 0; i < this.objectNew.options.length; i++) {
@@ -883,7 +907,10 @@ export default {
           type: "warning"
         });
         return;
-      } else if (Number(this.objectNew.score) <= 0 || this.objectNew.score.toString().indexOf('.') !== -1) {
+      } else if (
+        Number(this.objectNew.score) <= 0 ||
+        this.objectNew.score.toString().indexOf(".") !== -1
+      ) {
         this.$message({
           message: "分数应为正整数！",
           type: "warning"
@@ -948,10 +975,12 @@ export default {
       this.subjectNew = this.objDeepCopy(this.exercisesSub[last]);
       this.subjectButton = false;
       this.funcButton = true;
+      this.saveButton = true;
+      this.publishButton = false;
     },
     moveSubUp(index) {
       if (index === 0) {
-        this.$message({ type: "error", message: "此题无法上移" });
+        this.$message({ type: "warning", message: "此题无法上移" });
         return;
       }
       if (!this.exercisesSub[index].new) {
@@ -964,10 +993,12 @@ export default {
       this.exercisesSub[index - 1].order++;
       this.exercisesSub.splice(index - 1, 0, this.exercisesSub[index]);
       this.exercisesSub.splice(index + 1, 1);
+      this.saveButton = true;
+      this.publishButton = false;
     },
     moveSubDown(index) {
       if (index === this.exercisesSub.length - 1) {
-        this.$message({ type: "error", message: "此题无法下移" });
+        this.$message({ type: "warning", message: "此题无法下移" });
         return;
       }
       if (!this.exercisesSub[index].new) {
@@ -980,6 +1011,8 @@ export default {
       this.exercisesSub[index + 1].order--;
       this.exercisesSub.splice(index + 2, 0, this.exercisesSub[index]);
       this.exercisesSub.splice(index, 1);
+      this.saveButton = true;
+      this.publishButton = false;
     },
     deleteSubject(index) {
       this.$confirm("确认删除该题吗?", "提示", {
@@ -1000,6 +1033,8 @@ export default {
               that.exercisesSub[i].edited = true;
             }
           }
+          this.saveButton = true;
+          this.publishButton = false;
         })
         .catch(() => {
           this.$message({
@@ -1027,6 +1062,8 @@ export default {
       this.subjectNew = this.objDeepCopy(this.exercisesSub[index]);
       this.subjectButton = false;
       this.funcButton = true;
+      this.saveButton = true;
+      this.publishButton = false;
     },
     saveSubject(index) {
       if (
@@ -1039,7 +1076,8 @@ export default {
           type: "warning"
         });
       } else if (
-        Number(this.subjectNew.score) <= 0 || this.subjectNew.score.toString().indexOf('.') !== -1
+        Number(this.subjectNew.score) <= 0 ||
+        this.subjectNew.score.toString().indexOf(".") !== -1
       ) {
         this.$message({
           message: "分数应为正整数！",
@@ -1050,16 +1088,16 @@ export default {
         let sum = this.totalSubject;
         sum -= this.exercisesSub[index].score;
         sum += Number(this.subjectNew.score);
-          this.totalSubject -= Number(this.exercisesSub[index].score);
-          this.exercisesSub[index] = this.objDeepCopy(this.subjectNew);
-          this.exercisesSub[index].edit = false;
-          if (!this.exercisesSub[index].new) {
-            this.exercisesSub[index].edited = true;
-          }
-          this.subjectNew = {};
-          this.totalSubject += Number(this.exercisesSub[index].score);
-          this.subjectButton = true;
-          this.funcButton = false;
+        this.totalSubject -= Number(this.exercisesSub[index].score);
+        this.exercisesSub[index] = this.objDeepCopy(this.subjectNew);
+        this.exercisesSub[index].edit = false;
+        if (!this.exercisesSub[index].new) {
+          this.exercisesSub[index].edited = true;
+        }
+        this.subjectNew = {};
+        this.totalSubject += Number(this.exercisesSub[index].score);
+        this.subjectButton = true;
+        this.funcButton = false;
       }
     },
     resetSubject(index) {
@@ -1456,7 +1494,7 @@ export default {
           this.exercisesObj[i].delete
         ) {
           this.$message({
-            type: "error",
+            type: "warning",
             message: "请先保存习题!"
           });
           return;
@@ -1470,7 +1508,7 @@ export default {
           this.exercisesSub[j].delete
         ) {
           this.$message({
-            type: "error",
+            type: "warning",
             message: "请先保存习题!"
           });
           return;

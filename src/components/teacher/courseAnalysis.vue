@@ -14,7 +14,7 @@
             </el-button>
           </div>
         </el-col>
-        <el-col :span="6" align="right">
+        <el-col :span="6" align="right" class="left">
           <el-card class="info-card" :body-style="{ padding: '0' }">
             <div class="cardbody" align="start">
               <div class="course-info">
@@ -2459,7 +2459,7 @@ export default {
 }
 
 .info-card {
-  width: 300px;
+  width: 98%;
   height: 200px;
 }
 
@@ -2497,13 +2497,13 @@ export default {
 
 .select-card {
   margin-top: 10px;
-  width: 300px;
-  height: 527px;
+  width: 98%;
+  height: calc(61vh);
 }
 
 .content-card {
   width: 800px;
-  height: 737px;
+  height: calc(86vh);
 }
 
 .content-card .collapse {
@@ -2555,5 +2555,11 @@ export default {
   zoom: 90%;
   margin-top: 2px;
   margin-bottom: 3px;
+}
+
+@media screen and (max-width: 960px) {
+  .left {
+    display: none;
+  }
 }
 </style>
