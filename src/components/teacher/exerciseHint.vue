@@ -32,6 +32,14 @@ export default {
           });
         }
       }
+      if (e.key === "catalog") {
+        this.$alert("章节已修改", "提示", {
+          confirmButtonText: "确定",
+          callback: action => {
+            bus.$emit("refresh", true);
+          }
+        });
+      }
     };
     }
 }

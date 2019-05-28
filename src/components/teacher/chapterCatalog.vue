@@ -749,7 +749,7 @@ export default {
             }
           );
       }
-      // 调到最后一个
+      // 调到最后一个ok
       else if (
         Number(this.chapterForm.order) >=
         Number(this.catalog[this.catalog.length - 1].order)
@@ -785,7 +785,7 @@ export default {
               this.alterChapterOrder(i, newName);
               if (
                 i !== 0 &&
-                Number(this.catalog[i].order) - 1 >
+                Number(this.catalog[i].order - 1) >
                   Number(this.catalog[i - 1].order)
               ) {
                 break;
@@ -880,7 +880,7 @@ export default {
             Number(this.chapterForm.order)
           );
         }
-        // 从最后一个调到最后一个
+        // 从最后一个调到最后一个ok
         if (
           chapterIndex === this.catalog.length - 1 &&
           Number(this.chapterForm.order) >
@@ -937,26 +937,28 @@ export default {
           let nextChapter = {};
           let index = 0;
           let changeOrder = false;
-          for (let m = 0; m < this.catalog.length; m++) {
+          for (let m = 0; m < this.catalog.length - 1; m++) {
             if (
               Number(this.catalog[m].order) < Number(this.chapterForm.order) &&
-              Number(this.catalog[m + 1].order) >=
-                Number(this.chapterForm.order)
+              Number(this.catalog[m + 1].order) > Number(this.chapterForm.order)
             ) {
               sibID = this.catalog[m].id;
               nextChapter = this.catalog[m + 1];
-              if (
-                Number(this.catalog[m + 1].order) ===
-                Number(this.chapterForm.order)
-              ) {
-                index = m + 1;
-                changeOrder = true;
-              }
+
+              break;
+            }
+            if (
+              Number(this.catalog[m].order) === Number(this.chapterForm.order)
+            ) {
+              index = m;
+              changeOrder = true;
               break;
             }
           }
           if (changeOrder) {
             if (index > chapterIndex) {
+              sibID = this.catalog[index].id;
+              nextChapter = this.catalog[index + 1];
               for (let i = index; i > chapterIndex; i--) {
                 for (let j = 0; j < this.catalog[i].points.length; j++) {
                   this.alterPointChapterOrder(
@@ -975,14 +977,15 @@ export default {
                 this.alterChapterOrder(i, newName);
                 if (
                   i !== 0 &&
-                  this.catalog[i].order - 1 > this.catalog[i - 1].order
+                  Number(this.catalog[i].order - 1) >
+                    Number(this.catalog[i - 1].order)
                 ) {
                   break;
                 }
               }
-              sibID = this.catalog[index].id;
-              nextChapter = this.catalog[index + 1];
             } else if (index < chapterIndex) {
+              sibID = this.catalog[index - 1].id;
+              nextChapter = this.catalog[index];
               for (let i = index; i < chapterIndex; i++) {
                 for (let j = 0; j < this.catalog[i].points.length; j++) {
                   this.alterPointChapterOrder(
@@ -999,13 +1002,14 @@ export default {
                   this.catalog[i].chapterName.substr(start);
                 this.catalog[i].chapterName = newName;
                 this.alterChapterOrder(i, newName);
-                if (this.catalog[i].order + 1 < this.catalog[i + 1].order) {
+                if (
+                  Number(this.catalog[i].order + 1) <
+                  Number(this.catalog[i + 1].order)
+                ) {
                   break;
                 }
               }
             }
-            sibID = this.catalog[index].id;
-            nextChapter = this.catalog[index - 1];
           }
           if (sibID !== 0) {
             this.$http
@@ -1331,7 +1335,7 @@ export default {
       }
       // 在中间
       else if (index < this.catalog.length - 1) {
-        // 调到原来的位置
+        // 调到原来的位置ok
         if (
           this.catalog[index - 1].order < this.chapterForm.order &&
           this.catalog[index + 1].order > this.chapterForm.order
@@ -1507,6 +1511,12 @@ export default {
         } else {
           let sibID = 0;
           that.submitLoading = true;
+          if (localStorage.getItem('catalog')) {
+            localStorage.removeItem('catalog');
+          }
+          else {
+            localStorage.setItem('catalog', true);
+          }
           if (that.chapterForm.new) {
             that.addChapter();
           } else {
@@ -1600,36 +1610,13 @@ export default {
         .then(() => {
           var that = this;
           this.menuLoading = true;
+          if (localStorage.getItem('catalog')) {
+            localStorage.removeItem('catalog');
+          }
+          else {
+            localStorage.setItem('catalog', true);
+          }
           if (index === 0 && index !== this.catalog.length - 1) {
-            if (
-              Number(this.catalog[index + 1].order) ===
-              Number(Number(this.catalog[index].order) + 1)
-            ) {
-              for (let i = index + 1; i < this.catalog.length; i++) {
-                for (let j = 0; j < this.catalog[i].points.length; j++) {
-                  this.alterPointChapterOrder(
-                    i,
-                    j,
-                    Number(this.catalog[i].order) - 1
-                  );
-                }
-                let start = this.catalog[i].chapterName.indexOf("章") + 1;
-                let newName =
-                  "第" +
-                  (Number(this.catalog[i].order) - 1) +
-                  "章" +
-                  this.catalog[i].chapterName.substr(start);
-                this.catalog[i].chapterName = newName;
-                this.alterChapterOrder(i, newName);
-                if (
-                  i !== this.catalog.length - 1 &&
-                  Number(this.catalog[i + 1].order) - 1 >
-                    Number(this.catalog[i].order)
-                ) {
-                  break;
-                }
-              }
-            }
             this.deleteChapterRelation(this.catalog[index]);
             this.$http
               .post(
@@ -1651,7 +1638,6 @@ export default {
               .then(
                 response => {
                   if (response.status === 200) {
-                    this.getCatalog();
                   } else {
                     this.$message({ type: "error", message: "章节删除失败!" });
                     this.submitLoading = false;
@@ -1665,41 +1651,10 @@ export default {
                 }
               );
           } else if (index < this.catalog.length - 1) {
-            if (
-              Number(this.catalog[index + 1].order) ===
-              Number(Number(this.catalog[index].order) + 1)
-            ) {
-              for (let i = index + 1; i < this.catalog.length; i++) {
-                for (let j = 0; j < this.catalog[i].points.length; j++) {
-                  this.alterPointChapterOrder(
-                    i,
-                    j,
-                    Number(this.catalog[i].order) - 1
-                  );
-                }
-                let start = this.catalog[i].chapterName.indexOf("章") + 1;
-                let newName =
-                  "第" +
-                  (Number(this.catalog[i].order) - 1) +
-                  "章" +
-                  this.catalog[i].chapterName.substr(start);
-                this.catalog[i].chapterName = newName;
-                this.alterChapterOrder(i, newName);
-                if (
-                  i !== this.catalog.length - 1 &&
-                  Number(this.catalog[i + 1].order) - 1 >
-                    Number(this.catalog[i].order)
-                ) {
-                  break;
-                }
-              }
-            }
-            setTimeout(function() {
-              that.alterChapterSib(
-                that.catalog[index + 1],
-                that.catalog[index - 1].id
-              );
-            }, 1000);
+            this.alterChapterSib(
+              this.catalog[index + 1],
+              this.catalog[index - 1].id
+            );
           }
           this.deleteChapterRelation(this.catalog[index]);
           this.$http

@@ -301,6 +301,7 @@ export default {
       id: 0,
       chapterInfo: {},
       courseID: 0,
+      classID: 0,
       teacherID: localStorage.getItem("userID"),
       // 课前习题
       exercises: [
@@ -349,6 +350,7 @@ export default {
   methods: {
     getParams() {
       this.courseID = this.$route.query.courseID;
+      this.classID = this.$route.query.classID;
       this.id = this.$route.query.id;
     },
     getChapterInfo() {
@@ -1221,6 +1223,18 @@ export default {
             }
           });
         }
+      }
+      if (e.key === "catalog") {
+        this.$alert("章节已修改", "提示", {
+          confirmButtonText: "确定",
+          callback: action => {
+            bus.$emit("refresh", true);
+            this.$router.push({
+              path: "/teacher/exerciseEdit/exerciseHint",
+              query: { id: this.courseID, classID: this.classID }
+            });
+          }
+        });
       }
     };
   },

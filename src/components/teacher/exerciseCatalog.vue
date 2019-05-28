@@ -19,13 +19,13 @@
             </template>
             <div>
               <router-link
-                :to="{name: 'preExerciseEdit', query:{id: item1.id, courseID: courseID}}"
+                :to="{name: 'preExerciseEdit', query:{id: item1.id, courseID: courseID, classID: classID}}"
                 class="router-link-active"
               >
                 <el-menu-item :index="'pre' + index1.toString()">课前摸底习题</el-menu-item>
               </router-link>
               <router-link
-                :to="{name: 'revExerciseEdit', query:{id: item1.id, courseID: courseID}}"
+                :to="{name: 'revExerciseEdit', query:{id: item1.id, courseID: courseID, classID: classID}}"
                 class="router-link-active"
               >
                 <el-menu-item :index="'rev' + index1.toString()">课后习题</el-menu-item>
@@ -58,17 +58,18 @@ export default {
   data() {
     return {
       courseID: 0,
-      teacherID: localStorage.getItem('userID'),
+      teacherID: localStorage.getItem("userID"),
       classID: 0,
       // 章节知识点列表
       catalog: [
         {
-          chapterName: "章节一",
+          chapterName: "章节一"
         }
       ],
       menuLoading: false,
       activeDate: "",
-      activeIndex: "0-0"
+      activeIndex: "0-0",
+      refresh: false
     };
   },
   methods: {
@@ -108,7 +109,7 @@ export default {
                 while (i < catalogList.data.length) {
                   this.catalog.push({
                     id: catalogList.data[i].id,
-                    chapterName: catalogList.data[i].contentName,
+                    chapterName: catalogList.data[i].contentName
                   });
                   i++;
                 }
@@ -140,6 +141,12 @@ export default {
       }
       return sourceCopy;
     },
+    getData(val) {
+      this.refresh = val;
+    }
+  },
+  mounted() {
+    bus.$on("refresh", val => this.getData(val));
   },
   created() {
     this.courseID = this.$route.query.id;
@@ -160,6 +167,14 @@ export default {
       }
     };
   },
+  watch: {
+    refresh(val) {
+      if (val === true) {
+        this.getCatalog();
+        this.refresh = false;
+      }
+    }
+  }
 };
 </script>
 
