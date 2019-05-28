@@ -1260,7 +1260,7 @@ export default {
           trigger:'item',
           formatter:function(params){
             if(params.dataType=="node"){
-              return '坐标('+params.data.x+','+params.data.y+')';
+              return params.data.name;
             }
             else{
               return params.data.source+' > '+params.data.target;
