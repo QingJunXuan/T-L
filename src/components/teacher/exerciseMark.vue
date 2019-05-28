@@ -164,8 +164,10 @@ export default {
       window.location.hash = "#title";
     },
     stuForward() {
-      this.index++;
-      this.next = true;
+      ++this.index;
+      if (this.studentInfo[this.index].state === 1) {
+        this.next = true;
+      }
       window.location.hash = "#title";
     },
     // 获取
@@ -242,7 +244,8 @@ export default {
                     score: new Array(),
                     id: studentList.data[i].workID,
                     name: studentList.data[i].name,
-                    studentId: studentList.data[i].userID
+                    studentId: studentList.data[i].userID,
+                    state: 0
                   });
                   if (
                     this.studentInfo[i].studentId ===
@@ -287,6 +290,7 @@ export default {
               let answer = JSON.parse(response.bodyText);
               if (answer.state === 1) {
                 let i = 0;
+                this.studentInfo[index].state = 1;
                 while (i < answer.data.exerciseSets.length) {
                   if (answer.data.exerciseSets[i].exercise.exerciseType === 6) {
                     this.studentInfo[index].answer.push({
