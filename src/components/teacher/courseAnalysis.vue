@@ -220,7 +220,10 @@
         <el-col :span="16">
           <el-card class="content-card" :body-style="{ padding: '0' }">
             <div class="cardbody">
-              <el-scrollbar wrap-style="height: 737px; margin-top: 5px;overflow-x: hidden;" :native="false">
+              <el-scrollbar
+                wrap-style="height: 737px; margin-top: 5px;overflow-x: hidden;"
+                :native="false"
+              >
                 <div>
                   <el-collapse v-model="activeNames" class="collapse" accordion>
                     <el-collapse-item title="数据分析" name="1">
@@ -913,6 +916,8 @@ export default {
                   }
                 }
                 this.getClassNLP();
+              } else {
+                this.$message({ type: "warning", message: "暂无课程反馈数据" });
               }
               this.commentLoading = false;
             } else {
@@ -973,6 +978,8 @@ export default {
                   }
                   i++;
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无课程反馈数据" });
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -1024,6 +1031,8 @@ export default {
                 this.chapterRate = Number(
                   classList.data[0].scoreInfo.totalRateAvg.toFixed(1)
                 );
+              } else {
+                this.$message({ type: "warning", message: "暂无课程反馈数据" });
               }
               this.commentLoading = false;
             } else {
@@ -1084,6 +1093,8 @@ export default {
                   }
                   i++;
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无课程反馈数据" });
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -1150,6 +1161,8 @@ export default {
                   this.seriesData[1].data[i] =
                     res.data[i].studentChapter.totalScore_2;
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1250,6 +1263,8 @@ export default {
                       break;
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1342,6 +1357,8 @@ export default {
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1380,6 +1397,8 @@ export default {
                     index
                   ] = res.data[0].scoreInfo.totalRateAvg.toFixed(2);
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1407,7 +1426,11 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              this.seriesData[seriesIndex].data = res.data;
+              if (res.state === 1) {
+                this.seriesData[seriesIndex].data = res.data;
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
+              }
               this.drawChart();
             } else {
               this.drawLoading = false;
@@ -1458,6 +1481,8 @@ export default {
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1507,6 +1532,8 @@ export default {
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1556,6 +1583,8 @@ export default {
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1608,6 +1637,8 @@ export default {
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1937,16 +1968,13 @@ export default {
             }
             // 性别
             case 1: {
+              let count = 0;
               for (let i = 0; i < 2; i++) {
                 let val = this.genderMap[i];
                 if (val === undefined || Object.keys(val).length === 0) {
-                  this.$message({
-                    type: "warning",
-                    message: "请将选项选择完整!"
-                  });
-                  this.drawLoading = false;
-                  return;
+                  continue;
                 }
+                count += 1;
                 let c = val[0];
                 let g = val[1];
                 this.seriesData.push({
@@ -1968,6 +1996,13 @@ export default {
                     j
                   );
                 }
+              }
+              if (count === 0) {
+                this.drawLoading = false;
+                this.$message({
+                  type: "warning",
+                  message: "请将选项选择完整!"
+                });
               }
               this.colorOptions.push(this.colors[2]);
               this.colorOptions.push(this.colors[1]);
@@ -2014,16 +2049,13 @@ export default {
           switch (this.comparison) {
             // 性别
             case 1: {
+              let count = 0;
               for (let i = 0; i < 2; i++) {
                 let val = this.genderMap[i];
                 if (val === undefined || Object.keys(val).length === 0) {
-                  this.$message({
-                    type: "warning",
-                    message: "请将选项选择完整!"
-                  });
-                  this.drawLoading = false;
-                  return;
+                  continue;
                 }
+                count += 1;
                 let c = val[0];
                 let g = val[1];
                 this.seriesData.push({
@@ -2044,6 +2076,13 @@ export default {
                   i,
                   this.genderOptions[c].children[g].value
                 );
+              }
+              if (count === 0) {
+                this.drawLoading = false;
+                this.$message({
+                  type: "warning",
+                  message: "请将选项选择完整!"
+                });
               }
               this.colorOptions.push(this.colors[2]);
               this.colorOptions.push(this.colors[1]);

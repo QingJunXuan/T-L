@@ -555,6 +555,7 @@ export default {
           response => {
             if (response.status === 200) {
               let exerciseList = JSON.parse(response.bodyText);
+              alert(response.bodyText)
               if (exerciseList.state !== 0) {
                 let i = 0;
                 while (i < exerciseList.data.length) {
@@ -1522,7 +1523,7 @@ export default {
         deadline = this.time;
       }
       let entity = {};
-      if (this.chapterInfo.exerciseVisible_1 === false) {
+      if (this.chapterInfo.exerciseVisible_1 === null) {
         entity = {
           id: this.chapterInfo.id,
           courseID: this.chapterInfo.courseID,

@@ -441,25 +441,27 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              let i = 0;
-              while (i < res.data.length) {
-                let avg =
-                  (Number(res.data[i].studentChapter.totalScore_1) +
-                    Number(res.data[i].studentChapter.totalScore_2)) /
-                  2;
+              if (res.state === 1) {
+                let i = 0;
+                while (i < res.data.length) {
+                  let avg =
+                    (Number(res.data[i].studentChapter.totalScore_1) +
+                      Number(res.data[i].studentChapter.totalScore_2)) /
+                    2;
 
-                this.studentInfo.push({
-                  id: res.data[i].studentChapter.id,
-                  scorePre: res.data[i].studentChapter.totalScore_1,
-                  scoreRev: res.data[i].studentChapter.totalScore_2,
-                  scoreAvg: avg,
-                  comments: res.data[i].studentChapter.comment,
-                  rate: Number(res.data[i].studentChapter.rate),
-                  chapter: res.data[i].chapterName,
-                  chapterID: res.data[i].studentChapter.chapterID
-                });
-                this.xData.push(res.data[i].chapterName);
-                i++;
+                  this.studentInfo.push({
+                    id: res.data[i].studentChapter.id,
+                    scorePre: res.data[i].studentChapter.totalScore_1,
+                    scoreRev: res.data[i].studentChapter.totalScore_2,
+                    scoreAvg: avg,
+                    comments: res.data[i].studentChapter.comment,
+                    rate: Number(res.data[i].studentChapter.rate),
+                    chapter: res.data[i].chapterName,
+                    chapterID: res.data[i].studentChapter.chapterID
+                  });
+                  this.xData.push(res.data[i].chapterName);
+                  i++;
+                }
               }
               this.getStudentData(this.userID, 0);
             } else {
@@ -557,48 +559,52 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              let i = 0;
-              while (i < res.data.length) {
-                let avg =
-                  (Number(res.data[i].studentChapter.totalScore_1) +
-                    Number(res.data[i].studentChapter.totalScore_2)) /
-                  2;
-                if (this.xy === 0 && this.gradeAttribute !== 3) {
-                  switch (this.gradeAttribute) {
-                    case 0: {
-                      // 总
-                      this.seriesData[index].data.push(avg);
-                      break;
-                    }
-                    case 1: {
-                      // 课前
-                      this.seriesData[index].data.push(
-                        res.data[i].studentChapter.totalScore_1
-                      );
-                      break;
-                    }
-                    case 2: {
-                      // 课后
-                      this.seriesData[index].data.push(
-                        res.data[i].studentChapter.totalScore_2
-                      );
-                      break;
-                    }
-                    default: {
-                      break;
+              if (res.state === 1) {
+                let i = 0;
+                while (i < res.data.length) {
+                  let avg =
+                    (Number(res.data[i].studentChapter.totalScore_1) +
+                      Number(res.data[i].studentChapter.totalScore_2)) /
+                    2;
+                  if (this.xy === 0 && this.gradeAttribute !== 3) {
+                    switch (this.gradeAttribute) {
+                      case 0: {
+                        // 总
+                        this.seriesData[index].data.push(avg);
+                        break;
+                      }
+                      case 1: {
+                        // 课前
+                        this.seriesData[index].data.push(
+                          res.data[i].studentChapter.totalScore_1
+                        );
+                        break;
+                      }
+                      case 2: {
+                        // 课后
+                        this.seriesData[index].data.push(
+                          res.data[i].studentChapter.totalScore_2
+                        );
+                        break;
+                      }
+                      default: {
+                        break;
+                      }
                     }
                   }
+                  if (this.xy === 0 && this.gradeAttribute === 3) {
+                    // 课前对比课后
+                    this.seriesData[0].data.push(
+                      res.data[i].studentChapter.totalScore_1
+                    );
+                    this.seriesData[1].data.push(
+                      res.data[i].studentChapter.totalScore_2
+                    );
+                  }
+                  i++;
                 }
-                if (this.xy === 0 && this.gradeAttribute === 3) {
-                  // 课前对比课后
-                  this.seriesData[0].data.push(
-                    res.data[i].studentChapter.totalScore_1
-                  );
-                  this.seriesData[1].data.push(
-                    res.data[i].studentChapter.totalScore_2
-                  );
-                }
-                i++;
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {

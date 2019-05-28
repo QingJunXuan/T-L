@@ -1059,7 +1059,7 @@ export default {
         deadline = this.time;
       }
       let entity = {};
-      if (this.chapterInfo.exerciseVisible_2 === false) {
+      if (this.chapterInfo.exerciseVisible_2 === null) {
         entity = {
           id: this.chapterInfo.id,
           courseID: this.chapterInfo.courseID,

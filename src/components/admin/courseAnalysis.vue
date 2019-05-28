@@ -676,6 +676,8 @@ export default {
                 console.log(
                   "[" + courseIndex + "," + teacherIndex + "," + index + "]"
                 );
+              } else {
+                this.$message({ type: "warning", message: "暂无数据" });
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -701,15 +703,20 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (this.xy === 0 && this.comparison === 0) {
-                if (res.state === 1) {
-                  for (var key in res.data) {
-                    let index = this.xData.indexOf(key);
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = res.data[key];
+              if (res.state === 1) {
+                if (this.xy === 0 && this.comparison === 0) {
+                  if (res.state === 1) {
+                    for (var key in res.data) {
+                      let index = this.xData.indexOf(key);
+                      if (index !== -1) {
+                        this.seriesData[seriesIndex].data[index] =
+                          res.data[key];
+                      }
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -738,15 +745,20 @@ export default {
           response => {
             if (response.status === 200) {
               let res = JSON.parse(response.bodyText);
-              if (this.xy === 0 && this.comparison === 2) {
-                if (res.state === 1) {
-                  for (var key in res.data) {
-                    let index = this.xData.indexOf(key);
-                    if (index !== -1) {
-                      this.seriesData[seriesIndex].data[index] = res.data[key];
+              if (res.state === 1) {
+                if (this.xy === 0 && this.comparison === 2) {
+                  if (res.state === 1) {
+                    for (var key in res.data) {
+                      let index = this.xData.indexOf(key);
+                      if (index !== -1) {
+                        this.seriesData[seriesIndex].data[index] =
+                          res.data[key];
+                      }
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -775,6 +787,8 @@ export default {
                       this.seriesData[seriesIndex].data[index] = res.data[key];
                     }
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               }
               this.drawChart();
@@ -819,6 +833,8 @@ export default {
                       ).toFixed(1);
                     }
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               }
               this.drawChart();
@@ -874,6 +890,8 @@ export default {
                     }
                     i++;
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               } else if (this.xy === 6 && this.comparison === 3) {
                 if (res.state === 1) {
@@ -891,6 +909,8 @@ export default {
                   this.seriesData[seriesIndex].data[courseIndex] = Number(
                     rate / count
                   ).toFixed(1);
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               }
               this.drawChart();
@@ -935,6 +955,8 @@ export default {
                       ).toFixed(1);
                     }
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               }
               this.drawChart();
@@ -982,6 +1004,8 @@ export default {
                     }
                     i++;
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               } else if (this.xy === 6 && this.comparison === 2) {
                 if (res.state === 1) {
@@ -998,6 +1022,8 @@ export default {
                     }
                     i++;
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               }
               this.drawChart();
@@ -1042,6 +1068,8 @@ export default {
                       ).toFixed(2);
                     }
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               }
               this.drawChart();
@@ -1102,6 +1130,8 @@ export default {
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1145,6 +1175,8 @@ export default {
                       ).toFixed(2);
                     }
                   }
+                } else {
+                  this.$message({ type: "warning", message: "暂无分析数据" });
                 }
               }
               this.drawChart();
@@ -1201,6 +1233,8 @@ export default {
                     }
                   }
                 }
+              } else {
+                this.$message({ type: "warning", message: "暂无分析数据" });
               }
               this.drawChart();
             } else {
@@ -1761,7 +1795,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
   padding-top: 18px;
 
