@@ -523,7 +523,9 @@ export default {
                 label: {
                   show: true,
                   fontSize: 12,
-                  //color: '#000',
+                  color:'#000',
+                  fontSize:14,
+                  fontWeight:900,
                   formatter: function(val) {
                     //让series 中的文字进行换行
                     if (

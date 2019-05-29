@@ -552,12 +552,14 @@ export default {
             roam: true,
             itemStyle:{
               normal:{
-                color: "#ec7814",
+                color: "gold",
                 //opacity:0.8,
                 label:{
                   show:true,
                   fontSize:12,
-                  //color: '#000',
+                  color:'#000',
+                  fontSize:14,
+                  fontWeight:900,
                   formatter:function(val){   
                     //让series 中的文字进行换行
                     if(val.name.indexOf("、") == -1 && val.name.indexOf(":") != -1)  

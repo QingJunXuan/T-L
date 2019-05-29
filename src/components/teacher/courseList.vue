@@ -102,7 +102,7 @@ body {
 }
 </style>
 
-<style>
+<style scoped>
 .header {
   height: 60px;
   background-color: cadetblue;

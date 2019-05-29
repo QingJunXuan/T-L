@@ -1286,9 +1286,10 @@ export default {
             label: {
               normal: {
                 show: true,
-                textStyle:{
-                  fontColor:"#000"
-                }
+               color:'#000',
+                // color:"rgb(54, 27, 7)",
+                fontSize:14,
+                fontWeight:900
               }
             },
             edgeSymbol: ["circle", "arrow"],
@@ -1306,7 +1307,10 @@ export default {
             links: this.links,
             itemStyle:{
               normal:{
-                color: "#ec7814",
+                color: "gold",
+                textStyle:{
+                  color:"#000"
+                }
               }
             },
             lineStyle: {

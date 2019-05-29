@@ -56,7 +56,6 @@ export default {
       if(resp.data.state==1){
         
         this.teachers=resp.data.data
-        console.log(this.teachers)
       }
     }).catch(err=>{
       console.log(err)

@@ -1,12 +1,20 @@
 <template>
   <div style="height:778px">
-    <el-col :span="20" :offset="2">
-      <el-row :gutter="40">
+    <el-col :span="20" :offset="2"> 
+      <!-- <el-row style="font-size:18px;letter-spacing:5px;text-align:left">
+        <el-row style="padding-top:30px;" v-if="items.length!=0">当前学期：{{items[0].courseInfo.courseYear+'-'+items[0].courseInfo.courseSemester}}</el-row>
+      </el-row> -->
+      <el-row :gutter="10" style="padding-top:30px;padding-bottom:20px">
         <el-col :span="2" style="margin-top:10px">
           <el-button type="primary" size="mini" @click="isPlus=true">加入班级</el-button>
         </el-col>
-        <el-col :span="2" style="margin-top:10px">
+        <el-col :span="1" style="margin-top:10px;margin-right:40px">
           <el-button type="success" size="mini" @click="toAnalysis">课程分析</el-button>
+        </el-col>
+        <el-col :span="4" style="margin-top:10px">
+           <el-row style="font-size:18px;letter-spacing:4px;text-align:left">
+             <el-row v-if="items.length!=0">当前学期：{{items[0].courseInfo.courseYear+'-'+items[0].courseInfo.courseSemester}}</el-row>
+            </el-row>
         </el-col>
       </el-row>
       <el-row style="font-size:18px;letter-spacing:5px" v-show="noCourse">
@@ -123,6 +131,8 @@ export default {
             this.noCourse = false;
             resp.data.data.splice(2,1)
             this.items = resp.data.data;
+            console.log("TCL: created -> items", this.items)
+            
           }
         }
       })

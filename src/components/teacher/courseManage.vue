@@ -27,6 +27,9 @@
           <span style="color:darkcyan;font-weight:bold">学院管理员</span>为您开课吧
         </el-row>
       </el-row>
+      <el-row style="font-size:20px;font-weight:700;letter-spacing:4px;padding:30px;color:darkcyan">
+        <el-row v-if="items.length!=0">当前学期：{{items[0].courseInfo.courseYear+'-'+items[0].courseInfo.courseSemester}}</el-row>
+      </el-row>
       <el-row :gutter="40">
         <el-col :span="22" :offset="1">
         <span v-for="(item,index) in items" :key="index">
@@ -106,7 +109,9 @@ export default {
       })
       .then(resp => {
         if (resp.data.state == 1) {
+          
           this.items = resp.data.data;
+          console.log("TCL: created -> items", this.items)
           var length = this.items.length;
           if (length != 0) {
             this.noCourse = false;

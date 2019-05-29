@@ -62,11 +62,11 @@ export default {
       })
 
       let data = [];
-      var width=3400;
+      var width=4000;
       var init=0;
       for (let item of tempData.entries()) {
         var num=item[1].length
-        init=1700/num
+        init=2000/num
         item[1].forEach((value, index) => {
           let addData = {
             name: value,
@@ -79,7 +79,7 @@ export default {
 
       data.push({
         name: 'start',
-        x: 1700,
+        x: 2000,
         y: 0
       })
 
@@ -157,10 +157,17 @@ export default {
             top:30,
             symbolSize: 30,
             roam: true,
+            
+            data: this.data,
+            links: this.links,
 
             label: {
               normal: {
-                show: true
+                show: true,
+                color:'#000',
+                // color:"rgb(54, 27, 7)",
+                fontSize:14,
+                fontWeight:900
               }
             },
             edgeSymbol: ["circle", "arrow"],
@@ -174,11 +181,11 @@ export default {
                 }
               }
             },
-            data: this.data,
-            links: this.links,
             itemStyle:{
               normal:{
-                color: "#ec7814",
+                color: "gold",
+                // fontColor:'#000'
+                opacity:0.9
               }
             },
             lineStyle: {
