@@ -27,44 +27,50 @@
       </el-row>
       <el-row :gutter="40">
         <el-col :span="22" :offset="1">
-        <span v-for="(item,index) in items" :key="index">
-        <el-col :span="8" v-for="(item2,index2) in item.courseClasses" :key="index2">
-          <el-card :body-style="{padding:0}" style="margin:20px 0;">
-            <el-row class="top">
-              <p
-                id="name"
-                style="cursor: pointer"
-                @click="courseDetail(item.courseInfo.courseID,item2.id,item.courseName)"
-              >{{item.courseName}}</p>
-              <el-col :span="5" :offset="18" style="margin-top:10px">
-                <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
-              </el-col>
-            </el-row>
-            <el-row style="height:90px">
-              <el-row>
-                <el-col :span="16" :offset="1" style="text-align:left">
-                  <p style="font-size:13px;color:#000">近期作业</p>
-                  <p v-if="item2.currentExerciseChapter != -1"
-                    id="newest"
-                    @click="homework(item2.currentExerciseChapter)"
-                  >第 {{item2.currentExerciseChapter}} 章课后习题</p>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-row style="font-size:12px;text-align:right">
-                  <el-col :span="10" :offset="13">邀请码：{{item2.classCode}}</el-col>
+          <span v-for="(item,index) in items" :key="index">
+            <el-col :span="8" v-for="(item2,index2) in item.courseClasses" :key="index2">
+              <el-card :body-style="{padding:0}" style="margin:20px 0;">
+                <el-row class="top">
+                  <p
+                    id="name"
+                    style="cursor: pointer"
+                    @click="courseDetail(item.courseInfo.courseID,item2.id,item.courseName)"
+                  >{{item.courseName}}</p>
+                  <el-col :span="5" :offset="18" style="margin-top:10px">
+                    <span id="teacher">老师：{{item.courseInfo.teacherName}}</span>
+                  </el-col>
                 </el-row>
-              </el-row>
-            </el-row>
-          </el-card>
-        </el-col>
-        </span>
+                <el-row style="height:90px">
+                  <el-row>
+                    <el-col :span="16" :offset="1" style="text-align:left">
+                      <p style="font-size:13px;color:#000">近期作业</p>
+                      <p
+                        v-if="item2.currentExerciseChapter != -1"
+                        id="newest"
+                        @click="homework(item2.currentExerciseChapter)"
+                      >第 {{item2.currentExerciseChapter}} 章课后习题</p>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-row style="font-size:12px;text-align:right">
+                      <el-col :span="10" :offset="13">邀请码：{{item2.classCode}}</el-col>
+                    </el-row>
+                  </el-row>
+                </el-row>
+              </el-card>
+            </el-col>
+          </span>
         </el-col>
       </el-row>
       <el-dialog :visible.sync="isPlus" title="加入班级" width="30%" center>
         <el-form>
           <el-form-item label="邀请码" label-width="70px">
-            <el-input v-model="code" auto-complete="off" placeholder="请输入邀请码" @keyup.native.enter="submit"></el-input>
+            <el-input
+              v-model="code"
+              auto-complete="off"
+              placeholder="请输入邀请码"
+              @keyup.native.enter="submit"
+            ></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -108,38 +114,15 @@ export default {
           classNum: -1,
           classCode: "",
           currentExerciseChapter: -1
-        },
+        }
       },
       chapterNameList: [],
       items: []
     };
   },
   created() {
-    this.$axios
-      .get("http://10.60.38.173:8765/question/currentCourseByStudentId", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
-        },
-        params: {
-          studentId: localStorage.getItem('userID')
-        }
-      })
-      .then(resp => {
-        if (resp.data.state == 1) {
-          var length = resp.data.data.length;
-          if (length != 0) {
-            this.noCourse = false;
-            resp.data.data.splice(2,1)
-            this.items = resp.data.data;
-            console.log("TCL: created -> items", this.items)
-            
-          }
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-      window.onstorage = e => {
+    this.getCourses();
+    window.onstorage = e => {
       if (e.key === "username") {
         if (e.newValue === null) {
           this.$alert("你已退出登录", "提示", {
@@ -153,8 +136,32 @@ export default {
     };
   },
   methods: {
+    getCourses() {
+      this.$axios
+        .get("http://10.60.38.173:8765/question/currentCourseByStudentId", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          },
+          params: {
+            studentId: localStorage.getItem("userID")
+          }
+        })
+        .then(resp => {
+          if (resp.data.state == 1) {
+            var length = resp.data.data.length;
+            if (length != 0) {
+              this.noCourse = false;
+              resp.data.data.splice(2, 1);
+              this.items = resp.data.data;
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     toAnalysis() {
-      this.$router.push({ path: "/student/studentAnalysis"});
+      this.$router.push({ path: "/student/studentAnalysis" });
     },
     submit: function() {
       //获取课程信息，进行确认
@@ -168,9 +175,9 @@ export default {
           }
         })
         .then(resp => {
-          if(resp.data.state==0){
-            alert('该课程不存在')
-          }else{
+          if (resp.data.state == 0) {
+            alert("该课程不存在");
+          } else {
             this.courseConfirm = resp.data.data;
             //this.items.push(resp.data);
             this.isConfirm = true;
@@ -179,7 +186,6 @@ export default {
         .catch(err => {
           console.log(err);
         });
-      
     },
     confirm() {
       //确认加入班级
@@ -191,28 +197,34 @@ export default {
             Authorization: "Bearer " + localStorage.getItem("token")
           },
           params: {
-            studentID: localStorage.getItem('userID'),
+            studentID: localStorage.getItem("userID"),
             courseClassID: this.courseConfirm.courseClass.id
           }
         })
         .then(resp => {
           //==============================将新获得的班级添加到当前列表
-          if(this.noCourse==true) this.noCourse=false
-          this.items.push(this.courseConfirm);
-          this.$message('添加成功');
+          if (resp.data.state === 1) {
+            this.$message("添加成功");
+            this.getCourses();
+          } else {
+            this.$message({
+              type: "warning",
+              message: "本学期你已经学习过该课程!"
+            });
+          }
         })
         .catch(err => {
           console.log(err);
         });
       this.code = "";
     },
-    courseDetail: function(courseID, classID,courseName) {
+    courseDetail: function(courseID, classID, courseName) {
       this.$router.push({
         path: "/student/courseDetail",
         query: {
           courseID: courseID,
           classID: classID,
-          courseName:courseName
+          courseName: courseName
         }
       });
     },

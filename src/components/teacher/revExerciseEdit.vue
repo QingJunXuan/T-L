@@ -475,6 +475,7 @@ export default {
           cancelDelete: false
         }
       ],
+      published: false,
       subjectNew: {},
       objectNew: {},
       importData: [],
@@ -483,13 +484,14 @@ export default {
       chapterSettings: "暂无数据",
       totalObject: 0,
       totalSubject: 0,
+      oldScore: 0,
       objectButton: true,
       subjectButton: true,
       time: "",
       dialogTableVisible: false,
       funcButton: false,
       saveButton: false,
-      publishButton: true,
+      publishButton: false,
       submitLoading: false,
       importLoading: false,
       publishLoading: false,
@@ -520,12 +522,12 @@ export default {
               let content = JSON.parse(response.bodyText);
               if (content.state === 1) {
                 this.chapterInfo = content.data;
-                if (
-                  this.chapterInfo.exerciseDeadline_2 !== undefined ||
-                  this.chapterInfo.exerciseDeadline_2 !== ""
-                ) {
+                if (this.chapterInfo.exerciseVisible_2) {
+                  this.published = true;
                   this.time = this.chapterInfo.exerciseDeadline_2;
                 }
+              } else {
+                this.$message({ type: "error", message: "没有章节信息!" });
               }
             } else {
               this.$message({ type: "error", message: "加载失败!" });
@@ -635,9 +637,15 @@ export default {
                   i++;
                 }
                 this.exercisesSub.sort(this.compare("order"));
-                if (exerciseList.state === 2) {
+                this.oldScore = this.totalObject + this.totalSubject;
+                if (exerciseList.state === 2 || exerciseList.state === 4) {
                   this.saveButton = false;
-                  this.publishButton = true;
+                  if (
+                    this.exercisesObj.length !== 0 &&
+                    this.exercisesSub.length !== 0
+                  ) {
+                    this.publishButton = true;
+                  }
                 } else {
                   this.saveButton = false;
                   this.publishButton = false;
@@ -744,9 +752,9 @@ export default {
     setDeadline() {
       if (this.totalObject + this.totalSubject === 0) {
         this.$message({
-            type: "warning",
-            message: "请添加习题!"
-          });
+          type: "warning",
+          message: "请添加习题!"
+        });
         return;
       }
       this.dialogTableVisible = true;
@@ -788,9 +796,7 @@ export default {
           }
           for (let i = index + 1; i < that.exercisesObj.length; i++) {
             that.exercisesObj[i].order--;
-            if (!that.exercisesObj[i].new) {
-              that.exercisesObj[i].edited = true;
-            }
+            that.exercisesObj[i].edited = true;
           }
           this.saveButton = true;
           this.publishButton = false;
@@ -821,12 +827,11 @@ export default {
         this.$message({ type: "warning", message: "此题无法上移" });
         return;
       }
-      if (!this.exercisesObj[index].new) {
-        this.exercisesObj[index].edited = true;
-      }
-      if (!this.exercisesObj[index - 1].new) {
-        this.exercisesObj[index - 1].edited = true;
-      }
+
+      this.exercisesObj[index].edited = true;
+
+      this.exercisesObj[index - 1].edited = true;
+
       this.exercisesObj[index].order--;
       this.exercisesObj[index - 1].order++;
       this.exercisesObj.splice(index - 1, 0, this.exercisesObj[index]);
@@ -839,12 +844,11 @@ export default {
         this.$message({ type: "warning", message: "此题无法下移" });
         return;
       }
-      if (!this.exercisesObj[index].new) {
-        this.exercisesObj[index].edited = true;
-      }
-      if (!this.exercisesObj[index + 1].new) {
-        this.exercisesObj[index + 1].edited = true;
-      }
+
+      this.exercisesObj[index].edited = true;
+
+      this.exercisesObj[index + 1].edited = true;
+
       this.exercisesObj[index].order++;
       this.exercisesObj[index + 1].order--;
       this.exercisesObj.splice(index + 2, 0, this.exercisesObj[index]);
@@ -926,9 +930,9 @@ export default {
       this.totalObject -= Number(this.exercisesObj[index].score);
       this.exercisesObj[index] = this.objDeepCopy(this.objectNew);
       this.exercisesObj[index].edit = false;
-      if (!this.exercisesObj[index].new) {
-        this.exercisesObj[index].edited = true;
-      }
+
+      this.exercisesObj[index].edited = true;
+
       if (
         this.exercisesObj[index].options.length <=
         this.exercisesObj[index].oldOptions.length
@@ -951,7 +955,7 @@ export default {
     cancelObj(index) {
       this.exercisesObj[index].edit = false;
       this.objectNew = {};
-      if (this.exercisesObj[index].new) {
+      if (!this.exercisesObj[index].edited) {
         this.exercisesObj.splice(index, 1);
       }
       this.objectButton = true;
@@ -985,12 +989,11 @@ export default {
         this.$message({ type: "warning", message: "此题无法上移" });
         return;
       }
-      if (!this.exercisesSub[index].new) {
-        this.exercisesSub[index].edited = true;
-      }
-      if (!this.exercisesSub[index - 1].new) {
-        this.exercisesSub[index - 1].edited = true;
-      }
+
+      this.exercisesSub[index].edited = true;
+
+      this.exercisesSub[index - 1].edited = true;
+
       this.exercisesSub[index].order--;
       this.exercisesSub[index - 1].order++;
       this.exercisesSub.splice(index - 1, 0, this.exercisesSub[index]);
@@ -1003,12 +1006,11 @@ export default {
         this.$message({ type: "warning", message: "此题无法下移" });
         return;
       }
-      if (!this.exercisesSub[index].new) {
-        this.exercisesSub[index].edited = true;
-      }
-      if (!this.exercisesSub[index + 1].new) {
-        this.exercisesSub[index + 1].edited = true;
-      }
+
+      this.exercisesSub[index].edited = true;
+
+      this.exercisesSub[index + 1].edited = true;
+
       this.exercisesSub[index].order++;
       this.exercisesSub[index + 1].order--;
       this.exercisesSub.splice(index + 2, 0, this.exercisesSub[index]);
@@ -1017,6 +1019,7 @@ export default {
       this.publishButton = false;
     },
     deleteSubject(index) {
+      var that = this;
       this.$confirm("确认删除该题吗?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -1031,9 +1034,7 @@ export default {
           }
           for (let i = index + 1; i < that.exercisesSub.length; i++) {
             that.exercisesSub[i].order--;
-            if (!that.exercisesSub[i].new) {
-              that.exercisesSub[i].edited = true;
-            }
+            that.exercisesSub[i].edited = true;
           }
           this.saveButton = true;
           this.publishButton = false;
@@ -1093,9 +1094,9 @@ export default {
         this.totalSubject -= Number(this.exercisesSub[index].score);
         this.exercisesSub[index] = this.objDeepCopy(this.subjectNew);
         this.exercisesSub[index].edit = false;
-        if (!this.exercisesSub[index].new) {
-          this.exercisesSub[index].edited = true;
-        }
+
+        this.exercisesSub[index].edited = true;
+
         this.subjectNew = {};
         this.totalSubject += Number(this.exercisesSub[index].score);
         this.subjectButton = true;
@@ -1109,7 +1110,7 @@ export default {
     cancelSub(index) {
       this.exercisesSub[index].edit = false;
       this.subjectNew = {};
-      if (this.exercisesSub[index].new) {
+      if (!this.exercisesSub[index].edited) {
         this.exercisesSub.splice(index, 1);
       }
       this.subjectButton = true;
@@ -1136,7 +1137,7 @@ export default {
             } else {
               this.$message({
                 type: "error",
-                message: "选项添加失败!"
+                message: "选项" + String.fromCharCode(i + 65) + "添加失败!"
               });
               return null;
             }
@@ -1144,7 +1145,7 @@ export default {
           response => {
             this.$message({
               type: "error",
-              message: "选项添加失败!"
+              message: "选项" + String.fromCharCode(i + 65) + "添加失败!"
             });
             return null;
           }
@@ -1170,7 +1171,7 @@ export default {
             } else {
               this.$message({
                 type: "error",
-                message: "选项删除失败!"
+                message: "选项" + String.fromCharCode(i + 65) + "删除失败!"
               });
               return null;
             }
@@ -1178,7 +1179,7 @@ export default {
           response => {
             this.$message({
               type: "error",
-              message: "选项删除失败!"
+              message: "选项" + String.fromCharCode(i + 65) + "删除失败!"
             });
             return null;
           }
@@ -1203,14 +1204,14 @@ export default {
             } else {
               this.$message({
                 type: "error",
-                message: "选项修改失败!"
+                message: "选项" + String.fromCharCode(i + 65) + "修改失败!"
               });
             }
           },
           response => {
             this.$message({
               type: "error",
-              message: "选项修改失败!"
+              message: "选项" + String.fromCharCode(i + 65) + "修改失败!"
             });
           }
         );
@@ -1248,11 +1249,17 @@ export default {
                 j = j + 1;
               }
             } else {
-              this.$message({ type: "error", message: "习题添加失败!" });
+              this.$message({
+                type: "error",
+                message: "习题" + this.exercisesObj[index].order + "添加失败!"
+              });
             }
           },
           response => {
-            this.$message({ type: "error", message: "习题添加失败!" });
+            this.$message({
+              type: "error",
+              message: "习题" + this.exercisesObj[index].order + "添加失败!"
+            });
           }
         );
     },
@@ -1278,11 +1285,17 @@ export default {
           response => {
             if (response.status === 200) {
             } else {
-              this.$message({ type: "error", message: "习题添加失败!" });
+              this.$message({
+                type: "error",
+                message: "习题" + this.exercisesSub[index].order + "添加失败!"
+              });
             }
           },
           response => {
-            this.$message({ type: "error", message: "习题添加失败!" });
+            this.$message({
+              type: "error",
+              message: "习题" + this.exercisesSub[index].order + "添加失败!"
+            });
           }
         );
     },
@@ -1310,11 +1323,17 @@ export default {
                 this.saveDeleteOption(index, i);
               }
             } else {
-              this.$message({ type: "error", message: "习题删除失败!" });
+              this.$message({
+                type: "error",
+                message: "习题" + this.exercisesObj[index].order + "删除失败!"
+              });
             }
           },
           response => {
-            this.$message({ type: "error", message: "习题删除失败!" });
+            this.$message({
+              type: "error",
+              message: "习题" + this.exercisesObj[index].order + "删除失败!"
+            });
           }
         );
     },
@@ -1335,11 +1354,17 @@ export default {
           response => {
             if (response.status === 200) {
             } else {
-              this.$message({ type: "error", message: "习题删除失败!" });
+              this.$message({
+                type: "error",
+                message: "习题" + this.exercisesSub[index].order + "删除失败!"
+              });
             }
           },
           response => {
-            this.$message({ type: "error", message: "习题删除失败!" });
+            this.$message({
+              type: "error",
+              message: "习题" + this.exercisesSub[index].order + "删除失败!"
+            });
           }
         );
     },
@@ -1373,11 +1398,17 @@ export default {
           response => {
             if (response.status === 200) {
             } else {
-              this.$message({ type: "error", message: "习题编辑失败!" });
+              this.$message({
+                type: "error",
+                message: "习题" + this.exercisesObj[index].order + "编辑失败!"
+              });
             }
           },
           response => {
-            this.$message({ type: "error", message: "习题编辑失败!" });
+            this.$message({
+              type: "error",
+              message: "习题" + this.exercisesObj[index].order + "编辑失败!"
+            });
           }
         );
     },
@@ -1407,16 +1438,31 @@ export default {
           response => {
             if (response.status === 200) {
             } else {
-              this.$message({ type: "error", message: "习题编辑失败!" });
+              this.$message({
+                type: "error",
+                message: "习题" + this.exercisesSub[index].order + "编辑失败!"
+              });
             }
           },
           response => {
-            this.$message({ type: "error", message: "习题编辑失败!" });
+            this.$message({
+              type: "error",
+              message: "习题" + this.exercisesSub[index].order + "编辑失败!"
+            });
           }
         );
     },
     // 保存按钮
     submitReview() {
+      if (this.published) {
+        if (this.totalSubject + this.totalObject !== this.oldScore) {
+          this.$message({
+            type: "warning",
+            message: "习题已发布过,总分应为" + this.oldScore + "分,请调整分数!"
+          });
+          return;
+        }
+      }
       this.submitLoading = true;
       // 客观题
       for (let i = 0; i < this.exercisesObj.length; i++) {
@@ -1524,7 +1570,10 @@ export default {
         deadline = this.time;
       }
       let entity = {};
-      if (this.chapterInfo.exerciseVisible_1 === null) {
+      if (
+        this.chapterInfo.exerciseVisible_1 === null ||
+        this.chapterInfo.exerciseVisible_1 === false
+      ) {
         entity = {
           id: this.chapterInfo.id,
           courseID: this.chapterInfo.courseID,
@@ -1576,6 +1625,7 @@ export default {
               });
               this.publishLoading = false;
               this.dialogTableVisible = false;
+              this.publishButton = false;
             } else {
               this.$message({ type: "error", message: "习题发布失败!" });
               this.publishLoading = false;

@@ -235,6 +235,9 @@ export default {
       //判断是否发布
       const index = this.$route.query.index;
       var catalog = store.state.catalog;
+      this.haveRev = false;
+      this.exercises = [];
+      this.totalPoint = 0;
       if(catalog.length!=0 && catalog[index].exerciseVisible_2==true)
       this.$axios
         .get("http://10.60.38.173:8765/question/view", {

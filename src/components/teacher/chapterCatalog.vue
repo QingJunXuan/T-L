@@ -79,20 +79,20 @@
                   </el-col>
                 </el-row>
                 <el-row v-else class="vertical-middle" style="height: 50px">
-                  <el-col :span="3" align="start">
+                  <el-col :span="4" align="start">
                     <el-button
                       type="text"
                       size="mini"
                       circle
-                      icon="el-icon-circle-close-outline"
-                      style="color: #fff; margin-left: 3px"
+                      icon="el-icon-circle-close"
+                      style="color: #fff;"
                       @click="cancelEdit(item1, index2, item2)"
                     ></el-button>
                   </el-col>
                   <el-col :span="5">
                     <el-input v-model="newPoint.order" size="small" style="width: 100%"></el-input>
                   </el-col>
-                  <el-col :span="13">
+                  <el-col :span="12">
                     <el-input v-model="newPoint.name" size="small" style="width: 90%"></el-input>
                   </el-col>
                   <el-col :span="3" align="start">
@@ -480,7 +480,7 @@ export default {
       this.updateChapterVisible = true;
       this.chapterForm = {
         index: this.catalog.length,
-        order: 0,
+        order: this.catalog.length + 1,
         name: "",
         predecessor: [],
         descendant: [],
@@ -490,13 +490,13 @@ export default {
     handleAddPoint(index) {
       this.catalog[index].points.push({
         name: "",
-        order: 0,
+        order: this.catalog[index].points.length,
         edit: true,
         new: true
       });
       this.newPoint = {
         name: "",
-        order: 0,
+        order: this.catalog[index].points.length,
         edit: true,
         new: true
       };

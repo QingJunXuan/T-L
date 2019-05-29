@@ -153,6 +153,9 @@ export default {
     getPre() {
       const sid = this.$route.query.spreid;
       this.sid = sid;
+      this.havePre = false;
+      this.exercises = [];
+      this.totalPoint = 0;
       this.$axios
         .get("http://10.60.38.173:8765/question/view", {
           headers: {
