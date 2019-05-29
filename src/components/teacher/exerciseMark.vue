@@ -38,7 +38,7 @@
                 <div class="answer">
                   <pre>{{studentInfo[index].answer[i].content}}</pre>
                 </div>
-                <div style="margin-top: 15px">
+                <div style="margin-top: 15px" v-show="studentInfo[index].state === 1">
                   <span class="notice">得分</span>
                   <span style="margin-left: 10px">
                     <el-select

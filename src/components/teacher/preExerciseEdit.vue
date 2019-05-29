@@ -1,21 +1,6 @@
 <template>
   <el-container class="main">
     <div align="start" style="width: 100%">
-      <el-dialog title="请选择截止时间" :visible.sync="dialogTableVisible">
-        <div align="center">
-          <el-date-picker v-model="time" type="date" size="small" :picker-options="startLimit"></el-date-picker>
-          <el-button
-            @click="publish"
-            :loading="publishLoading"
-            type="primary"
-            size="small"
-            class="confirm-button"
-          >确认</el-button>
-        </div>
-        <div
-          style="width: 70%; margin: 0 auto; font-size: 12px; margin-top: 10px"
-        >注：发布后截止日期和题目总分不可修改。</div>
-      </el-dialog>
       <el-dialog
         title="请选择习题"
         :visible.sync="selectHistoryVisible"
@@ -284,9 +269,10 @@
         >保存</el-button>
         <el-button
           type="success"
-          @click="setDeadline"
+          @click="publish"
           :disabled="funcButton"
           v-show="publishButton"
+          :loading="publishLoading"
           size="small"
         >发布</el-button>
         <el-button @click="getPreExercises" :disabled="funcButton" type="info" size="small">重置</el-button>
@@ -342,14 +328,7 @@ export default {
       submitLoading: false,
       publishLoading: false,
       importLoading: false,
-      dialogTableVisible: false,
       selectHistoryVisible: false,
-      time: "",
-      startLimit: {
-        disabledDate(time) {
-          return time.getTime() < Date.now(); //开始时间不选时，结束时间最大值小于等于当天
-        }
-      }
     };
   },
   methods: {
@@ -373,7 +352,6 @@ export default {
                 this.chapterInfo = content.data;
                 if (this.chapterInfo.exerciseVisible_1) {
                   this.published = true;
-                  this.time = this.chapterInfo.exerciseDeadline_1;
                 }
               } else {
                 this.$message({ type: "error", message: "没有章节信息!" });
@@ -459,7 +437,7 @@ export default {
                 }
                 this.exercises.sort(this.compare("order"));
                 this.oldScore = this.totalScore;
-                if (exerciseList.state === 2) {
+                if (exerciseList.state === 2 || exerciseList.state === 4) {
                   this.saveButton = false;
                   if (this.exercises.length !== 0) {
                     this.publishButton = true;
@@ -566,16 +544,6 @@ export default {
             this.$message({ type: "error", message: "加载失败!" });
           }
         );
-    },
-    setDeadline() {
-      if (this.totalScore === 0) {
-        this.$message({
-          type: "warning",
-          message: "请添加习题!"
-        });
-        return;
-      }
-      this.dialogTableVisible = true;
     },
     handleType() {
       if (this.exerciseNew.type === 1) {
@@ -1062,6 +1030,13 @@ export default {
       }, 2000);
     },
     publish() {
+      if (this.totalScore === 0) {
+        this.$message({
+          type: "warning",
+          message: "请添加习题!"
+        });
+        return;
+      }
       for (let i = 0; i < this.exercises.length; i++) {
         if (
           this.exercises[i].new ||
@@ -1078,11 +1053,9 @@ export default {
       }
       this.publishLoading = true;
       var deadline = "";
-      if (typeof this.time !== "string") {
-        deadline = this.time.Format("yyyy-MM-dd").toString();
-      } else {
-        deadline = this.time;
-      }
+      let time=new Date()
+      time.setDate(time.getDate()+365)
+      deadline = time.Format("yyyy-MM-dd").toString();
       let entity = {};
       if (
         this.chapterInfo.exerciseVisible_2 === null ||
@@ -1137,7 +1110,6 @@ export default {
                 type: "success",
                 message: "习题发布成功!"
               });
-              this.dialogTableVisible = false;
               this.publishLoading = false;
               this.publishButton = false;
             } else {

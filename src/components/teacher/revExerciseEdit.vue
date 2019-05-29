@@ -638,7 +638,7 @@ export default {
                 }
                 this.exercisesSub.sort(this.compare("order"));
                 this.oldScore = this.totalObject + this.totalSubject;
-                if (exerciseList.state === 2) {
+                if (exerciseList.state === 2 || exerciseList.state === 4) {
                   this.saveButton = false;
                   if (
                     this.exercisesObj.length !== 0 &&
@@ -1019,6 +1019,7 @@ export default {
       this.publishButton = false;
     },
     deleteSubject(index) {
+      var that = this;
       this.$confirm("确认删除该题吗?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -1033,7 +1034,6 @@ export default {
           }
           for (let i = index + 1; i < that.exercisesSub.length; i++) {
             that.exercisesSub[i].order--;
-
             that.exercisesSub[i].edited = true;
           }
           this.saveButton = true;
