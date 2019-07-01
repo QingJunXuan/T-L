@@ -1468,6 +1468,7 @@ export default {
                       Number(res.data.year[key].rate).toFixed(1)
                     );
                   }
+                  this.drawChart();
                 } else {
                   this.seriesData[seriesIndex].data = new Array(
                     this.xData.length
@@ -1480,11 +1481,12 @@ export default {
                       ).toFixed(1);
                     }
                   }
+                  this.drawChart();
                 }
               } else {
                 this.$message({ type: "warning", message: "暂无分析数据" });
+                this.drawChart();
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1519,6 +1521,7 @@ export default {
                       Number(res.data.semester[key].rate).toFixed(1)
                     );
                   }
+                  this.drawChart();
                 } else {
                   this.seriesData[seriesIndex].data = new Array(
                     this.xData.length
@@ -1531,11 +1534,13 @@ export default {
                       ).toFixed(1);
                     }
                   }
+
+                  this.drawChart();
                 }
               } else {
+                this.drawChart();
                 this.$message({ type: "warning", message: "暂无分析数据" });
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -1570,6 +1575,7 @@ export default {
                       Number(res.data.year[key].score).toFixed(2)
                     );
                   }
+                  this.drawChart();
                 } else {
                   this.seriesData[seriesIndex].data = new Array(
                     this.xData.length
@@ -1582,11 +1588,12 @@ export default {
                       ).toFixed(2);
                     }
                   }
+                  this.drawChart();
                 }
               } else {
+                this.drawChart();
                 this.$message({ type: "warning", message: "暂无分析数据" });
               }
-              this.drawChart();
             } else {
               this.drawLoading = false;
               this.$message({ type: "error", message: "加载失败!" });
@@ -1623,6 +1630,8 @@ export default {
                       Number(res.data.semester[key].score).toFixed(2)
                     );
                   }
+
+                  this.drawChart();
                 } else {
                   this.seriesData[seriesIndex].data = new Array(
                     this.xData.length
@@ -1636,11 +1645,12 @@ export default {
                       ).toFixed(2);
                     }
                   }
+                  this.drawChart();
                 }
               } else {
+                this.drawChart();
                 this.$message({ type: "warning", message: "暂无分析数据" });
               }
-              this.drawChart();
             } else {
               this.$message({ type: "error", message: "加载失败!" });
             }
@@ -2350,7 +2360,7 @@ export default {
       let myChart = this.$echarts.init(document.getElementById("myChart"));
       myChart.clear();
       this.drawCount += 1;
-      
+
       // 绘制图表
       myChart.setOption({
         color: this.colorOptions,
