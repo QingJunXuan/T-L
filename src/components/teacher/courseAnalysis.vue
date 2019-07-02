@@ -563,7 +563,7 @@ export default {
               if (courseList.state === 1) {
                 let i = 0;
                 let courseIndex = 0;
-                this.courseID = 100010; //courseList.data[i].courseInfo.courseID;
+                this.courseID = courseList.data[i].courseInfo.courseID;
                 this.courseName =
                   courseList.data[i].courseInfo.courseName +
                   "[" +
