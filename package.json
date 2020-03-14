@@ -10,7 +10,7 @@
     "build": "node --max-old-space-size=8192 build/build.js"
   },
   "dependencies": {
-    "acorn": "^6.1.1",
+    "acorn": "^6.4.1",
     "ajv": "^6.10.0",
     "axios": "^0.18.0",
     "echarts": "^4.2.1",
