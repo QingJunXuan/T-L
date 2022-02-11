@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "acorn": "^6.1.1",
-    "ajv": "^6.10.0",
+    "ajv": "^6.12.3",
     "axios": "^0.18.0",
     "echarts": "^4.2.1",
     "element-ui": "^2.7.0",
